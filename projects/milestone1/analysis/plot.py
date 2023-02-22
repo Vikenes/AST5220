@@ -4,14 +4,13 @@ import astropy.units as u
 from astropy.constants import c  
 import os 
 
+
+import warnings 
+warnings.filterwarnings("ignore", category=DeprecationWarning )
+
+### Style and formatting of plots 
 plt.style.use("seaborn")
 
-# Paths 
-here = os.path.abspath(".")
-# data_path = here + "/../output/data/"
-# latex_path = here + "/../../latex/"
-# temp_path = here + "/../../output/plots/temp/"
-# plot_path = here +"/../../output/plots/pdfs/"
 
 
 #   rc and plot params
@@ -35,6 +34,14 @@ plt.rcParams['savefig.bbox'] = 'tight'
 plt.rcParams['font.family'] = 'Times New Roman'
 
 
+
+# Paths 
+here = os.path.abspath(".")
+data_path = here + "/../out_data/"
+# latex_path = here + "/../../latex/"
+# temp_path = here + "/../../output/plots/temp/"
+fig_path = here +"/figures/"
+
 def save_push(fig, pdf_name, save=True, push=False, show=False, tight=True):
     """
     This function handles whether you want to show,
@@ -46,15 +53,13 @@ def save_push(fig, pdf_name, save=True, push=False, show=False, tight=True):
     """
     if tight:
         fig.tight_layout()
+
     pdfname = pdf_name.replace('.pdf', '').strip() + ".pdf"
-    file = plot_path + pdfname
+    file = fig_path + pdfname
+    
     if save:
         print(f'Saving plot: {file}')
         fig.savefig(file)
-        if png_duplicate:
-            png_fname = temp_path + pdfname.replace('.pdf', '.png')
-            fig.savefig(png_fname)
-            os.system(f"git add {png_fname}")
     if push:
         os.system(f"git add {file}")
         os.system("git commit -m 'upload plot'")
@@ -67,17 +72,80 @@ def save_push(fig, pdf_name, save=True, push=False, show=False, tight=True):
         plt.close()
 
 
+def set_ax_info(ax, xlabel, ylabel=False, zlabel='none', style='plain', title=None, legend=True):
+    """Write title and labels on an axis with the correct fontsizes.
+    Args:
+        ax (matplotlib.axis): the axis on which to display information
+        title (str): the desired title on the axis
+        xlabel (str): the desired lab on the x-axis
+        ylabel (str): the desired lab on the y-axis
+    """
+    ax.set_xlabel(xlabel)
+    if ylabel != False:
+        ax.set_ylabel(ylabel)
+    if zlabel != 'none':
+        ax.set_zlabel(zlabel)
+    ax.set_title(title)
+    # ax.tick_params(axis='both', which='major', labelsize=15)
+    # ax.yaxis.get_offset_text().set_fontsize(15)
+    try:
+        ax.ticklabel_format(style=style)
+    except AttributeError:
+        pass
+    if legend:
+        ax.legend()
 
-cosmology_data = np.loadtxt("../cosmology.txt", unpack=True)
-x = cosmology_data[0]
-eta = (cosmology_data[1] * u.m).to(u.Mpc)
-Hp, dHp_dx = (cosmology_data[2:4] / u.s).to(100*u.km / u.s / u.Mpc)
 
-OmegaB, OmegaCDM, OmegaLambda, OmegaR = cosmology_data[4:8]
-OmegaNu, OmegaK = cosmology_data[8:-1]
-Omega_tot = OmegaNu + OmegaB + OmegaCDM + OmegaK + OmegaLambda + OmegaR
 
-t = (cosmology_data[-1]*u.s).to(u.Gyr)
+
+# -----------------------------------------------------------------------------
+#   General plot code above
+#   XXX
+#   Specific plot code below
+# -----------------------------------------------------------------------------
+
+
+
+def load(file, folder=data_path, skiprows=0):
+    # Tired of repeating unpack, delimiter, skiprows for all... 
+    return np.loadtxt(folder + file, unpack=True, skiprows=skiprows)
+
+
+def comparison_tests(param_test=[]):
+    cosmology_data = load("cosmology.txt")
+    x = cosmology_data[0]
+    eta = (cosmology_data[1] * u.m).to(u.Mpc)
+    Hp, dHp_dx = (cosmology_data[2:4] / u.s).to(100*u.km / u.s / u.Mpc)
+
+    OmegaB, OmegaCDM, OmegaLambda, OmegaR = cosmology_data[4:8]
+    OmegaNu, OmegaK = cosmology_data[8:-1]
+    Omega_tot = OmegaNu + OmegaB + OmegaCDM + OmegaK + OmegaLambda + OmegaR
+
+    t = (cosmology_data[-1]*u.s).to(u.Gyr)
+
+
+
+def supernova_fit():
+    chi2, h, OmegaM, OmegaK = load("results_supernovafitting_1e4.txt", skiprows=1)
+    OmegaLambda = 1 - OmegaM - OmegaK 
+    chi2min = np.min(chi2)
+    chi2_1sigma = chi2 < chi2min + 3.53
+    chi2_2sigma = chi2 < chi2min + 8.02 
+    # flat = OmegaM == OmegaLambda
+    # flat = np.abs(OmegaM + OmegaLambda).argmin()
+    plt.plot(OmegaM[chi2_2sigma], OmegaLambda[chi2_2sigma],'ro',ms=3, label=r'$2\sigma$')
+    plt.plot(OmegaM[chi2_1sigma], OmegaLambda[chi2_1sigma],'bo',ms=3, label=r'$1\sigma$')
+    plt.plot(OmegaM, 1 - OmegaM, 'k--', label='flat')
+    # plt.plot(OmegaM, 1 - OmegaM, label='meh')
+
+    plt.xlim(0,1)
+    plt.ylim(0,1.5)
+    plt.legend()
+    plt.show()
+
+supernova_fit()
+
+"""
 
 def plot_Hp():
     plt.plot(x, Hp)
@@ -120,3 +188,4 @@ def plot_t():
 # plot_etaH_c()
 # plot_omegas()
 plot_t()
+"""
