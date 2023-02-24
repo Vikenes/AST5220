@@ -38,7 +38,7 @@ int main(int argc, char **argv){
   cosmo.info();
   
   // Output background evolution quantities
-  cosmo.output("out_data/cosmology_large.txt");
+  cosmo.output("out_data/cosmology.txt");
 
   // Do the supernova fits. Uncomment when you are ready to run this
   // Make sure you read the comments on the top of src/SupernovaFitting.h

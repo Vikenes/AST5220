@@ -26,6 +26,8 @@ class BackgroundCosmology{
     // Start and end of x-integration (can be changed)
     double x_start = Constants.x_start;
     double x_end   = Constants.x_end;
+    const int nx   = 1e5;
+    const int npts = 1e4;
 
     // Splines to be made
     Spline eta_of_x_spline{"eta"};
