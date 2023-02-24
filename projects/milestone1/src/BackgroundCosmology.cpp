@@ -36,13 +36,13 @@ BackgroundCosmology::BackgroundCosmology(
 //====================================================
 
 // Solve the background
-void BackgroundCosmology::solve(double x_min, double x_max, int nx){
+void BackgroundCosmology::solve(){
   // Utils::StartTiming("Eta");
   //=============================================================================
   // Solve the ODE for eta(x), and create a Spline. 
   //=============================================================================
-  // int nx = 1e5;
-  Vector x_array = Utils::linspace(x_min, x_max, nx);
+  int nx = 1e5;
+  Vector x_array = Utils::linspace(x_start, x_end, nx);
 
   // The ODE for deta/dx
   ODEFunction detadx = [&](double x, const double *eta, double *detadx){
@@ -246,9 +246,12 @@ void BackgroundCosmology::info() const{
 // Output some data to file
 //====================================================
 void BackgroundCosmology::output(const std::string filename) const{
-  const double x_min = -15.0;
+  const double x_min = -20.0;
   const double x_max =  0.0;
-  const int    n_pts =  1000;
+  const int    n_pts =  10000;
+
+  std::cout << "Writing to " << filename << ", for " 
+  << x_min << "< x < " << x_max << std::endl;
   
   Vector x_array = Utils::linspace(x_min, x_max, n_pts);
 
@@ -258,6 +261,7 @@ void BackgroundCosmology::output(const std::string filename) const{
     fp << eta_of_x(x)        << " ";
     fp << Hp_of_x(x)         << " ";
     fp << dHpdx_of_x(x)      << " ";
+    fp << ddHpddx_of_x(x)    << " ";
     fp << get_OmegaB(x)      << " ";
     fp << get_OmegaCDM(x)    << " ";
     fp << get_OmegaLambda(x) << " ";

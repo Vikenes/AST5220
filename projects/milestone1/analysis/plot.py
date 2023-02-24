@@ -60,19 +60,17 @@ def save_push(fig, pdf_name, save=True, push=False, show=False, tight=True):
     if save:
         print(f'Saving plot: {file}')
         fig.savefig(file)
+    else:
+        plt.show()
     if push:
         os.system(f"git add {file}")
         os.system("git commit -m 'upload plot'")
         os.system("git push")
-    if show:
-        plt.show()
-    if not show:
-        plt.close()
-    else:
-        plt.close()
+
+    plt.close()
 
 
-def set_ax_info(ax, xlabel, ylabel=False, zlabel='none', style='plain', title=None, legend=True):
+def set_ax_info(ax, xlabel, ylabel=False, title=None, legend=True):
     """Write title and labels on an axis with the correct fontsizes.
     Args:
         ax (matplotlib.axis): the axis on which to display information
@@ -83,15 +81,13 @@ def set_ax_info(ax, xlabel, ylabel=False, zlabel='none', style='plain', title=No
     ax.set_xlabel(xlabel)
     if ylabel != False:
         ax.set_ylabel(ylabel)
-    if zlabel != 'none':
-        ax.set_zlabel(zlabel)
     ax.set_title(title)
     # ax.tick_params(axis='both', which='major', labelsize=15)
     # ax.yaxis.get_offset_text().set_fontsize(15)
-    try:
-        ax.ticklabel_format(style=style)
-    except AttributeError:
-        pass
+    # try:
+        # ax.ticklabel_format(style=style)
+    # except AttributeError:
+        # pass
     if legend:
         ax.legend()
 
@@ -111,6 +107,45 @@ def load(file, folder=data_path, skiprows=0):
     return np.loadtxt(folder + file, unpack=True, skiprows=skiprows)
 
 
+
+def plot_single_param(x, quantity, fname, xlabel, ylabel=None, title=None, 
+                        xlim=None, ylim=None, log=True, save=True, push=False):
+
+    fig, ax = plt.subplots(figsize=(10,8))
+    ax.plot(x, quantity)
+    if xlim is not None:
+        ax.set_xlim(xlim)
+    if ylim is not None:
+        ax.set_ylim(ylim)
+
+    if log:
+        ax.set_yscale('log')
+    
+    set_ax_info(ax, xlabel, ylabel, title, legend=False)
+    
+    save_push(fig, fname, save, push)
+    
+
+def plot_omega_params(x, m, r, L, fname, xlabel=None, ylabel=None, title=None, 
+                    xlim=[-20,5], ylim=[0,1.1], save=True, push=False):
+
+    fig, ax = plt.subplots(figsize=(10,8))
+
+    ax.plot(x, m, label=r'$\Omega_\mathrm{m} = \Omega_\mathrm{b} + \Omega_\mathrm{CDM}$')
+    ax.plot(x, r, label=r'$\Omega_\mathrm{rel} = \Omega_\mathrm{r} + \Omega_\nu$')
+    ax.plot(x, L, label=r'$\Omega_\Lambda$')
+
+
+
+    if xlim is not None:
+        ax.set_xlim(xlim)
+    if ylim is not None:
+        ax.set_ylim(ylim)
+
+    set_ax_info(ax, xlabel, ylabel, title, legend=True)
+    
+    save_push(fig, fname, save, push)
+
 def comparison_tests(param_test=[]):
     cosmology_data = load("cosmology.txt")
     x = cosmology_data[0]
@@ -122,6 +157,23 @@ def comparison_tests(param_test=[]):
     Omega_tot = OmegaNu + OmegaB + OmegaCDM + OmegaK + OmegaLambda + OmegaR
 
     t = (cosmology_data[-1]*u.s).to(u.Gyr)
+
+    dhp_h = lambda w: - (1 + 3*w) / (2 * np.exp(x))
+
+    plt.plot(x, dHp_dx/Hp)
+    # plt.plot(x, dhp_h(0), '--', label='m')
+    # plt.plot(x, dhp_h(-1), '--', label=r'$\Lambda$')
+    # plt.plot(x, dhp_h(1/3), '--', label='rad')
+
+    # plt.yscale('log')
+    plt.legend()
+    # plt.xlim(-5,0.2)
+    # plt.ylim(-10,10)
+    plt.show()
+
+
+
+
 
 
 
@@ -143,7 +195,8 @@ def supernova_fit():
     plt.legend()
     plt.show()
 
-supernova_fit()
+# comparison_tests()
+# supernova_fit()
 
 """
 
@@ -189,3 +242,6 @@ def plot_t():
 # plot_omegas()
 plot_t()
 """
+
+if __name__=='__main__':
+    pass 

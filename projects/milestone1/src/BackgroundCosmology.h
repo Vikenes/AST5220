@@ -48,7 +48,7 @@ class BackgroundCosmology{
     void info() const;
 
     // Do all the solving
-    void solve(double x_min=Constants.x_start, double x_max=Constants.x_end, int nx=1e4);
+    void solve();
 
     // Output some results to file
     void output(const std::string filename) const;
