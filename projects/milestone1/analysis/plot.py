@@ -58,7 +58,7 @@ def save_push(fig, pdf_name, save=True, push=False, show=False, tight=True):
     file = fig_path + pdfname
     
     if save:
-        print(f'Saving plot: {file}')
+        print(f'Saving plot: {pdfname}')
         fig.savefig(file)
     else:
         plt.show()
@@ -108,20 +108,35 @@ def load(file, folder=data_path, skiprows=0):
 
 
 
-def plot_single_param(x, quantity, fname, xlabel, ylabel=None, title=None, 
+def plot_single_param(x, quantity, fname, mr_eq=None, mL_eq=None,
+                        xlabel=None, ylabel=None, title=None, legend=False,
                         xlim=None, ylim=None, log=True, save=True, push=False):
 
     fig, ax = plt.subplots(figsize=(10,8))
     ax.plot(x, quantity)
-    if xlim is not None:
-        ax.set_xlim(xlim)
-    if ylim is not None:
-        ax.set_ylim(ylim)
+
+    if ylim is None:
+        ymin = np.min(quantity)
+        ymax = np.max(quantity)
+    else:
+        ymin, ymax = ylim
+
+
+    if mr_eq is not None:
+        ax.vlines(mr_eq, ymin, ymax, ls='dashed',
+                    color='red', label=r'$\Omega_\mathrm{rel}=\Omega_m$')
+
+    if mL_eq is not None:
+        ax.vlines(mL_eq, ymin, ymax, ls='dashed',
+                    color='green', label=r'$\Omega_m=\Omega_\Lambda$')
+
+    ax.set_ylim(ylim)
+    ax.set_xlim(xlim)
 
     if log:
         ax.set_yscale('log')
     
-    set_ax_info(ax, xlabel, ylabel, title, legend=False)
+    set_ax_info(ax, xlabel, ylabel, title, legend=legend)
     
     save_push(fig, fname, save, push)
     
@@ -146,34 +161,73 @@ def plot_omega_params(x, m, r, L, fname, xlabel=None, ylabel=None, title=None,
     
     save_push(fig, fname, save, push)
 
-def comparison_tests(param_test=[]):
-    cosmology_data = load("cosmology.txt")
-    x = cosmology_data[0]
-    eta = (cosmology_data[1] * u.m).to(u.Mpc)
-    Hp, dHp_dx = (cosmology_data[2:4] / u.s).to(100*u.km / u.s / u.Mpc)
-
-    OmegaB, OmegaCDM, OmegaLambda, OmegaR = cosmology_data[4:8]
-    OmegaNu, OmegaK = cosmology_data[8:-1]
-    Omega_tot = OmegaNu + OmegaB + OmegaCDM + OmegaK + OmegaLambda + OmegaR
-
-    t = (cosmology_data[-1]*u.s).to(u.Gyr)
-
-    dhp_h = lambda w: - (1 + 3*w) / (2 * np.exp(x))
-
-    plt.plot(x, dHp_dx/Hp)
-    # plt.plot(x, dhp_h(0), '--', label='m')
-    # plt.plot(x, dhp_h(-1), '--', label=r'$\Lambda$')
-    # plt.plot(x, dhp_h(1/3), '--', label='rad')
-
-    # plt.yscale('log')
-    plt.legend()
-    # plt.xlim(-5,0.2)
-    # plt.ylim(-10,10)
-    plt.show()
 
 
+def compare_dH_over_H(x, dH_H, H_label, x_mr_eq, x_mL_eq, 
+                        title=None, xlim=[-20,5], save=True, push=False):
+    
+    fig, ax = plt.subplots(figsize=(12,10))
+
+    ax.plot(x, dH_H, label=H_label)
+    ax.hlines(-1, xmin=xlim[0], xmax=x_mr_eq,  ls='dashed',color='r', label=r'$\omega=1/3$')
+    ax.hlines(-1/2, xmin=x_mr_eq, xmax=x_mL_eq,ls='dashed',color='green', label=r'$\omega=0$')
+    ax.hlines(1, xmin=x_mL_eq, xmax=xlim[-1],  ls='dashed',color='orange', label=r'$\omega=-1$')
+
+    ax.set_xlim(xlim)
+
+    set_ax_info(ax, xlabel='$x$', title=title)
+    save_push(fig, 'dH_over_H.pdf', save)
 
 
+        
+def compare_ddH_over_H(x, ddH_H, H_label, x_mr_eq, x_mL_eq, 
+                        title=None, xlim=[-20,5], save=True, push=False):
+    
+    fig, ax = plt.subplots(figsize=(12,10))
+
+    ax.plot(x, ddH_H, label=H_label)
+    ax.hlines(1, xmin=xlim[0], xmax=x_mr_eq,  ls='dashed',color='r', label=r'$\omega=1/3$')
+    ax.hlines(1/4, xmin=x_mr_eq, xmax=x_mL_eq,ls='dashed',color='green', label=r'$\omega=0$')
+    ax.hlines(1, xmin=x_mL_eq, xmax=xlim[-1],  ls='dashed',color='orange', label=r'$\omega=-1$')
+
+    ax.set_xlim(xlim)
+
+    set_ax_info(ax, xlabel='$x$', title=title)
+    save_push(fig, 'ddH_over_H.pdf', save)
+
+
+def plot_t_and_eta(x, t, etac, fname, xlim=[-20,5], save=True):
+    fig, ax = plt.subplots(figsize=(8,6))
+
+    ax.set_xlim(xlim)
+    ax.plot(x, t, label=r'$t(x)$')
+    ax.plot(x, etac, label=r'$\eta(x)/c$')
+    
+    ylabel=r'Time $[\mathrm{Gyr}]$'
+    xlabel=r"$x$"
+
+
+    set_ax_info(ax, xlabel, ylabel)
+    save_push(fig, fname, save=save)
+
+
+
+def plot_dL(z_data, dL_data, dL_error, z_sim, dL_sim, save):
+    fig, ax = plt.subplots(figsize=(10,8))
+
+
+    ax.plot(z_sim, dL_sim, label='Simulation')
+    ax.errorbar(z_data, dL_data, yerr=dL_error, barsabove=True, fmt='x', 
+                capthick=1.5, capsize=5, elinewidth=2, color='r',
+                label='Data')
+
+    ax.set_xscale('log')
+    ax.set_yscale('log')
+    xlabel=r'$z$'
+    ylabel=r'$d_L(z)\:[\mathrm{Gpc}]$'
+
+    set_ax_info(ax, xlabel, ylabel, title="Supernova fit")
+    save_push(fig, "dL_z_compare.pdf", save=save)
 
 
 
