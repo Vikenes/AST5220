@@ -268,6 +268,7 @@ void BackgroundCosmology::output(const std::string filename) const{
     fp << get_OmegaR(x)      << " ";
     fp << get_OmegaNu(x)     << " ";
     fp << get_OmegaK(x)      << " ";
+    fp << get_luminosity_distance_of_x(x) << " ";
     fp <<"\n";
   };
   std::for_each(x_array.begin(), x_array.end(), print_data);

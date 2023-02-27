@@ -37,7 +37,7 @@ plt.rcParams['font.family'] = 'Times New Roman'
 
 # Paths 
 here = os.path.abspath(".")
-data_path = here + "/../out_data/"
+data_path = here + "/../data/"
 # latex_path = here + "/../../latex/"
 # temp_path = here + "/../../output/plots/temp/"
 fig_path = here +"/figures/"
@@ -212,45 +212,42 @@ def plot_t_and_eta(x, t, etac, fname, xlim=[-20,5], save=True):
 
 
 
-def plot_dL(z_data, dL_data, dL_error, z_sim, dL_sim, save):
+def plot_dL(z_data, dL_data, dL_error, z_sim, dL_sim, 
+            fname="dL_z_compare.pdf", save=True):
     fig, ax = plt.subplots(figsize=(10,8))
 
 
-    ax.plot(z_sim, dL_sim, label='Simulation')
-    ax.errorbar(z_data, dL_data, yerr=dL_error, barsabove=True, fmt='x', 
+    ax.plot(z_sim, dL_sim/z_sim, label='Simulation')
+    ax.errorbar(z_data, dL_data/z_data, yerr=dL_error/z_data, barsabove=True, fmt='x', 
                 capthick=1.5, capsize=5, elinewidth=2, color='r',
                 label='Data')
 
     ax.set_xscale('log')
     ax.set_yscale('log')
     xlabel=r'$z$'
-    ylabel=r'$d_L(z)\:[\mathrm{Gpc}]$'
+    ylabel=r'$d_L(z)/z \:[\mathrm{Gpc}]$'
 
     set_ax_info(ax, xlabel, ylabel, title="Supernova fit")
-    save_push(fig, "dL_z_compare.pdf", save=save)
+    save_push(fig, fname, save=save)
 
 
 
-def supernova_fit():
-    chi2, h, OmegaM, OmegaK = load("results_supernovafitting_1e4.txt", skiprows=1)
-    OmegaLambda = 1 - OmegaM - OmegaK 
-    chi2min = np.min(chi2)
-    chi2_1sigma = chi2 < chi2min + 3.53
-    chi2_2sigma = chi2 < chi2min + 8.02 
-    # flat = OmegaM == OmegaLambda
-    # flat = np.abs(OmegaM + OmegaLambda).argmin()
-    plt.plot(OmegaM[chi2_2sigma], OmegaLambda[chi2_2sigma],'ro',ms=3, label=r'$2\sigma$')
-    plt.plot(OmegaM[chi2_1sigma], OmegaLambda[chi2_1sigma],'bo',ms=3, label=r'$1\sigma$')
-    plt.plot(OmegaM, 1 - OmegaM, 'k--', label='flat')
-    # plt.plot(OmegaM, 1 - OmegaM, label='meh')
+def supernova_fit(OmegaM, OmegaLambda, chi2_1sigma, chi2_2sigma, fname, save=True):
 
-    plt.xlim(0,1)
-    plt.ylim(0,1.5)
-    plt.legend()
-    plt.show()
+    fig, ax = plt.subplots(figsize=(12,10))
 
-# comparison_tests()
-# supernova_fit()
+    ax.plot(OmegaM[chi2_2sigma], OmegaLambda[chi2_2sigma],'ro',ms=2)
+    ax.plot(OmegaM[chi2_1sigma], OmegaLambda[chi2_1sigma],'bo',ms=2)
+    ax.plot([], 'ro', label=r'$2\sigma$')
+    ax.plot([], 'bo', label=r'$1\sigma$')
+    omega_k_zero = np.linspace(0, 1, 20)
+    ax.plot(omega_k_zero, 1 - omega_k_zero, 'k--', label=r'$\Omega_k=0$')
+
+    ax.set_xlim(0,1)
+    ax.set_ylim(0,1.5)
+    set_ax_info(ax, xlabel=r"$\Omega_m$", ylabel=r"$\Omega_\Lambda$")
+    save_push(fig, fname, save)
+
 
 """
 
