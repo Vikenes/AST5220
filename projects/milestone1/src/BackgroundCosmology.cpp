@@ -23,8 +23,14 @@ BackgroundCosmology::BackgroundCosmology(
   // TODO: Compute OmegaR, OmegaNu, OmegaLambda, H0, ...
   //=============================================================================
   H0 = Constants.H0_over_h * h; 
-  OmegaR = M_PI*M_PI / 15.0 * pow(Constants.k_b * TCMB, 4) / (pow(Constants.hbar,3) * pow(Constants.c,5))
-           * 8.0 * M_PI * Constants.G / (3.0 * pow(H0, 2));
+  double kT = Constants.k_b * TCMB;
+
+  double hbar = Constants.hbar;
+  double c = Constants.c;
+  double hbar3_c5 = hbar*hbar*hbar * c*c*c*c*c;
+
+  OmegaR = M_PI*M_PI / 15.0 * kT*kT*kT*kT / hbar3_c5 * 8.0 * M_PI * Constants.G / (3.0 * H0*H0);
+  
   OmegaNu = Neff * 7.0 / 8.0 * pow(4.0/11.0, 4.0/3.0) * OmegaR;
   OmegaLambda = 1 - (OmegaB + OmegaCDM + OmegaK + OmegaR + OmegaNu); 
 
@@ -40,7 +46,7 @@ BackgroundCosmology::BackgroundCosmology(
 void BackgroundCosmology::solve(){
   // Utils::StartTiming("Eta");
   //=============================================================================
-  // Solve the ODE for eta(x), and create a Spline. 
+  // Solve the ODE for eta(x) and t(x), and create a Spline. 
   //=============================================================================
   Vector x_array = Utils::linspace(x_start, x_end, nx);
 
@@ -89,6 +95,39 @@ void BackgroundCosmology::solve(){
   // Utils::EndTiming("t");
 }
 
+
+// Solve the background
+void BackgroundCosmology::solve_eta(){
+  // Utils::StartTiming("Eta");
+  //=============================================================================
+  // Solve the ODE for eta(x), and create a Spline. 
+  // Use for supernova fitting, to avoid unnecessary computations of t(x).
+  //=============================================================================
+  Vector x_array = Utils::linspace(x_start, x_end, nx);
+
+  // The ODE for deta/dx
+  ODEFunction detadx = [&](double x, const double *eta, double *detadx){
+    detadx[0] = Constants.c / Hp_of_x(x);
+    return GSL_SUCCESS;
+  };
+
+  // The initial conditions for deta/dx
+  double eta_ini = Constants.c / Hp_of_x(x_start);
+  Vector eta_ic{eta_ini};
+
+  // Solve the ODE 
+  ODESolver eta_ode;
+  eta_ode.solve(detadx, x_array, eta_ic);
+
+  // Spline result 
+  auto eta_array = eta_ode.get_data_by_component(0);
+  eta_of_x_spline.create(x_array, eta_array, "Eta(x) spline");
+
+  // Utils::EndTiming("Eta");
+
+
+}
+
 //====================================================
 // Get methods
 //====================================================
@@ -105,11 +144,15 @@ double BackgroundCosmology::H_of_x(double x) const{
 
 /*Computes Hp(x)*/
 double BackgroundCosmology::Hp_of_x(double x) const{
+  // Reduce number of exp-calls.
+  // Increase efficiency for supernova fitting. 
+  double exp_of_minus_x = exp(-x); 
+  double exp_of_minus_2x = exp_of_minus_x * exp_of_minus_x;
 
-  double Hp = H0 * sqrt((OmegaB + OmegaCDM)*exp(-x) 
-                        + (OmegaR + OmegaNu) * exp(-2*x) 
+  double Hp = H0 * sqrt((OmegaB + OmegaCDM) * exp_of_minus_x 
+                        + (OmegaR + OmegaNu) * exp_of_minus_2x 
                         + OmegaK 
-                        + OmegaLambda * exp(2*x));
+                        + OmegaLambda / exp_of_minus_2x);
   return Hp;
 }
 
@@ -118,7 +161,7 @@ double BackgroundCosmology::Hp_of_x(double x) const{
 */
 double BackgroundCosmology::dHpdx_of_x(double x) const{
   // Term inside square root. 
-  double dv_sqrt_term = -(OmegaB + OmegaCDM) * exp(-x)
+  double dv_sqrt_term = -      (OmegaB + OmegaCDM) * exp(-x)
                         - 2 * (OmegaR + OmegaNu) * exp(-2*x) 
                         + 2 * OmegaLambda * exp(2*x);
 
@@ -181,7 +224,7 @@ double BackgroundCosmology::get_OmegaK(double x) const{
 
 //=============================================================================
 double BackgroundCosmology::get_luminosity_distance_of_x(double x) const{
-  double dL = get_comoving_distance_of_x(x) / exp(x);
+  double dL = get_comoving_distance_of_x(x) * exp(-x);
   return dL;
 }
 
@@ -194,7 +237,6 @@ double BackgroundCosmology::get_comoving_distance_of_x(double x) const{
   if(OmegaK > 0) return chi * std::sinh(OmegaK_factor) / OmegaK_factor;
 
   return 0.0;
-
 }
 
 double BackgroundCosmology::eta_of_x(double x) const{

@@ -113,7 +113,7 @@ void mcmc_fit_to_supernova_data(std::string supernovadata_filename, std::string 
     double param_OmegaCDM = parameters[1] - param_OmegaB; // OmegaCDM = OmegaM - OmegaB
     double param_OmegaK   = parameters[2];
     BackgroundCosmology cosmo(param_h, param_OmegaB, param_OmegaCDM, param_OmegaK, param_Neff, param_TCMB);
-    cosmo.solve();
+    cosmo.solve_eta();
     //=========================================================================================
 
     // Compute chi^2
