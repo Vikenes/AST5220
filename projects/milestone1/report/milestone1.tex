@@ -5,13 +5,15 @@ The main goal of this section is mainly concerned with using known parameter val
 
 
 \subsection{Theory}\label{M1:theory}
-The theory behind this milestone. \note{Defnie ALL parameters}
+The theory behind this milestone. \note{Define ALL parameters}
+
+\note{Neutrinos are on the loose. Catch them before it's too late.}
 
 When we don't assume $k=0$ and omit neutrino contribution, i.e. setting $\onun=0$, the Friedmann equation can be written as 
 \begin{equation}
-    H = H_0 \sqrt{(\obn + \ocdmn)a^{-3} + \ogn a^{-4} + \okn a^{-2} + \oln}, \label{M1:theory:eq:Friedmann_H_omegas}
+    H = H_0 \sqrt{\omn a^{-3} + \ogn a^{-4} + \okn a^{-2} + \oln}, \label{M1:theory:eq:Friedmann_H_omegas}
 \end{equation}
-where $H\equiv\dot{a}/a$ is the Hubble parameter. Dot denotes a derivative with respect to cosmic time, $t$. We also introduce the scaled Hubble factor, $\H\equiv aH$. Rather than working with the scale factor, $a(t)$, we will be working with the logarithm of the scale factor 
+where $H\equiv\dot{a}/a$ is the Hubble parameter. Dot denotes a derivative with respect to cosmic time, $t$. The matter component is the sum of the baryon and cold dark matter (CDM) components, $\omn=\obn+\ocdmn$. We also introduce the scaled Hubble factor, $\H\equiv aH$. Rather than working with the scale factor, $a(t)$, we will be working with the logarithm of the scale factor 
 \begin{equation} \label{M1:theory:eq:x_dx_definitions}
     x\equiv \ln a,\quad '\equiv \dv{x}. 
 \end{equation}
@@ -19,14 +21,17 @@ where $H\equiv\dot{a}/a$ is the Hubble parameter. Dot denotes a derivative with 
 %
 The resulting expression for $\Hx$ is thus  
 \begin{equation} \label{M1:theory:eq:Hp_of_x}
-    \Hx = H_0 \sqrt{(\obn + \ocdmn)e^{-x} + \ogn e^{-2x} + \okn + \oln e^{2x}}. 
+    \Hx = H_0 \sqrt{\omn e^{-x} + \ogn e^{-2x} + \okn + \oln e^{2x}}. 
 \end{equation}
 %
 %
-We will need the first and second derivative of $\Hx$. To simplify the resulting expressions, we define a function, $g(x)$, to be the derivative of the term inside the square root in Eq. \eqref{M1:theory:eq:Hp_of_x}. 
+We will need the first and second derivative of $\Hx$. To simplify the resulting expressions, we define the function, $g(x)$, as the derivative of the term inside the square root in Eq. \eqref{M1:theory:eq:Hp_of_x}, namely 
+\begin{equation}
+    g(x) \equiv -\omn e^{-x} -2\ogn e^{-2x} + 2\oln e^{2x}. \label{M1:theory:eq:g_of_x} 
+\end{equation} 
 %
+Using the chain rule, the first two derivatives of $\Hx$ can be written as 
 \begin{align} 
-    g(x) & \equiv -(\obn+\ocdmn) e^{-x} -2\ogn e^{-2x} + 2\oln e^{2x}, \label{M1:theory:eq:g_of_x} \\ 
     \dv{\H(x)}{x} &= \frac{H_0^2}{2\Hx}g(x), \label{M1:theory:eq:dHp_dx} \\
     \dv[2]{\Hx}{x} &= \frac{H_0^2}{2\Hx}\bracket{g'(x) - \frac{1}{2}\closed{\frac{H_0 g(x)}{\Hx}}^2}. \label{M1:theory:eq:ddHp_ddx}
 \end{align}
@@ -34,10 +39,9 @@ We will need the first and second derivative of $\Hx$. To simplify the resulting
 
 \begin{align}
     \ok(x) &= \frac{\okn}{\Hx^2 / H_0^2}, \\ 
-    \ocdm(x) &= \frac{\ocdmn}{e^x \Hx^2 / H_0^2}, \\ 
-    \ob(x) &= \frac{\obn}{e^x \Hx^2 / H_0^2}, \\ 
+    \om(x) &= \frac{\omn}{e^x \Hx^2 / H_0^2}, \\ 
     \og(x) &= \frac{\ogn}{e^{2x} \Hx^2 / H_0^2}, \\ 
-    \ol(x) &= \frac{\oln}{e^{-2x} \Hx^2 / H_0^2}, \\ 
+    \ol(x) &= \frac{\oln}{e^{-2x} \Hx^2 / H_0^2}, \\    
 \end{align}
 
 The density parameter of the photons today, $\ogn$, is given by 

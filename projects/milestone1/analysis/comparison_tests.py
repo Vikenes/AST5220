@@ -136,7 +136,8 @@ def luminosity_distance(save):
 
 
 def supernova_fit(save, burn=1000):
-    supernova_mcmc_results = plot.load("fit_new.txt", skiprows=1)
+    supernova_mcmc_results = plot.load("supernovafit_speed_ne4.txt", skiprows=1)
+    supernova_mcmc_results2 = plot.load("fit_new.txt", skiprows=1)
 
     chi2, h, OmegaM, OmegaK = supernova_mcmc_results[:,burn:]
     OmegaLambda = 1 - OmegaM - OmegaK 
@@ -146,12 +147,21 @@ def supernova_fit(save, burn=1000):
 
     # bins = np.linspace(65, 75, 100)
 
+    chi22, h2, OmegaM2, OmegaK2 = supernova_mcmc_results2[:,burn:]
+    # OmegaLambda = 1 - OmegaM - OmegaK 
+    chi2min2 = np.min(chi22)
+    chi2_1sigma2 = chi22 < chi2min2 + 3.53
+    # chi2_2sigma = chi2 < chi2min + 8.02
+
     # h00 = 0.67 
-    H0 = h[chi2_1sigma] * (100*u.km / u.s / u.Mpc)
+    H0 = h * (100*u.km / u.s / u.Mpc)
+    H02 = h2 * (100*u.km / u.s / u.Mpc)
     # print(H00);exit()
-    # plt.hist(H0.value, bins=100, density=True)
+    plt.hist(H0.value - H02.value, bins=100, density=True, color='k')
+    # plt.hist(H02.value, bins=100, density=True, alpha=0.4, color='red')
+
     # plt.vlines(0.67 * (100*u.km / u.s / u.Mpc).value, 0, 2.5)
-    plt.hist(OmegaK, bins=50)
+    # plt.hist(OmegaK, bins=50)
     plt.show()
     exit()
     """
@@ -177,12 +187,13 @@ def supernova_fit(save, burn=1000):
 
 
 # luminosity_distance(save)
-dH_ddH_over_H(save)
-Hp_plot(save)
-eta_plot(save)
-eta_H_plot(save)
+# exit()
+# dH_ddH_over_H(save)
+# Hp_plot(save)
+# eta_plot(save)
+# eta_H_plot(save)
 # eta_t_plot(save)
-plot_omegas(save)
+# plot_omegas(save)
 
 
-# supernova_fit(save)
+supernova_fit(save)

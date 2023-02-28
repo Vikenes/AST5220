@@ -147,7 +147,7 @@ def plot_omega_params(x, m, r, L, fname, xlabel=None, ylabel=None, title=None,
     fig, ax = plt.subplots(figsize=(10,8))
 
     ax.plot(x, m, label=r'$\Omega_\mathrm{m} = \Omega_\mathrm{b} + \Omega_\mathrm{CDM}$')
-    ax.plot(x, r, label=r'$\Omega_\mathrm{rel} = \Omega_\mathrm{r} + \Omega_\nu$')
+    ax.plot(x, r, label=r'$\Omega_\mathrm{rel} = \Omega_\gamma + \Omega_\nu$')
     ax.plot(x, L, label=r'$\Omega_\Lambda$')
 
 
