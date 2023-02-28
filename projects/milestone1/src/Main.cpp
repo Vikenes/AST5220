@@ -38,13 +38,14 @@ int main(int argc, char **argv){
   // cosmo.info();
   
   // Output background evolution quantities
-  // cosmo.output("data/cosmology_dL.txt");
+  // cosmo.output("data/cosmology.txt"); // Consistency checks and analysis  
+  // cosmo.output("data/cosmology_dL.txt"); // Comparing with supernova data 
 
   // Do the supernova fits. Uncomment when you are ready to run this
   // Make sure you read the comments on the top of src/SupernovaFitting.h
-  Utils::StartTiming("Supernova");
-  mcmc_fit_to_supernova_data("data/supernovadata.txt", "data/fit_new.txt");
-  Utils::EndTiming("Supernova"); 
+  // Utils::StartTiming("Supernova");
+  mcmc_fit_to_supernova_data("data/supernovadata.txt", "data/supernovafit.txt");
+  // Utils::EndTiming("Supernova"); 
 
   // Remove when module is completed
   return 0;
