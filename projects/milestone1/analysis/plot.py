@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import astropy.units as u 
 from astropy.constants import c  
 import os 
+from matplotlib.ticker import ScalarFormatter, FormatStrFormatter
 
 
 import warnings 
@@ -14,18 +15,19 @@ plt.style.use("seaborn")
 
 
 #   rc and plot params
-TICKLABELSIZE = 25
-LABELSIZE = 25
-LEGENDSIZE = 20
-TITLESIZE = 30
+TICKLABELSIZE = 20
+LABELSIZE     = 25
+LEGENDSIZE    = 20
+TITLESIZE     = 30
+LABELPAD      = 12
 
 #   Set rc-params
 plt.rc("legend", fontsize=LEGENDSIZE, fancybox=True, loc="best", frameon=True, edgecolor="black")
 plt.rc("font", size=25)
-plt.rc("axes", titlesize=TITLESIZE, labelsize=LABELSIZE)
+plt.rc("axes", titlesize=TITLESIZE, labelsize=LABELSIZE, labelpad=LABELPAD)
 plt.rc("xtick", labelsize=TICKLABELSIZE)
 plt.rc("ytick", labelsize=TICKLABELSIZE)
-# plt.rc("tickparams")
+plt.rc("ytick.minor", pad=10)
 plt.rc("lines", linewidth=2.5)
 plt.rc('text', usetex=True)
 # plt.rc("label", fontsize=20)
@@ -82,6 +84,7 @@ def set_ax_info(ax, xlabel, ylabel=False, title=None, legend=True):
     if ylabel != False:
         ax.set_ylabel(ylabel)
     ax.set_title(title)
+    
     # ax.tick_params(axis='both', which='major', labelsize=15)
     # ax.yaxis.get_offset_text().set_fontsize(15)
     # try:
@@ -227,7 +230,16 @@ def plot_dL(z_data, dL_data, dL_error, z_sim, dL_sim,
     xlabel=r'$z$'
     ylabel=r'$d_L(z)/z \:[\mathrm{Gpc}]$'
 
+    # for axis in [ax.xaxis, ax.yaxis]:
+
     set_ax_info(ax, xlabel, ylabel, title="Supernova fit")
+    # formatter = ScalarFormatter()
+    # formatter.set_scientific(False)
+    ax.yaxis.set_minor_formatter(ScalarFormatter())
+    # ax.yaxis.set_minor_formatter(FormatStrFormatter("%d"))
+    # ax.yaxis.set_major_formatter(ScalarFormatter())
+
+    # plt.ticklabel_format(axis='y', style='plain')
     save_push(fig, fname, save=save)
 
 

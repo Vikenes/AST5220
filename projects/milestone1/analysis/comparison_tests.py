@@ -116,6 +116,7 @@ def eta_t_plot(save):
     eta, t = load_eta_and_t()
     eta_c = (eta / c).to(u.Gyr)
 
+
     plot.plot_t_and_eta(x, t, eta_c, fname="t_and_eta_c.pdf", save=save)
 
 
@@ -132,10 +133,11 @@ def luminosity_distance(save):
     dL_sim = dL_sim[z_sim_mask]
     
 
-    plot.plot_dL(z, dL, dL_error, z_sim, dL_sim, fname="dL_z_compare_log.pdf", save=save)
+    plot.plot_dL(z, dL, dL_error, z_sim, dL_sim.value, fname="dL_z_compare_log.pdf", save=save)
 
 
-def load_supernovafit(burn=1000):
+def load_supernovafit(burn):
+    # supernova_mcmc_results = plot.load("supernovafit_h0_new.txt", skiprows=1)
     supernova_mcmc_results = plot.load("supernovafit.txt", skiprows=1)
     chi2, h, OmegaM, OmegaK = supernova_mcmc_results[:,burn:]
     return chi2, h, OmegaM, OmegaK
@@ -199,5 +201,5 @@ def supernova_fit_H0_pdf(save, burn=1000):
 
 
 # supernova_fit_omegas(save)
-supernova_fit_H0_pdf(True)
+# supernova_fit_H0_pdf(save)
 
