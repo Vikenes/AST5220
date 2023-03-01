@@ -10,39 +10,48 @@
 
 
 %=================================
+%    Avoid compiler warning  
+%==================================
+\makeatletter
+\renewcommand*\aa@pageof{, page \thepage{} of \pageref*{LastPage}}
+\makeatother
+
+
+%=================================
 %    Text commands  
 %==================================
 \renewcommand{\note}[1]{\textcolor{red}{#1}}
 
+
 %=================================
-%    Brackets and parenthesis  
+%    Math commands   
 %==================================
+
+%===== Parenthesis and brackets ==========
 \newcommand{\closed}[1]{\left( #1 \right)}
 \newcommand{\bracket}[1]{\left[ #1 \right]}
 
-%=================================
-%    Density parameters 
-%==================================
+%===== Density parameter ============
 \newcommand{\obn}{\Omega_{b0}}
 \newcommand{\omn}{\Omega_{m0}}
-\newcommand{\okn}{\Omega_{k0}}
 \newcommand{\ocdmn}{\Omega_\mathrm{CDM0}}
+\newcommand{\oradn}{\Omega_{r0}}
 \newcommand{\ogn}{\Omega_{\gamma 0}}
 \newcommand{\onun}{\Omega_{\nu 0}}
+\newcommand{\okn}{\Omega_{k0}}
 \newcommand{\oln}{\Omega_{\Lambda 0}}
 
 \newcommand{\ob}{\Omega_b}
 \newcommand{\om}{\Omega_{m}}
-\newcommand{\ok}{\Omega_{k}}
 \newcommand{\ocdm}{\Omega_\mathrm{CDM}}
+\newcommand{\orad}{\Omega_{\gamma}}
 \newcommand{\og}{\Omega_{\gamma}}
 \newcommand{\onu}{\Omega_{\nu}}
+\newcommand{\ok}{\Omega_{k}}
 \newcommand{\ol}{\Omega_{\Lambda}}
 
 
-%=================================
-%    Cosmological quantities 
-%==================================
+%=== Cosmological quantities ====
 \renewcommand{\H}{\mathcal{H}}
 \newcommand{\Hx}{\H(x)}
 
