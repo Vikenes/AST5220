@@ -121,8 +121,8 @@ def eta_t_plot(save):
 
 
 def luminosity_distance(save):
-    z, dL, dL_error = np.loadtxt("../data/supernovadata.txt", unpack=True, skiprows=1)
-    supernova_x = np.loadtxt("../data/cosmology_dL.txt", unpack=True, skiprows=1)
+    z, dL, dL_error = plot.load("supernovadata.txt", skiprows=1)
+    supernova_x     = plot.load("cosmology_dL.txt" , skiprows=1)
     x_sim_dL = supernova_x[0]
     dL_sim = (supernova_x[-1]*u.m).to(u.Gpc)
 
@@ -135,54 +135,56 @@ def luminosity_distance(save):
     plot.plot_dL(z, dL, dL_error, z_sim, dL_sim, fname="dL_z_compare_log.pdf", save=save)
 
 
-def supernova_fit(save, burn=1000):
-    supernova_mcmc_results = plot.load("supernovafit_speed_ne4.txt", skiprows=1)
-    supernova_mcmc_results2 = plot.load("fit_new.txt", skiprows=1)
-
+def load_supernovafit(burn=1000):
+    supernova_mcmc_results = plot.load("supernovafit.txt", skiprows=1)
     chi2, h, OmegaM, OmegaK = supernova_mcmc_results[:,burn:]
+    return chi2, h, OmegaM, OmegaK
+
+
+def supernova_fit_omegas(save, burn=1000):
+
+    chi2, h, OmegaM, OmegaK = load_supernovafit(burn)
     OmegaLambda = 1 - OmegaM - OmegaK 
     chi2min = np.min(chi2)
     chi2_1sigma = chi2 < chi2min + 3.53
     chi2_2sigma = chi2 < chi2min + 8.02
 
-    # bins = np.linspace(65, 75, 100)
-
-    chi22, h2, OmegaM2, OmegaK2 = supernova_mcmc_results2[:,burn:]
-    # OmegaLambda = 1 - OmegaM - OmegaK 
-    chi2min2 = np.min(chi22)
-    chi2_1sigma2 = chi22 < chi2min2 + 3.53
-    # chi2_2sigma = chi2 < chi2min + 8.02
-
-    # h00 = 0.67 
-    H0 = h * (100*u.km / u.s / u.Mpc)
-    H02 = h2 * (100*u.km / u.s / u.Mpc)
-    # print(H00);exit()
-    plt.hist(H0.value - H02.value, bins=100, density=True, color='k')
-    # plt.hist(H02.value, bins=100, density=True, alpha=0.4, color='red')
-
-    # plt.vlines(0.67 * (100*u.km / u.s / u.Mpc).value, 0, 2.5)
-    # plt.hist(OmegaK, bins=50)
-    plt.show()
-    exit()
-    """
-
-
-    s2 = np.var(OmegaLambda)
-    mu = np.mean(OmegaLambda)
-
-    plt.hist(OmegaLambda[burn:], bins=40, density=True)
-    x = np.linspace(0, 1.5, 100)
-    plt.plot(x, 1/np.sqrt(2*np.pi*s2) * np.exp(- (x-mu)**2 / (2 * s2)))
-    plt.vlines(0.685, 0, 10, color='red')
-    plt.ylim(0, 2.6)
-    plt.xlim(-0.1, 1.6)
-    plt.show()
-
-    exit()
-    """
-
-    plot.supernova_fit(OmegaM, OmegaLambda, chi2_1sigma, chi2_2sigma, 
+    plot.plot_OmegaM_OmegaLambda_plane(OmegaM, OmegaLambda, chi2_1sigma, chi2_2sigma, 
                     fname=f"mcmc_supernova_fit_Nburn{burn}.pdf", save=save)
+
+
+def supernova_fit_H0_pdf(save, burn=1000):
+    chi2, h, OmegaM, OmegaK = load_supernovafit(burn)
+
+    H0 = h * (100*u.km / u.s / u.Mpc)
+
+    H0_mean = np.mean(H0)
+    H0_std  = np.std(H0) 
+    H0_var  = np.var(H0) 
+    
+    H0_min = H0_mean - 4*H0_std 
+    H0_max = H0_mean + 4*H0_std 
+    N_bins = 100 
+    bins   = np.linspace(H0_min, H0_max, N_bins)
+
+    H0_gaussian_distr = (2*np.pi*H0_std**2)**(-1/2) * np.exp(-(bins - H0_mean)**2 / (2 * H0_var))
+
+    plot.plot_H0_posterior_pdf(H0, bins, H0_gaussian_distr,
+                                fname=f'H0_pdf_Nburn{burn}.pdf', save=save)
+
+
+    # s2 = np.var(OmegaLambda)
+    # mu = np.mean(OmegaLambda)
+
+    # plt.hist(OmegaLambda[burn:], bins=40, density=True)
+    # x = np.linspace(0, 1.5, 100)
+    # plt.plot(x, 1/np.sqrt(2*np.pi*s2) * np.exp(- (x-mu)**2 / (2 * s2)))
+    # plt.vlines(0.685, 0, 10, color='red')
+    # plt.ylim(0, 2.6)
+    # plt.xlim(-0.1, 1.6)
+    # plt.show()
+
+
 
 
 
@@ -196,4 +198,6 @@ def supernova_fit(save, burn=1000):
 # plot_omegas(save)
 
 
-supernova_fit(save)
+# supernova_fit_omegas(save)
+supernova_fit_H0_pdf(True)
+

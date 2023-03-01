@@ -232,7 +232,7 @@ def plot_dL(z_data, dL_data, dL_error, z_sim, dL_sim,
 
 
 
-def supernova_fit(OmegaM, OmegaLambda, chi2_1sigma, chi2_2sigma, fname, save=True):
+def plot_OmegaM_OmegaLambda_plane(OmegaM, OmegaLambda, chi2_1sigma, chi2_2sigma, fname, save=True):
 
     fig, ax = plt.subplots(figsize=(12,10))
 
@@ -249,50 +249,15 @@ def supernova_fit(OmegaM, OmegaLambda, chi2_1sigma, chi2_2sigma, fname, save=Tru
     save_push(fig, fname, save)
 
 
-"""
+def plot_H0_posterior_pdf(H0, bins, H0_gaussian, fname, save=True):
+    fig, ax = plt.subplots(figsize=(12,8))
 
-def plot_Hp():
-    plt.plot(x, Hp)
-    plt.xlim(-12,0)
-    plt.ylim(1e-1, 1e3)
-    plt.yscale('log')
-    plt.show()
+    ax.plot(bins, H0_gaussian, label=r"$H_0\sim \mathcal{N}(\mu,\sigma^2)$")
+    ax.hist(H0, bins=bins, density=True, edgecolor='k')
+    set_ax_info(ax, xlabel=r"$H_0\:[\mathrm{km/s/Mpc}]$")
+    save_push(fig, fname, save)
 
-def plot_eta():
-    plt.plot(x, eta)
-    # plt.xlim(-12,0)
-    # plt.ylim(1, 2e4)
-    plt.yscale('log')
-    plt.show()
 
-def plot_etaH_c():
-    # print(((eta*Hp/c).decompose())[0])
-    plt.plot(x, (eta*Hp/c).to(1))
-    plt.xlim(-12,0)
-    # plt.ylim(1, 2e4)
-    # plt.yscale('log')
-    plt.show()
-
-def plot_omegas():
-    plt.plot(x, OmegaR+OmegaNu, label=r"$\Omega_r$")
-    plt.plot(x, OmegaB+OmegaCDM, label=r"$\Omega_m=\Omega_b+\Omega_{CDM}$")
-    plt.plot(x, OmegaLambda, label=r"$\Omega_\Lambda$")
-    plt.plot(x, Omega_tot,'k--')
-    plt.legend()
-    plt.show()
-
-def plot_t():
-    plt.plot(x, t)
-    plt.yscale('log')
-    print(f't(0) = {t[-1]:.3f}')
-    plt.show()
-
-# plot_Hp()
-# plot_eta()
-# plot_etaH_c()
-# plot_omegas()
-plot_t()
-"""
 
 if __name__=='__main__':
     pass 
