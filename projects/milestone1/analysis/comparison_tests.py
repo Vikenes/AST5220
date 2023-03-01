@@ -11,6 +11,9 @@ warnings.filterwarnings("ignore", category=DeprecationWarning )
 save = False
 
 simulation_data = plot.load("cosmology.txt")
+# simulation_data = plot.load("cosmology_times.txt")
+
+
 x = simulation_data[0]
 
 
@@ -48,16 +51,19 @@ def load_omegas():
     return OmegaM, OmegaRel, OmegaLambda 
 
 
-def domination_eras():
+def domination_eras(idx=False):
     OmegaM, OmegaRel, OmegaLambda = load_omegas()
 
     matter_dom_onset_idx = np.where(OmegaM > OmegaRel+OmegaLambda)[0][0]
     Lambda_dom_onset_idx = np.where(OmegaLambda > OmegaM+OmegaRel)[0][0]
 
+
     matter_dom_onset = x[matter_dom_onset_idx]
     Lambda_dom_onset = x[Lambda_dom_onset_idx]
-
-    return matter_dom_onset, Lambda_dom_onset
+    if idx:
+        return matter_dom_onset_idx, Lambda_dom_onset_idx
+    else:
+        return matter_dom_onset, Lambda_dom_onset
 
 
 
@@ -175,6 +181,41 @@ def supernova_fit_H0_pdf(save, burn=1000):
                                 fname=f'H0_pdf_Nburn{burn}.pdf', save=save)
 
 
+def table():
+
+    z_of_x = lambda x_: np.exp(-x_) - 1 
+    mr, ml = domination_eras(idx=True)
+    eta, t = load_eta_and_t() 
+    x_today_idx = np.abs(x).argmin()
+
+    Hp, dHp_dx = load_H_parameters()[0:2]
+    a_dot_dot = (np.exp(-x) * Hp * dHp_dx).to((u.Gyr)**(-2)) 
+
+    accleration_start_idx = np.argmin(np.abs(a_dot_dot))
+
+    x_mr = x[mr]
+    x_ml = x[ml]
+    x_ac = x[accleration_start_idx]
+
+    t_mr = t[mr]
+    t_ml = t[ml]
+    t_ac = t[accleration_start_idx]
+
+    z_mr = z_of_x(x_mr)
+    z_ml = z_of_x(x_ml)
+    z_ac = z_of_x(x_ac)
+
+    t_today = t[x_today_idx]
+
+    print(f"mr: x={x_mr:.3f}, z={z_mr:.3f}, t={t_mr.to(u.yr):.3f}")
+    print(f"ml: x={x_ml:.3f}, z={z_ml:.3f}, t={t_ml:.3f}")
+    print(f"ac: x={x_ac:.3f}, z={z_ac:.3f}, t={t_ac:.3f}")
+    print(f"t toay= {t_today:.3f}")
+    print(t[x_today_idx-1:x_today_idx+2])
+
+
+
+
     # s2 = np.var(OmegaLambda)
     # mu = np.mean(OmegaLambda)
 
@@ -188,18 +229,17 @@ def supernova_fit_H0_pdf(save, burn=1000):
 
 
 
+# table()
+
+dH_ddH_over_H(save)
+Hp_plot(save)
+eta_plot(save)
+eta_H_plot(save)
+eta_t_plot(save)
+plot_omegas(save)
 
 
-# luminosity_distance(save)
-# exit()
-# dH_ddH_over_H(save)
-# Hp_plot(save)
-# eta_plot(save)
-# eta_H_plot(save)
-# eta_t_plot(save)
-# plot_omegas(save)
-
-
-# supernova_fit_omegas(save)
-# supernova_fit_H0_pdf(save)
+luminosity_distance(save)
+supernova_fit_omegas(save)
+supernova_fit_H0_pdf(save)
 
