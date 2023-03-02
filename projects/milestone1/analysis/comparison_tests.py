@@ -208,6 +208,12 @@ def table():
     z_ac = z_of_x(x_ac)
 
     t_today = t[x_today_idx]
+    print("--")
+    x_of_z = lambda z_: -np.log(z_ + 1)
+    print(1.3, x_of_z(1.3))
+    print(0.01, x_of_z(0.01))
+    print("--")
+    exit()
 
     print(f"mr: x={x_mr:.3f}, z={z_mr:.3f}, t={t_mr.to(u.yr):.3f}")
     print(f"ml: x={x_ml:.3f}, z={z_ml:.3f}, t={t_ml:.3f}")
@@ -249,7 +255,7 @@ def plot_dL_best(burn=200):
 
 # plot_dL_best()
 
-# table()
+table()
 
 # dH_ddH_over_H(save)
 # Hp_plot(save)

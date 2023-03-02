@@ -276,6 +276,7 @@ void BackgroundCosmology::info() const{
   std::cout << "OmegaK:      " << OmegaK      << "\n";
   std::cout << "OmegaNu:     " << OmegaNu     << "\n";
   std::cout << "OmegaR:      " << OmegaR      << "\n";
+  std::cout << "OmegaRad:    " << OmegaR+OmegaNu<< "\n";
   std::cout << "Neff:        " << Neff        << "\n";
   std::cout << "h:           " << h           << "\n";
   std::cout << "TCMB:        " << TCMB        << "\n";

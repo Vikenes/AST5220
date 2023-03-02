@@ -47,7 +47,8 @@ int main(int argc, char **argv){
   double OmegaCDM_est   = OmegaM_est - OmegaB;
   BackgroundCosmology bestSNfit(h_est, OmegaB, OmegaCDM_est, OmegaK_est, Neff, TCMB);
   bestSNfit.solve();
-  bestSNfit.output("data/bestfit_cosmology_dL.txt");
+  bestSNfit.info();
+  // bestSNfit.output("data/bestfit_cosmology_dL.txt");
 
   // Do the supernova fits. Uncomment when you are ready to run this
   // Make sure you read the comments on the top of src/SupernovaFitting.h
