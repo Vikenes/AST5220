@@ -48,9 +48,14 @@ extern struct ConstantsAndUnits {
   const double k_max = 0.3     / Mpc;
   
   // Min and max x-value
-  // const double x_start = -10.0;
+  // const double x_start = -10.0; // For high-res results. 
   const double x_start = log(1e-10);
   const double x_end   = 5.0;
+  
+  // For dL comparison:
+  // const double x_start = log(1e-2);
+  // const double x_end   = 0.0;
+
 
   // Include polarization and/or neutrinos?
   const bool polarization  = true;

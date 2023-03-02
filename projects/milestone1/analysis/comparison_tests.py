@@ -130,6 +130,7 @@ def eta_t_plot(save):
 def luminosity_distance(save):
     z, dL, dL_error = plot.load("supernovadata.txt", skiprows=1)
     supernova_x     = plot.load("cosmology_dL.txt" , skiprows=1)
+    # supernova_x     = plot.load("bestfit_cosmology_dL.txt" , skiprows=1)
     x_sim_dL = supernova_x[0]
     dL_sim = (supernova_x[-1]*u.m).to(u.Gpc)
 
@@ -144,14 +145,15 @@ def luminosity_distance(save):
 
 def load_supernovafit(burn):
     # supernova_mcmc_results = plot.load("supernovafit_h0_new.txt", skiprows=1)
-    supernova_mcmc_results = plot.load("supernovafit.txt", skiprows=1)
-    chi2, h, OmegaM, OmegaK = supernova_mcmc_results[:,burn:]
+    supernova_mcmc_results = plot.load("supernovafit.txt", skiprows=1+burn)
+    chi2, h, OmegaM, OmegaK = supernova_mcmc_results
     return chi2, h, OmegaM, OmegaK
 
 
 def supernova_fit_omegas(save, burn=1000):
 
     chi2, h, OmegaM, OmegaK = load_supernovafit(burn)
+   
     OmegaLambda = 1 - OmegaM - OmegaK 
     chi2min = np.min(chi2)
     chi2_1sigma = chi2 < chi2min + 3.53
@@ -228,18 +230,36 @@ def table():
     # plt.show()
 
 
+def plot_dL_best(burn=200):
+    chi2, h, OmegaM, OmegaK = load_supernovafit(burn)
+    best_fit_idx = np.argmin(chi2)
+    c2min = chi2[best_fit_idx]
+    hmin = h[best_fit_idx]
+    ommin = OmegaM[best_fit_idx]
+    okmin = OmegaK[best_fit_idx]
+
+    print("Best fit:")
+    # print("chi2     h   om  ok")
+    print(f"chi2 = {c2min:.8f}")
+    print(f"h    = {hmin :.8f}")
+    print(f"Om   = {ommin:.8f}")
+    print(f"Ok   = {okmin:.8f}")
+    Hpx = hmin*100
+    exit()
+
+# plot_dL_best()
 
 # table()
 
-dH_ddH_over_H(save)
-Hp_plot(save)
-eta_plot(save)
-eta_H_plot(save)
-eta_t_plot(save)
-plot_omegas(save)
+# dH_ddH_over_H(save)
+# Hp_plot(save)
+# eta_plot(save)
+# eta_H_plot(save)
+# eta_t_plot(save)
+# plot_omegas(save)
 
 
 luminosity_distance(save)
-supernova_fit_omegas(save)
-supernova_fit_H0_pdf(save)
+# supernova_fit_omegas(save)
+# supernova_fit_H0_pdf(save)
 
