@@ -3,10 +3,15 @@
 \usepackage{graphicx}
 \usepackage{txfonts}
 \usepackage{hyperref}
-\usepackage{natbib}
 \usepackage{physics}
 \usepackage{xcolor}
 \usepackage{amsmath}
+
+\usepackage{natbib}
+% \usepackage[square,numbers]{natbib}
+\bibpunct{(}{)}{;}{a}{}{,}      
+\setcitestyle{square,comma,numbers,compress}
+
 
 
 %=================================
@@ -44,7 +49,7 @@
 \newcommand{\ob}{\Omega_b}
 \newcommand{\om}{\Omega_{m}}
 \newcommand{\ocdm}{\Omega_\mathrm{CDM}}
-\newcommand{\orad}{\Omega_{\gamma}}
+\newcommand{\orad}{\Omega_{r}}
 \newcommand{\og}{\Omega_{\gamma}}
 \newcommand{\onu}{\Omega_{\nu}}
 \newcommand{\ok}{\Omega_{k}}
@@ -54,6 +59,14 @@
 %=== Cosmological quantities ====
 \renewcommand{\H}{\mathcal{H}}
 \newcommand{\Hx}{\H(x)}
+
+
+%==== Parameter samples =======
+\newcommand{\hest}{\hat{h}}
+\newcommand{\omest}{\hat{\Omega}_{m0}}
+\newcommand{\okest}{\hat{\Omega}_{k0}}
+\newcommand{\C}{\mathcal{C}}
+
 
 
 

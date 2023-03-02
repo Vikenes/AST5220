@@ -1,0 +1,28 @@
+
+\subsection{Implementation details}\label{M1:implementation} 
+Something about the numerical work.
+\subsubsection{Splining and data analysis \note{(Working title)}}
+
+
+\subsubsection{MCMC \note{(Working title)}}
+The supernova data we will use contains data of luminosity distance, $d_L^\mathrm{obs}(z_i)$, with associated measurement errors, $\sigma_i$, at different redshifts, $z_i$. Using these measurements, we want to constrain the three-dimensional parameter space 
+\begin{equation}
+    \mathcal{C} = \Big\{ \hest,\: \omest,\: \okest \Big\}, \label{eq:M1:implementations:supernova_parameter_space}
+\end{equation}  
+where the hat is used to distinguish them from the fiducial values. \note{Fiducial?}  
+
+We will assume that the measurements at different redshifts are normal distributed and uncorrelated. The likelihood function is then given by $L\propto e^{-\chi^2/2}$, where 
+\begin{equation}
+    \chi^2(\C) = \sum_{i=1}^N \frac{[d_L(z_i, \C) - d_L^\mathrm{obs}(z_i)]^2}{\sigma_i^2}, \label{eq:M1:implementations:chi2_supernova_data}
+\end{equation}
+is the function we want to minimize. \note{Little h needs to be defined.} To do this, we will sample parameter values randomly by a MCMC process. The parameter space we will explore is limited to  
+\begin{equation} \label{eq:M1:implementations:supernova_parameter_ranges}
+    \begin{split}
+        0.5 < \hest < 1.5, \\
+        0 < \omest < 1, \\
+        -1 < \okest < 1.
+    \end{split}
+\end{equation}   
+To generate a new sample, we update each parameter by generating a random number $P\sim\mathcal{N}(0,1)$, and multiplying it by a step size. We will use step sizes of $\Delta \hest = 0.007,\,\Delta \omest=0.05,\,\Delta\okest=0.05$. To determine whether a new configuration should be included in the sample we use the Metropolis algorithm, where we always accept a state if it yields a lower value of $\chi^2$ compared to the previous state that was accepted. If the new value of $\chi^2$ is greater than the old one, we accept it if the ratio of the likelihood functions $L(\chi^2_\mathrm{new})/L(\chi^2_\mathrm{old})>p$, where $p\sim\mathcal{U}(0,1)$. We continue drawing samples until we get a total of $\hat{n}=10^4$ samples. For the samples generated, we omit the first $1000$ samples of the chain from our analysis.   
+
+\note{Explain: $\obn=0.05$, splining, etc...}
