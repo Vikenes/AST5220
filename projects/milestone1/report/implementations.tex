@@ -5,7 +5,7 @@ Something about the numerical work.
 
 
 \subsubsection{MCMC \note{(Working title)}}
-The supernova data we will use contains data of luminosity distance, $d_L^\mathrm{obs}(z_i)$, with associated measurement errors, $\sigma_i$, at different redshifts, $z_i$. Using these measurements, we want to constrain the three-dimensional parameter space 
+The supernova data we will use contains $N=31$ data points of luminosity distance, $d_L^\mathrm{obs}(z_i)$, with associated measurement errors, $\sigma_i$, at different redshifts, $z_i\in[0.01,\,1.30]$. Using these measurements, we want to constrain the three-dimensional parameter space 
 \begin{equation}
     \mathcal{C} = \Big\{ \hest,\: \omest,\: \okest \Big\}, \label{eq:M1:implementations:supernova_parameter_space}
 \end{equation}  
@@ -24,5 +24,11 @@ is the function we want to minimize. \note{Little h needs to be defined.} To do 
     \end{split}
 \end{equation}   
 To generate a new sample, we update each parameter by generating a random number $P\sim\mathcal{N}(0,1)$, and multiplying it by a step size. We will use step sizes of $\Delta \hest = 0.007,\,\Delta \omest=0.05,\,\Delta\okest=0.05$. To determine whether a new configuration should be included in the sample we use the Metropolis algorithm, where we always accept a state if it yields a lower value of $\chi^2$ compared to the previous state that was accepted. If the new value of $\chi^2$ is greater than the old one, we accept it if the ratio of the likelihood functions $L(\chi^2_\mathrm{new})/L(\chi^2_\mathrm{old})>p$, where $p\sim\mathcal{U}(0,1)$. We continue drawing samples until we get a total of $\hat{n}=10^4$ samples. For the samples generated, we omit the first $1000$ samples of the chain from our analysis.   
+
+With our generated samples, we can use the best fit, $\chi^2_\mathrm{min}$, to find the $1\sigma$ and $2\sigma$ confidence regions. For the $\chi^2$ distribution with $3$ parameters, these regions are given by $\chi^2 - \chi^2_\mathrm{min}<3.53$ and $\chi^2 - \chi^2_\mathrm{min}<8.02$, respectively. We will plot the $1\sigma$ and $2\sigma$ constraint in the $(\omn,\oln)$ plane. Since $\oradn<10^{-4}$, $\oln$ can be approximated well by $\oln=1-\omn$. After that we will plot the posterior probability distribution function (PDF) for $H_0$. 
+
+To compare our fit with the Planck data, we will plot $d_L^\mathrm{obs}(z_i)$ together with $d_L^\mathrm{fit}(z)$ and $d_L^\mathrm{Planck}(z)$. \note{Mention that we use the new parameters to recompute shit.}
+
+
 
 \note{Explain: $\obn=0.05$, splining, etc...}
