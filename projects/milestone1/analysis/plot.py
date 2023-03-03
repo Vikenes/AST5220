@@ -166,20 +166,26 @@ def plot_omega_params(x, m, r, L, fname, xlabel=None, ylabel=None, title=None,
 
 
 
-def compare_dH_over_H(x, dH_H, H_label, x_mr_eq, x_mL_eq, 
-                        title=None, xlim=[-20,5], save=True, push=False):
+def compare_dH_and_ddH_over_H(x, dH_over_H, ddH_over_H, dH_label, ddH_label, x_mr_eq, x_mL_eq, 
+                        title=None, xlim=[-15,5], save=True, push=False):
     
-    fig, ax = plt.subplots(figsize=(12,10))
+    fig, ax = plt.subplots(figsize=(10,8))
 
-    ax.plot(x, dH_H, label=H_label)
+    ax.plot(x, dH_over_H, color='blue', label=dH_label)
+    ax.plot(x, ddH_over_H, color='k', label=ddH_label)
+
     ax.hlines(-1, xmin=xlim[0], xmax=x_mr_eq,  ls='dashed',color='r', label=r'$\omega=1/3$')
     ax.hlines(-1/2, xmin=x_mr_eq, xmax=x_mL_eq,ls='dashed',color='green', label=r'$\omega=0$')
     ax.hlines(1, xmin=x_mL_eq, xmax=xlim[-1],  ls='dashed',color='orange', label=r'$\omega=-1$')
 
+    ax.hlines(1, xmin=xlim[0], xmax=x_mr_eq,  ls='dashed',color='r')#, label=r'$\omega=1/3$')
+    ax.hlines(1/4, xmin=x_mr_eq, xmax=x_mL_eq,ls='dashed',color='green')#, label=r'$\omega=0$')
+    ax.hlines(1, xmin=x_mL_eq, xmax=xlim[-1],  ls='dashed',color='orange')#, label=r'$\omega=-1$')
+
     ax.set_xlim(xlim)
 
     set_ax_info(ax, xlabel='$x$', title=title)
-    save_push(fig, 'dH_over_H.pdf', save)
+    save_push(fig, 'dH_and_ddH_over_H.pdf', save)
 
 
         

@@ -20,7 +20,6 @@ x = simulation_data[0]
 
 def load_H_parameters(convert_units=True):
 
-    H_units = 100*u.km / u.s / u.Mpc 
     H_params = simulation_data[1:4] / u.s 
 
     if convert_units: 
@@ -78,7 +77,7 @@ def Hp_plot(save):
 
 def eta_plot(save):
     eta = load_eta_and_t()[0]
-    title = r'$\eta(x)\: ( \mathrm{Mpc} ) $'
+    title = r'$\eta(x)\: [\mathrm{Mpc}]$'
 
     plot.plot_single_param(x, eta, "compare_eta.pdf", xlabel=r"x", 
                             xlim=[-12,0], ylim=[1e0, 2e4], 
@@ -110,12 +109,10 @@ def plot_omegas(save):
 def dH_ddH_over_H(save):
     Hp, dHp, ddHp = load_H_parameters()
     dH_label = r"$\frac{1}{\mathcal{H}(x)} \frac{\mathrm{d} \mathcal{H}(x)}{\mathrm{d}x}$"
+    ddH_label = r"$\frac{1}{\mathcal{H}(x)} \frac{\mathrm{d}^2 \mathcal{H}(x)}{\mathrm{d}x^2}$"
     m_dom, L_dom = domination_eras()
 
-    plot.compare_dH_over_H(x, dHp/Hp, dH_label, m_dom, L_dom, title='tbd', save=save)
-
-    ddH_label = r"$\frac{1}{\mathcal{H}(x)} \frac{\mathrm{d}^2 \mathcal{H}(x)}{\mathrm{d}x^2}$"
-    plot.compare_ddH_over_H(x, ddHp/Hp, ddH_label, m_dom, L_dom, title='tbd', save=save)
+    plot.compare_dH_and_ddH_over_H(x, dHp/Hp, ddHp/Hp, dH_label, ddH_label, m_dom, L_dom, title='tbd', save=save)
 
 
 def eta_t_plot(save):
@@ -255,9 +252,9 @@ def plot_dL_best(burn=200):
 
 # plot_dL_best()
 
-table()
+# table()
 
-# dH_ddH_over_H(save)
+dH_ddH_over_H(True)
 # Hp_plot(save)
 # eta_plot(save)
 # eta_H_plot(save)
@@ -265,7 +262,7 @@ table()
 # plot_omegas(save)
 
 
-luminosity_distance(save)
+# luminosity_distance(save)
 # supernova_fit_omegas(save)
 # supernova_fit_H0_pdf(save)
 
