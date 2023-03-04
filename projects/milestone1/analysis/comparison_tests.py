@@ -5,17 +5,17 @@ from astropy.constants import c
 import os 
 import plot
 
+
 import warnings 
 warnings.filterwarnings("ignore", category=DeprecationWarning )
 
 save = False
 
-simulation_data = plot.load("cosmology.txt")
+simulation_data = plot.load("cosmology.txt") # (np.log(1e-10), 5)
 # simulation_data = plot.load("cosmology_times.txt")
 
 
 x = simulation_data[0]
-
 
 
 def load_H_parameters(convert_units=True):
@@ -47,57 +47,92 @@ def load_omegas():
 
     OmegaM = OmegaB + OmegaCDM
     OmegaRel = OmegaR + OmegaNu 
+
     return OmegaM, OmegaRel, OmegaLambda 
 
 
-def domination_eras(idx=False):
+def equality_times(idx=False):
     OmegaM, OmegaRel, OmegaLambda = load_omegas()
 
-    matter_dom_onset_idx = np.where(OmegaM > OmegaRel+OmegaLambda)[0][0]
-    Lambda_dom_onset_idx = np.where(OmegaLambda > OmegaM+OmegaRel)[0][0]
+    Rad_dom_end = np.where(OmegaRel < OmegaM+OmegaLambda)[0][0]
+    Lambda_dom_onset = np.where(OmegaLambda > OmegaM+OmegaRel)[0][0]
 
+    MR_eq_idx = np.abs(OmegaRel[:Rad_dom_end+1] - OmegaM[:Rad_dom_end+1]).argmin() 
+    ML_eq_idx = np.abs(OmegaM[MR_eq_idx:Lambda_dom_onset+1] - OmegaLambda[MR_eq_idx:Lambda_dom_onset+1]).argmin()
+    ML_eq_idx += MR_eq_idx 
 
-    matter_dom_onset = x[matter_dom_onset_idx]
-    Lambda_dom_onset = x[Lambda_dom_onset_idx]
+        
     if idx:
-        return matter_dom_onset_idx, Lambda_dom_onset_idx
+        return MR_eq_idx, ML_eq_idx
     else:
-        return matter_dom_onset, Lambda_dom_onset
+        return x[MR_eq_idx], x[ML_eq_idx]
+
+def acceleration_onset(idx=False):
+
+    Hp, dHp_dx = load_H_parameters()[0:2]
+    a_dot_dot = (np.exp(-x) * Hp * dHp_dx).to((u.Gyr)**(-2)) 
+
+    accleration_onset_idx = np.argmin(np.abs(a_dot_dot))
+    if idx:
+        return accleration_onset_idx
+    else:
+        return x[accleration_onset_idx]
+
+
+def z_of_x(x_):
+    return np.exp(-x_) - 1 
+
+def radiation_matter_equality(idx=False):
+    OmegaM, OmegaRel, OmegaLambda = load_omegas()
+    matter_dom_onset_idx = np.where(OmegaM > OmegaRel+OmegaLambda)[0][0]
 
 
 
 def Hp_plot(save):
+    ### OK ### 
     Hp = load_H_parameters()[0]
-    title = r'$\mathcal{H}(x)\: \Big( \frac{100\,\mathrm{km/s}}{\mathrm{Mpc}} \Big) $'
-    plot.plot_single_param(x, Hp, "compare_Hp.pdf", xlabel=r"x", 
-                            xlim=[-12,0], ylim=[1e-1, 1e3], 
-                            title=title, save=save)
+    ylabel = r'$\mathcal{H}\: \left[ \frac{100\,\mathrm{km/s}}{\mathrm{Mpc}} \right] $'
+
+    mr_eq, mL_eq = equality_times()
+    
+    plot.plot_single_param(x, Hp, "compare_Hp.pdf", 
+                            mr_eq=mr_eq, mL_eq=mL_eq, acc=acceleration_onset(),
+                            xlabel=r"$x$", ylabel=ylabel, 
+                            xlim=[-16,3], ylim=[1e-1, 1e4], 
+                            legend=True, legendloc='lower left', save=save)
 
 
 
 def eta_plot(save):
+    ### OK ### 
     eta = load_eta_and_t()[0]
-    title = r'$\eta(x)\: [\mathrm{Mpc}]$'
-
-    plot.plot_single_param(x, eta, "compare_eta.pdf", xlabel=r"x", 
-                            xlim=[-12,0], ylim=[1e0, 2e4], 
-                            title=title, save=save)
+    ylabel = r'$\eta\:\:[\mathrm{Mpc}]$'
+    mr_eq, mL_eq = equality_times()
+    plot.plot_single_param(x, eta, "compare_eta.pdf", 
+                            xlabel=r"x", ylabel=ylabel, 
+                            xlim=[-15,5], ylim=[0.1, 5e5],
+                            mr_eq=mr_eq, mL_eq=mL_eq, log=False,
+                            legend=True, save=save)
 
 
 def eta_H_plot(save):
+    ### OK ### 
     Hp = load_H_parameters()[0]
     eta = load_eta_and_t()[0]
-    title = r'$\eta(x) \mathcal{H}(x) / c $'
+    ylabel = r'$\eta \mathcal{H} / c $'
 
     eta_Hp_over_c = (eta*Hp/c).to(1)
-    mr_eq, mL_eq = domination_eras()
+    mr_eq, mL_eq = equality_times()
     plot.plot_single_param(x, eta_Hp_over_c, "compare_eta_H_over_c.pdf", 
                             mr_eq=mr_eq, mL_eq=mL_eq, legend=True,
-                            xlabel=r"x", xlim=[-20,1], ylim=[0.75, 3], 
-                            log=False, title=title, save=save)
+                            xlabel=r"x", ylabel=ylabel, 
+                            xlim=[-16,2], ylim=[0.75, 4], 
+                            yticks=[1,2,3,4],
+                            log=False, save=save)
 
 
 def plot_omegas(save):
+    ### OK ### 
     OmegaM, OmegaRel, OmegaLambda = load_omegas()
     title = r"$\Omega_i(x)$"
 
@@ -107,37 +142,64 @@ def plot_omegas(save):
 
 
 def dH_ddH_over_H(save):
+    ### OK ### 
     Hp, dHp, ddHp = load_H_parameters()
-    dH_label = r"$\frac{1}{\mathcal{H}(x)} \frac{\mathrm{d} \mathcal{H}(x)}{\mathrm{d}x}$"
-    ddH_label = r"$\frac{1}{\mathcal{H}(x)} \frac{\mathrm{d}^2 \mathcal{H}(x)}{\mathrm{d}x^2}$"
-    m_dom, L_dom = domination_eras()
+    m_dom, L_dom = equality_times()
 
-    plot.compare_dH_and_ddH_over_H(x, dHp/Hp, ddHp/Hp, dH_label, ddH_label, m_dom, L_dom, title='tbd', save=save)
+    # dH_label = r"$\frac{1}{\mathcal{H}} \frac{\mathrm{d} \mathcal{H}}{\mathrm{d}x}$"
+    # ddH_label = r"$\frac{1}{\mathcal{H}} \frac{\mathrm{d}^2 \mathcal{H}}{\mathrm{d}x^2}$"
+    dH_label = r"$\frac{\mathcal{H}'(x)}{\mathcal{H}(x)}$"
+    ddH_label = r"$\frac{\mathcal{H}''(x)}{\mathcal{H}(x)}$"
+
+
+    plot.compare_dH_and_ddH_over_H(x, dHp/Hp, ddHp/Hp, dH_label, ddH_label, m_dom, L_dom, 
+                                   title=None, save=save)
 
 
 def eta_t_plot(save):
+    ### OK ### 
     eta, t = load_eta_and_t()
     eta_c = (eta / c).to(u.Gyr)
 
+    mr_eq, mL_eq = equality_times()
+    acc = acceleration_onset()
 
-    plot.plot_t_and_eta(x, t, eta_c, fname="t_and_eta_c.pdf", save=save)
+    plot.plot_t_and_eta(x, t, eta_c, fname="t_and_eta_c.pdf", mr_eq=mr_eq, mL_eq=mL_eq, acc=None, save=save)
 
 
+def luminosity_distance(data):
+    
+    x_sim =  data[0]
+    dL_sim   = (data[-1]*u.m).to(u.Gpc)
 
-def luminosity_distance(save):
-    z, dL, dL_error = plot.load("supernovadata.txt", skiprows=1)
-    supernova_x     = plot.load("cosmology_dL.txt" , skiprows=1)
-    # supernova_x     = plot.load("bestfit_cosmology_dL.txt" , skiprows=1)
-    x_sim_dL = supernova_x[0]
-    dL_sim = (supernova_x[-1]*u.m).to(u.Gpc)
-
-    z_sim = np.exp(-x_sim_dL) - 1 
+    z_sim = z_of_x(x_sim) 
     z_sim_mask = (z_sim <= 1.31) & (z_sim >= 0.005)
     z_sim = z_sim[z_sim_mask]
+
     dL_sim = dL_sim[z_sim_mask]
     
+    return z_sim, dL_sim 
 
-    plot.plot_dL(z, dL, dL_error, z_sim, dL_sim.value, fname="dL_z_compare_log.pdf", save=save)
+
+def plot_dL(save, plot_fit=False):
+    z, dL, dL_error = plot.load("supernovadata.txt", skiprows=1)
+    planck_data     = plot.load("cosmology_dL.txt" , skiprows=1)
+    fit_data        = plot.load("bestfit_cosmology_dL.txt" , skiprows=1)
+
+    z_planck, dL_planck = luminosity_distance(planck_data)
+    z_fit, dL_fit = luminosity_distance(fit_data)
+
+    data    = [z,        dL, dL_error]
+    planck  = [z_planck, dL_planck.value]
+    fit     = [z_fit,    dL_fit.value]
+
+
+    if plot_fit:
+        plot.plot_dL(data, planck, fit, fname="dL_z_compare_fitted.pdf", save=save)
+    else:
+        plot.plot_dL(data, planck, fname='dL_z_compare_planck.pdf', save=save)
+
+
 
 
 def load_supernovafit(burn):
@@ -156,7 +218,7 @@ def supernova_fit_omegas(save, burn=1000):
     chi2_1sigma = chi2 < chi2min + 3.53
     chi2_2sigma = chi2 < chi2min + 8.02
 
-    plot.plot_OmegaM_OmegaLambda_plane(OmegaM, OmegaLambda, chi2_1sigma, chi2_2sigma, 
+    plot.plot_OmegaM_OmegaLambda_plane(OmegaM, OmegaLambda, chi2_1sigma, chi2_2sigma, chi2_min=np.argmin(chi2),
                     fname=f"mcmc_supernova_fit_Nburn{burn}.pdf", save=save)
 
 
@@ -168,6 +230,10 @@ def supernova_fit_H0_pdf(save, burn=1000):
     H0_mean = np.mean(H0)
     H0_std  = np.std(H0) 
     H0_var  = np.var(H0) 
+
+    print(f"H0 mean: {H0_mean:.5f}")
+    print(f"H0 std : {H0_std:.5f}")
+
     
     H0_min = H0_mean - 4*H0_std 
     H0_max = H0_mean + 4*H0_std 
@@ -182,55 +248,44 @@ def supernova_fit_H0_pdf(save, burn=1000):
 
 def table():
 
-    z_of_x = lambda x_: np.exp(-x_) - 1 
-    mr, ml = domination_eras(idx=True)
-    eta, t = load_eta_and_t() 
+    MR_eq_idx, ML_eq_idx = equality_times(idx=True)
+    acc_onset_idx = acceleration_onset(idx=True)
     x_today_idx = np.abs(x).argmin()
 
+    eta, t = load_eta_and_t() 
+
     Hp, dHp_dx = load_H_parameters()[0:2]
-    a_dot_dot = (np.exp(-x) * Hp * dHp_dx).to((u.Gyr)**(-2)) 
 
-    accleration_start_idx = np.argmin(np.abs(a_dot_dot))
 
-    x_mr = x[mr]
-    x_ml = x[ml]
-    x_ac = x[accleration_start_idx]
 
-    t_mr = t[mr]
-    t_ml = t[ml]
-    t_ac = t[accleration_start_idx]
+    x_mr = x[MR_eq_idx]
+    x_ml = x[ML_eq_idx]
+    x_ac = x[acc_onset_idx]
+
+    t_mr = t[MR_eq_idx]
+    t_ml = t[ML_eq_idx]
+    t_ac = t[acc_onset_idx]
 
     z_mr = z_of_x(x_mr)
     z_ml = z_of_x(x_ml)
     z_ac = z_of_x(x_ac)
 
     t_today = t[x_today_idx]
-    print("--")
-    x_of_z = lambda z_: -np.log(z_ + 1)
-    print(1.3, x_of_z(1.3))
-    print(0.01, x_of_z(0.01))
-    print("--")
-    exit()
+    eta_over_c_today = (eta[x_today_idx] / c).to(u.Gyr) 
 
-    print(f"mr: x={x_mr:.3f}, z={z_mr:.3f}, t={t_mr.to(u.yr):.3f}")
+    print(f"mr: x={x_mr:.3f}, z={z_mr:.3f}, t={t_mr.to(u.Gyr):.3e}")
     print(f"ml: x={x_ml:.3f}, z={z_ml:.3f}, t={t_ml:.3f}")
     print(f"ac: x={x_ac:.3f}, z={z_ac:.3f}, t={t_ac:.3f}")
     print(f"t toay= {t_today:.3f}")
     print(t[x_today_idx-1:x_today_idx+2])
 
+    mr_eq = [x_mr, z_mr, t_mr.to(u.yr).value]
+    ml_eq = [x_ml, z_ml, t_ml.value]
+    acc   = [x_ac, z_ac, t_ac.value]
+    print('making table')
+    exit()
+    plot.time_table(mr_eq, ml_eq, acc, t_today, eta_over_c_today, show=True, save=True)
 
-
-
-    # s2 = np.var(OmegaLambda)
-    # mu = np.mean(OmegaLambda)
-
-    # plt.hist(OmegaLambda[burn:], bins=40, density=True)
-    # x = np.linspace(0, 1.5, 100)
-    # plt.plot(x, 1/np.sqrt(2*np.pi*s2) * np.exp(- (x-mu)**2 / (2 * s2)))
-    # plt.vlines(0.685, 0, 10, color='red')
-    # plt.ylim(0, 2.6)
-    # plt.xlim(-0.1, 1.6)
-    # plt.show()
 
 
 def plot_dL_best(burn=200):
@@ -251,18 +306,21 @@ def plot_dL_best(burn=200):
     exit()
 
 # plot_dL_best()
+table()
 
-# table()
+# save=True
 
-dH_ddH_over_H(True)
+# dH_ddH_over_H(save)
 # Hp_plot(save)
 # eta_plot(save)
 # eta_H_plot(save)
 # eta_t_plot(save)
+
 # plot_omegas(save)
 
+# plot_dL(save)
+# plot_dL(save, True)
 
-# luminosity_distance(save)
 # supernova_fit_omegas(save)
 # supernova_fit_H0_pdf(save)
 
