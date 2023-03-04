@@ -12,7 +12,7 @@
 \bibpunct{(}{)}{;}{a}{}{,}      
 \setcitestyle{square,comma,numbers,compress}
 
-
+\usepackage{booktabs}
 
 %=================================
 %    Avoid compiler warning  
@@ -21,6 +21,11 @@
 \renewcommand*\aa@pageof{, page \thepage{} of \pageref*{LastPage}}
 \makeatother
 
+
+%=================================
+%    Label commands  
+%==================================
+\newcommand{\figref}[1]{Fig. \ref{#1}}
 
 %=================================
 %    Text commands  
@@ -35,6 +40,9 @@
 %===== Parenthesis and brackets ==========
 \newcommand{\closed}[1]{\left( #1 \right)}
 \newcommand{\bracket}[1]{\left[ #1 \right]}
+
+%===== Formatting ============
+\newcommand{\unit}[1]{\,[\mathrm{#1}]}
 
 %===== Density parameter ============
 \newcommand{\obn}{\Omega_{b0}}
@@ -70,6 +78,7 @@
 
 
 
-
+% \newcommand{\midrule}{\colrule}
+% \newcommand{\bottomrule}{\botrule}
 
 \graphicspath{{../milestone1/analysis/figures/}{../milestone2/analysis/figures/}}
