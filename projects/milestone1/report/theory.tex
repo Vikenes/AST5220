@@ -2,19 +2,21 @@
 
 \subsection{Theory}\label{ssec:M1:theory}
 
-\subsubsection{Density parameters}
+\subsubsection{Density parameters and Hubble factor}
 
-The Friedmann equation can be written in terms of density parameters, $\Omega_i\equiv \rho_i/\rho_c$, where $\rho_c\equiv 3H^2/8\pi G$ is the critical density. We will assume that a given species, $i$, of the Universe can be described by a constant equation of state, $w_i \equiv P_i/\rho_i$, where $P_i$ denotes the pressure. The density of a species evolves as \cite[Eq. (2.72)]{Dodelson}
+The Friedmann equation can be written in terms of density parameters, $\Omega_i\equiv \rho_i/\rho_c$, where $\rho_c\equiv 3H^2/8\pi G$ is the critical density. The density of a given species, $i$, evolves as \cite[Eq. (2.61)]{Dodelson}
 \begin{equation}
-    \rho_i(t)\propto a(t)^{-3(1+w_i)}. \label{eq:M1:theory:rho_i_eos_dependence}
+    \rho_i(t)\propto a(t)^{-3(1+w_i)}, \label{eq:M1:theory:rho_i_eos_dependence}
 \end{equation}
+where we have assumed that the equation of state (EoS) parameter, $w_i \equiv P_i/\rho_i$ \cite[Eq. 2.60]{Dodelson}, is constant. $P_i$ denotes the pressure of the species. 
 %
-%
-For baryons and cold dark matter (CDM), we have $w=0$, for photons and massless neutrinos \note{(Write massless assumption)} we have $w=1/3$ and for a cosmological constant we have $w=-1$. Including a curvature parameter $\Omega_k$, with $w=-1/3$, the Friedmann Equation can be written as \cite[Eq. (3.14)]{Dodelson}  
+We will limit ourselves to consider three types of species in this report: matter, radiation and dark energy. We will only consider baryons and cold dark matter (CDM) for the matter component, which we express as $\omn=\obn+\ocdmn$. The subscript $0$ is used to refer to today's value. The radiation component we consider is $\oradn=\ogn+\onun$, corresponding to photons and neutrinos, respectively. For the dark energy, we only have the cosmological constant $\oln$.   
+
+Matter, radiation and dark energy have densities evolving according to Eq. \eqref{eq:M1:theory:rho_i_eos_dependence} with $w_i=0,\,1/3$ and $-1$, respectively. Neutrinos having $w=1/3$ only holds since we will assume that the neutrinos are massless. Curvature can be described by $w_i=-1/3$, with $\okn\equiv -kc^2/H_0^2$. The parameter $k$ represents the curvature of the Universe, where $k=0$ corresponds to a flat Universe. With these parameters, the Friedmann Equation can be written as \cite[Eq. (3.14)]{Dodelson}  
 \begin{equation}
     H = H_0 \sqrt{\omn a^{-3} + \oradn a^{-4} + \okn a^{-2} + \oln}, \label{eq:M1:theory:Friedmann_H_omegas}
 \end{equation}
-where $H\equiv\dot{a}/a$ is the Hubble parameter, with the dot denoting a derivative with respect to cosmic time, $t$. For brevity, we have expressed the density parameters of matter and radiation as $\omn=\obn+\ocdmn$ and $\oradn=\ogn+\onun$, respectively. A subscript $0$ indicates the value of a given parameter today, at $a=1$. The density parameters of radiation follow from the CMB temperature, and are given by 
+where $H\equiv\dot{a}/a$ is the Hubble parameter, with the dot denoting a derivative with respect to cosmic time, $t$. For the radiation, $\ogn$ and $\onun$ follow from the temperature of the CMB today, $\tcmb$, and the effective number of massless neutrinos, $N_\mathrm{eff}$. They are given by 
 \begin{align}
     \ogn &= 2 \cdot \frac{\pi^2}{30} \frac{(k_b T_\mathrm{CMB0})^4}{\hbar^3 c^5} \cdot \frac{8\pi G}{3H_0^2}, \label{eq:M1:theory:omega_gamma0_T} \\
     \onun &= N_\mathrm{eff} \cdot \frac{7}{8} \cdot \closed{\frac{4}{11}}^{4/3} \ogn. \label{eq:M1:theory:omega_nu0_T}
@@ -37,22 +39,23 @@ The resulting expression for $\Hx$ is thus
     \Hx = H_0 \sqrt{\omn e^{-x} + \oradn e^{-2x} + \okn + \oln e^{2x}}. 
 \end{equation}
 %
-Once $\Hx$ is known, we can compute the value of the density parameters at any given $x$, with 
+This form of the Hubble factor is the one we will focus on for the majority of this report. In terms of $\Hx$, the value of the density parameters can be obtained at any given $x$, with 
 \begin{align}
     \ok(x) &= \frac{\okn}{\Hx^2 / H_0^2}, \label{eq:M1:theory:omega_k_of_x}\\ 
     \om(x) &= \frac{\omn}{e^x \Hx^2 / H_0^2}, \label{eq:M1:theory:omega_m_of_x}\\ 
     \orad(x) &= \frac{\oradn}{e^{2x} \Hx^2 / H_0^2}, \label{eq:M1:theory:omega_r_of_x}\\ 
     \ol(x) &= \frac{\oln}{e^{-2x} \Hx^2 / H_0^2}, \label{eq:M1:theory:omega_L_of_x}    
 \end{align}
-With these expressions, we can determine when the Universe was dominated by an equal amount of matter and radiation, and by an equal amount of matter and cosmological constant. These can be found numerically, as $\orad(x)=\om(x)$ and $\om(x)=\ol(x)$, respectively. Another time of interest is the onset of acceleration, defined as the time when $\ddot{a}=0$. In terms of $\H$ and $x$, this corresponds to 
+
+From these expressions, we can identify the epochs during which the Universe was dominated by an equal amount of matter and radiation, and by an equal amount of matter and dark energy. These epochs are defined by the time when $\om=\orad$ and $\om=\ol$, respectively, and are a valuable asset towards understanding the physics governing the evolution of the Universe. Another time of interest is the onset of acceleration, defined as the time when $\ddot{a}=0$. In terms of $\H$ and $x$, this corresponds to 
 \begin{equation}
     \ddot{a} = \dv{x}{t}\dv{\dot{a}}{x}=\dv{\ln a}{t}\dv{\Hx}{x} = e^{-x} \Hx \dv{\Hx}{x}. \label{eq:M1:theory:acceleration_onset}
 \end{equation}   
-In Sect. \ref{subsec:M1:theory:analytical_solutions} we will derive an expression for the derivative of $\H$ that we can use. 
+In Sect. \ref{subsec:M1:theory:analytical_solutions} we will derive an expression for $\H'(x)$. 
 
 %======= eta and t ===============
-\subsubsection{Conformal time}
-Having considered the main quantities governing the evolution of the background cosmology in terms of $x$, we want to relate these quantities to some time variables. One of the main time variables we will be working with is the conformal time, $\eta$, which is a measure of the distance light have been able to travel since $t=0$, where $t$ is the cosmic time. Using its definition in terms of $t$ \cite[Eq. (2.90)]{Dodelson}, we can express it in terms of $x$ as 
+\subsubsection{Conformal time} \label{sssec:M1:theory:conformal_time}
+We now want to relate the Hubble factor to some time variables. The main one we will consider is the conformal time, $\eta$. It is a measure of the distance light has been able to travel since $t=0$, where $t$ is the cosmic time. Using its definition in terms of $t$ \cite[Eq. (2.90)]{Dodelson}, we can express it in terms of $x$ as 
 \begin{equation}
     \eta = \int_0^t \frac{c \, \dd t'}{a(t')} = \int_{-\infty}^{x'} \frac{c\,\dd x'}{\H(x')}. \label{eq:M1:theory:eta_of_x_integral_expression}
 \end{equation}
@@ -67,11 +70,9 @@ The initial condition we have is $\eta(-\infty)=0$. Noting from Eq. \eqref{eq:M1
     \eta(x_\mathrm{start}) \approx \int_{-\infty}^{x_\mathrm{start}} \frac{c\,\dd x'}{H_0\sqrt{\oradn}} e^{x'} = \frac{c}{\H(x_\mathrm{start})}. \label{eq:M1:theory:eta_of_xstart_analytical_approximation}
 \end{align} 
 %
-\note{Move sentence below to check section.} 
-From this, we also get a way of checking that our solution is reasonable, by checking if $\eta(c)\Hx/c=1$ at low $x$.    
-% 
+Note that $\eta(x)\Hx/c\to 1$ at low $x$, which provides a natural way of validating our implementation.    
 
-In addition to $\eta$, we also want to know the value of $t$ at different points in the Universe's evolution. By definition, $H=\dot{a}/a$, and from the chain rule we obtain a differential equation for $t(x)$ which we can solve numerically, 
+For the cosmic time, $t$, starting from $H=\dot{a}/a$ and applying the chain rule yields the desired differential equation for $t(x)$, which we will solve numerically, 
 \begin{equation}
     \dv{t}{x} = \frac{1}{H(x)}. \label{eq:M1:theory:cosmic_time_ODE}
 \end{equation}
@@ -87,64 +88,60 @@ Comparing with Eq. \eqref{eq:M1:theory:eta_of_xstart_analytical_approximation}, 
 
 %============== Supernova fitting =================
 \subsubsection{Distance measures} 
-\note{Rewrite this, express with x.}
-
-For the supernova fitting, we will need a measure of the luminosity distance, $d_L$, defined as 
-%
+The supernova data we will study has distances measured in terms of luminosity distance, $d_L$. Expressing it in terms of the angular distance, $d_A=ar$, it becomes 
 \begin{equation}
-    d_L(a) = \frac{d_A}{a^2} = \frac{r}{a}, \label{eq:m1:theory:dL_of_a_general expression}
+    d_L(a) = \frac{d_A}{a^2} = \frac{r}{a} \implies d_L(x)=e^{-x}r. \label{eq:m1:theory:dL_of_a_general expression}
 \end{equation} 
-where $d_A=ar$ is the angular distance of the source at a distance $r$ away from us. Photons move on $0$-geodesics, and from the line-element in spherical coordinates,
+Here, $r$ represents the radial coordinate of the emitted photon. To get an expression for $r$, we consider a photon's line-element in spherical coordinates,
 \begin{equation}
-    ds^2 = -c^2 dt^2 + a^2 \closed{\frac{dr^2}{1-kr^2} + r^2 d\theta^2 + r^2 \sin^2\theta d\phi^2}, \label{eq:M1:theory:FLRW_general_nonflat_spherical}
+    ds^2 = -c^2 dt^2 + a^2 \closed{\frac{dr^2}{1-kr^2} + r^2 d\theta^2 + r^2 \sin^2\theta d\phi^2}. \label{eq:M1:theory:FLRW_general_nonflat_spherical}
 \end{equation} 
-we get the co-moving distance by integrating the line element of radially moving photons. For a photon emitted at, $(t,r)$, reaching an observer at $(t_0, 0)$, we get 
+For photons travelling radially towards us, we have $\dd \theta=\dd\phi=0$. Since $ds^2=0$ for photons, integrating the line-element of a photon emitted at, $(t,r)$, reaching an observer at $(t_0, 0)$, yields 
 \begin{equation}
     \int_0^r \frac{\dd r'}{\sqrt{1-k r'}} = \int_t^{t_0} \frac{c\,\dd t}{a}. \label{eq:M1:theory:comoving_distance_integral_expression}
 \end{equation} 
-\note{(Define $\okn=-kc^2/H_0^2$)}
 %
-
-The RHS is the co-moving distance, $\chi$, which in terms of conformal time is given as  
+The RHS of Eq. \eqref{eq:M1:theory:comoving_distance_integral_expression} is known as the co-moving distance, $\chi$, which in terms of conformal time is given as  
 \begin{equation}
     \chi = \int_t^{t_0} \frac{c\,\dd t}{a} = \int_x^0 \frac{c\,\dd x'}{\H(x')} = \eta(0) - \eta(x). \label{eq:M1:theory:chi_eta0_minus_eta_of_x}
 \end{equation}
 %
-Solving Eq. \eqref{eq:M1:theory:comoving_distance_integral_expression} with respect to $r$, we get (\note{check punctuation after cases})
+Solving Eq. \eqref{eq:M1:theory:comoving_distance_integral_expression} with respect to $r$, we get
 \begin{equation}
     r = \begin{cases}
-        \chi\cdot \frac{\sin\closed{\sqrt{\abs{\okn}} H_0 \chi / c}}{\closed{\sqrt{\abs{\okn}} H_0 \chi / c}},\quad &\okn < 0 \\ 
-        \chi,\quad &\okn=0 \\ 
-        \chi\cdot \frac{\sinh\closed{\sqrt{\abs{\okn}} H_0 \chi / c}}{\closed{\sqrt{\abs{\okn}} H_0 \chi / c}},\quad &\okn > 0
+        \chi\cdot \frac{\sin\closed{\sqrt{\abs{\okn}} H_0 \chi / c}}{\closed{\sqrt{\abs{\okn}} H_0 \chi / c}},\quad &\okn < 0, \\ 
+        \chi,\quad &\okn=0, \\ 
+        \chi\cdot \frac{\sinh\closed{\sqrt{\abs{\okn}} H_0 \chi / c}}{\closed{\sqrt{\abs{\okn}} H_0 \chi / c}},\quad &\okn > 0.
     \end{cases}
 \end{equation} 
+Eq. \eqref{eq:m1:theory:dL_of_a_general expression} can now be used to compute $d_L$, and the expression to use depends on the curvature.     
 
 
 %======= Sanity checks ===========
-\subsubsection{Analytical solutions (Working title)} \label{subsec:M1:theory:analytical_solutions}
-In order to test our solutions we will need the first and second derivative of $\Hx$. To simplify the resulting expressions, we define the function, $g(x)$, as the derivative of the term inside the square root in Eq. \eqref{eq:M1:theory:Hp_of_x}, namely 
+\subsubsection{Analytical solutions} \label{subsec:M1:theory:analytical_solutions}
+In \secref{sssec:M1:theory:conformal_time} we discussed how $\eta(x)$ can be used to test our implementation in the radiation dominating era. To test our solutions in other regimes, we will need the first and second derivative of $\Hx$. To simplify the resulting expressions, we define the function, $g(x)$, as the derivative of the term inside the square root in Eq. \eqref{eq:M1:theory:Hp_of_x}, namely 
 \begin{equation}
     g(x) \equiv -\omn e^{-x} -2\oradn e^{-2x} + 2\oln e^{2x}. \label{eq:M1:theory:g_of_x} 
 \end{equation} 
 %
-The first two derivatives of $\Hx$ are   
+The first two derivatives of $\Hx$ are easily seen to be   
 \begin{align} 
     \dv{\H(x)}{x} &= \frac{H_0^2}{2\Hx}g(x), \label{eq:M1:theory:dHp_dx} \\
     \dv[2]{\Hx}{x} &= \frac{H_0^2}{2\Hx}\bracket{g'(x) - \frac{1}{2}\closed{\frac{H_0 g(x)}{\Hx}}^2}. \label{eq:M1:theory:ddHp_ddx}
 \end{align}
 %
 
-Now we will consider the situation where the Universe is dominated by a single fluid with a constant equation of state parameter, $w$. The density of that fluid evolves according to \eqref{eq:M1:theory:rho_i_eos_dependence}, which we express in terms of the Hubble parameter, 
+Now we will consider the situation where the Universe is dominated by a single fluid with a constant EoS parameter, $w$. In that case we have $H(t)^2 \propto \rho_i(t)^2$ \cite[Eq. (3.13)]{Dodelson}. Using Eq. \eqref{eq:M1:theory:rho_i_eos_dependence}, the Hubble parameter expressed in terms of $w_i$ becomes  
 \begin{equation}
     H(t)^2 \propto a^{-3(1+w)}\implies \Hx = c_1 e^{-\frac{3}{2}(1+w)x}, \label{eq:M1:theory:Hx_eos_wi}
 \end{equation}
-where $c_1$ is some constant. Now we obtain an analytical expression for $\H'(x)/\Hx$ in terms of $w$ only, as other factors cancel out. Using that $w=1/3,\,0,\,-1$ for radiation, matter and the cosmological constant, we get   
+where $c_1$ is some constant. The reason for doing this, is that both $c_1$ and the exponential factor drops out when we consider $\H'(x)/\Hx$ and $\H''(x)/\Hx$. For different values of $w_i$, $\H'(x)/\Hx$ becomes    
 \begin{equation} \label{eq:M1:theory:dH_dx_over_H_w}
     \frac{1}{\Hx}\dv{\H}{x} = - \frac{1+3w}{2} = 
     \begin{cases}
-        -1,\quad & w=1/3 \\ 
-        -1/2, \quad & w=0 \\ 
-        1, \quad & w=-1
+        -1,\quad & w=1/3, \\ 
+        -1/2, \quad & w=0, \\ 
+        1, \quad & w=-1.
     \end{cases} 
 \end{equation}  
 %
@@ -158,4 +155,4 @@ Similarly, the expression for $\H''(x)/\Hx$ becomes
     \end{cases}
 \end{equation}
 %  
-Equations \eqref{eq:M1:theory:dH_dx_over_H_w} and \eqref{eq:M1:theory:ddH_ddx_over_H_w} offer a means to evaluate the accuracy of our numerical solution. By computing the values of $\H$, $\H'$, and $\H''$, we can examine whether these quantities exhibit the expected behaviour in regimes where a single component dominates the Universe. This allows us to assess the validity of our model and ensure that it is consistent with the underlying physical principles.
+Equations \eqref{eq:M1:theory:dH_dx_over_H_w} and \eqref{eq:M1:theory:ddH_ddx_over_H_w} offer a means to evaluate the accuracy of our numerical solution at different regimes. Each density parameter evolve differently with $x$, as seen from Eqs. \eqref{eq:M1:theory:omega_k_of_x}-\eqref{eq:M1:theory:omega_L_of_x}. Certain ranges of $x$-values will therefore closely resemble a Universe that is dominated by a single fluid. By computing $\H$, $\H'$, and $\H''$, we can examine whether these quantities exhibit the expected behaviour. This allows us to assess the validity of our model and ensure that it is consistent with the underlying physical principles.
