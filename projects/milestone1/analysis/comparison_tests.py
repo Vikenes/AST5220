@@ -11,11 +11,17 @@ warnings.filterwarnings("ignore", category=DeprecationWarning )
 
 save = False
 
-simulation_data = plot.load("cosmology.txt") # (np.log(1e-10), 5)
-# simulation_data = plot.load("cosmology_times.txt")
+def data(fname="cosmology.txt"):
+    # simulation_data = plot.load("cosmology.txt") # (np.log(1e-10), 5)
+    # simulation_data = plot.load("cosmology_times.txt")
+    global simulation_data
+    global x 
+    simulation_data = plot.load(fname)
+    x = simulation_data[0]
 
-
-x = simulation_data[0]
+data()
+print(x[0], x[-1])
+# x = simulation_data[0]
 
 
 def load_H_parameters(convert_units=True):
@@ -94,6 +100,8 @@ def Hp_plot(save):
     ylabel = r'$\mathcal{H}\: \left[ \frac{100\,\mathrm{km/s}}{\mathrm{Mpc}} \right] $'
 
     mr_eq, mL_eq = equality_times()
+    print(x[0])
+    exit()
     
     plot.plot_single_param(x, Hp, "compare_Hp.pdf", 
                             mr_eq=mr_eq, mL_eq=mL_eq, acc=acceleration_onset(),
@@ -247,7 +255,7 @@ def supernova_fit_H0_pdf(save, burn=1000):
 
 
 def table():
-
+    data("cosmology_times.txt")
     MR_eq_idx, ML_eq_idx = equality_times(idx=True)
     acc_onset_idx = acceleration_onset(idx=True)
     x_today_idx = np.abs(x).argmin()
@@ -273,40 +281,28 @@ def table():
     t_today = t[x_today_idx]
     eta_over_c_today = (eta[x_today_idx] / c).to(u.Gyr) 
 
-    print(f"mr: x={x_mr:.3f}, z={z_mr:.3f}, t={t_mr.to(u.Gyr):.3e}")
-    print(f"ml: x={x_ml:.3f}, z={z_ml:.3f}, t={t_ml:.3f}")
+    print(f"mr: x={x_mr:.3f}, z={z_mr:.3f}, t={t_mr.to(u.Gyr)/10**(-5):.3f}")
     print(f"ac: x={x_ac:.3f}, z={z_ac:.3f}, t={t_ac:.3f}")
-    print(f"t toay= {t_today:.3f}")
-    print(t[x_today_idx-1:x_today_idx+2])
+    print(f"ml: x={x_ml:.3f}, z={z_ml:.3f}, t={t_ml:.3f}")
+    print(f"t today= {t_today:.3f}")
+    print(f"eta0   = {eta_over_c_today:.3f}")
 
-    mr_eq = [x_mr, z_mr, t_mr.to(u.yr).value]
+    # print(t[x_today_idx-1:x_today_idx+2])
+
+    mr_eq = [x_mr, z_mr, t_mr.to(u.Gyr).value]
     ml_eq = [x_ml, z_ml, t_ml.value]
     acc   = [x_ac, z_ac, t_ac.value]
-    print('making table')
-    exit()
-    plot.time_table(mr_eq, ml_eq, acc, t_today, eta_over_c_today, show=True, save=True)
+    print(x[0], x[-1])
+
+    # print('making table')
+    # plot.time_table(mr_eq, ml_eq, acc, t_today, eta_over_c_today, show=True, save=False)
+
+    data()
 
 
-
-def plot_dL_best(burn=200):
-    chi2, h, OmegaM, OmegaK = load_supernovafit(burn)
-    best_fit_idx = np.argmin(chi2)
-    c2min = chi2[best_fit_idx]
-    hmin = h[best_fit_idx]
-    ommin = OmegaM[best_fit_idx]
-    okmin = OmegaK[best_fit_idx]
-
-    print("Best fit:")
-    # print("chi2     h   om  ok")
-    print(f"chi2 = {c2min:.8f}")
-    print(f"h    = {hmin :.8f}")
-    print(f"Om   = {ommin:.8f}")
-    print(f"Ok   = {okmin:.8f}")
-    Hpx = hmin*100
-    exit()
 
 # plot_dL_best()
-table()
+# table()
 
 # save=True
 

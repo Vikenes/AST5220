@@ -1,15 +1,24 @@
 
-\subsection{Implementation details}\label{M1:implementation} 
+\subsection{Implementation details}\label{ssec:M1:implementations} 
 Something about the numerical work.
-\subsubsection{Splining and data analysis \note{(Working title)}}
-When working 
 
-\subsubsection{MCMC \note{(Working title)}}
-The supernova data we will use contains $N=31$ data points of luminosity distance, $d_L^\mathrm{obs}(z_i)$, with associated measurement errors, $\sigma_i$, at different redshifts, $z_i\in[0.01,\,1.30]$. Using these measurements, we want to constrain the three-dimensional parameter space 
+\subsubsection{Actual computations \note{(Working title)}}
+The cosmological parameters we use assume $\okn=0$. In \secref{sssec:M1:implementations:supernova_fitting} we discuss how we will use supernova data to estimate a value for $\okn$. We therefore implement all functions in \secref{ssec:M1:theory} in their full form, and set $\okn=0$ for the fiducial simulations.  
+
+\subsubsection{Splining and data analysis \note{(Working title)}}
+To solve the differential equations for $\eta$ and $t$ (Eq. \eqref{eq:M1:theory:eta_ODE} and \eqref{eq:M1:theory:cosmic_time_ODE}) we use the \texttt{C++} library \texttt{GSL} \cite{gough2009gnu}, and use their Runge-Kutta4 solver. From the solution we create a spline of the results for the given $x$ domain we have considered. 
+
+We will consider three different configurations for $x$-values. For the initial testing, we will use $x_i\in[\ln(10^{-10}),\,5]$. For the supernova data, we will use $x_i\in[\ln 10^{-2},\,0]$. When we want to estimate important times during the cosmic evolution, we will consider $x_i\in[-10,\,1]$. In all cases, we use $N_x=10^5$ number of points.  
+
+\note{Make new simulations...} 
+
+
+\subsubsection{MCMC \note{(Working title)}}\label{sssec:M1:implementations:supernova_fitting}
+The supernova data we will use contains $N=31$ data points of luminosity distance, $d_L^\mathrm{obs}(z_i)$, with associated measurement errors, $\sigma_i$, at different redshifts, $z_i\in[0.01,\,1.30]$. This approximately corresponds to $x_i\in[-9.95\cdot 10^{-3},\,-0.833]$. Using these measurements, we want to constrain the three-dimensional parameter space 
 \begin{equation}
     \mathcal{C} = \Big\{ \hest,\: \omest,\: \okest \Big\}, \label{eq:M1:implementations:supernova_parameter_space}
 \end{equation}  
-where the hat is used to distinguish them from the fiducial values. \note{Fiducial?}  
+where the hat is used to distinguish them from the fiducial values. \note{Fiducial?}. We use $\obn=0.05$ for this analysis, so $\omest$ enters via $\ocdmn=\omest-\obn$. Additionally, the neutrinos are not relevant in the regime we consider here, so we also set $N_\mathrm{eff}=0$.  
 
 We will assume that the measurements at different redshifts are normal distributed and uncorrelated. The likelihood function is then given by $L\propto e^{-\chi^2/2}$, where 
 \begin{equation}
@@ -27,8 +36,7 @@ To generate a new sample, we update each parameter by generating a random number
 
 With our generated samples, we can use the best fit, $\chi^2_\mathrm{min}$, to find the $1\sigma$ and $2\sigma$ confidence regions. For the $\chi^2$ distribution with $3$ parameters, these regions are given by $\chi^2 - \chi^2_\mathrm{min}<3.53$ and $\chi^2 - \chi^2_\mathrm{min}<8.02$, respectively. We will plot the $1\sigma$ and $2\sigma$ constraint in the $(\omn,\oln)$ plane. Since $\oradn<10^{-4}$, $\oln$ can be approximated well by $\oln=1-\omn$. After that we will plot the posterior probability distribution function (PDF) for $H_0$. 
 
-To compare our fit with the Planck data, we will plot $d_L^\mathrm{obs}(z_i)$ together with $d_L^\mathrm{fit}(z)$ and $d_L^\mathrm{Planck}(z)$. We do this by computing the background with $h,\,\omn,\,\okn$ replaced with the values of $\hest,\,\omest,\,okest$ corresponding to $\chi^2_\mathrm{min}$.     
+To compare our fit with the Planck data, we will plot $d_L^\mathrm{obs}(z_i)$ together with $d_L^\mathrm{fit}(z)$ and $d_L^\mathrm{Planck}(z)$. We do this by computing the background with $h,\,\omn,\,\okn$ replaced with the values of $\hest,\,\omest,\,\okest$ corresponding to $\chi^2_\mathrm{min}$.     
 
 
 
-\note{Explain: $\obn=0.05$, splining, etc...}

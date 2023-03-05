@@ -352,11 +352,11 @@ def time_table(mr_eq, ml_eq, acc_onset, t0, eta0, save=False, show=False):
 
     df = pd.DataFrame(data, index=None)
     if save:
-        fname = latex_path+"time_values.tex"
-        df.style.format("{:.2f}", subset=column_names).hide(axis="index").to_latex(buf=fname, hrules=True)
+        fname = latex_path+"time_valuesDONTOVERWRITE.tex"
+        df.style.format("{:.3f}", subset=column_names).hide(axis="index").to_latex(buf=fname, hrules=True)
 
     if show:
-        df.style.format("{:.2f}", subset=column_names).hide(axis="index")
+        df.style.format("{:.3f}", subset=column_names).hide(axis="index")
         print(df.to_string())
 
 

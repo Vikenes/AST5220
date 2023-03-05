@@ -62,7 +62,7 @@ A plot showing the luminosity distance as a function of redshift is shown in \fi
 
 The $1\sigma$ and $2\sigma$ confidence regions in the $\ol-\om$ plane is shown in \figref{fig:M1:oM_oL_plane}. In the figure we have also indicated the parameter configuration for a flat Universe. A majority of the configurations seem to favour a non-flat Universe, but rather an \note{open} Universe, with $\okn\approx 0.0674$.     
 \begin{figure}[ht!]
-    \includegraphics[width=\linewidth]{mcmc_supernova_fit_Nburn1000.pdf}
+    \includegraphics[width=\linewidth]{mcmc_supernova_fit_Nburn1000_TEMP.png}
     \caption{plane}
     \label{fig:M1:oM_oL_plane}
 \end{figure}
@@ -75,7 +75,7 @@ The posterior PDF of $H_0$ is shown in \figref{fig:M1:H0_posterior_pdf}, where w
 \end{figure}
 
 
-With the fitted parameters, we can solve the background cosmology once again, and compute the resulting luminosity distance  
+With the fitted parameters, we can solve the background cosmology once again, and compute the resulting luminosity distance. The result is shown in \figref{fig:M1:dL_of_z_data_vs_bestfit}, where the previous result from \figref{fig:M1:dL_of_z_data_vs_Planck} is included for comparison purposes. The simulation with the best fit parameters yields a luminosity distance function that is much more consistent with data. However, there is still some discrepancy at lower redshift. \note{Comment about background cosmology and distances?}   
 \begin{figure}[ht!]
     \includegraphics[width=\linewidth]{dL_z_compare_fitted.pdf}
     \caption{dlz}
@@ -89,6 +89,10 @@ With the fitted parameters, we can solve the background cosmology once again, an
 \end{figure}
 
 
-
-% \input{tables/time_values.tex}
-\input{../milestone1/report/tables/time_values.tex}
+There are three important periods we have discussed, the times of matter-radiation equality, acceleration onset and matter-dark energy equality. The times when these incidents occur are listed in table \ref{tab:M1:times}, in terms of $x$, redshift $z$ and cosmic time $t$. We also include the age of the Universe today, $t_0\equiv t(x=0)$, and the conformal time today, $\eta_0/c$. 
+\begin{table*}[ht!]
+    \raggedright
+    \input{../milestone1/report/tables/time_values.tex}
+    \label{tab:M1:times}
+    \caption{Important times during the evolution of the Universe, expressed in terms of $x$, redshift and cosmic time. In the last two rows we also present today's time values}
+\end{table*}
