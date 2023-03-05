@@ -9,9 +9,6 @@ import pandas as pd
 import warnings 
 warnings.filterwarnings("ignore", category=DeprecationWarning )
 
-### Style and formatting of plots 
-# plt.style.use("seaborn")
-
 
 
 #   rc and plot params
@@ -332,12 +329,15 @@ def plot_H0_posterior_pdf(H0, bins, H0_gaussian, fname, save=True):
 
 
 def time_table(mr_eq, ml_eq, acc_onset, t0, eta0, save=False, show=False):
-    # T, E, E2, absM, M2, N = load(filename)
+    """
+    Complete mess...
+    """
+
+
 
     eta_col_name = r"$\eta_0 / c\: [\mathrm{Gyr}]$"
     t0_col_name = r"$t_0\:[\mathrm{Gyr}]$"
     column_names = [r"$\Omega_m=\Omega_r$", r"$\Omega_m=\Omega_\Lambda$", r"Acceleration onset", t0_col_name, eta_col_name]
-    # data = np.asarray([mr, absm_avg, Cv, chi])
 
     row_labels = np.asarray([r"$x$", r"$z$", r"$t$"])
     data = {

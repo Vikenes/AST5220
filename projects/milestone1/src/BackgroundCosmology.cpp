@@ -44,7 +44,7 @@ BackgroundCosmology::BackgroundCosmology(
 
 // Solve the background
 void BackgroundCosmology::solve(){
-  // Utils::StartTiming("Eta");
+  Utils::StartTiming("Eta");
   //=============================================================================
   // Solve the ODE for eta(x) and t(x), and create a Spline. 
   //=============================================================================
@@ -68,10 +68,10 @@ void BackgroundCosmology::solve(){
   auto eta_array = eta_ode.get_data_by_component(0);
   eta_of_x_spline.create(x_array, eta_array, "Eta(x) spline");
 
-  // Utils::EndTiming("Eta");
+  Utils::EndTiming("Eta");
 
 
-  // Utils::StartTiming("t");
+  Utils::StartTiming("t");
   //=============================================================================
   // Solve ODE for t(x) and Spline result.
   //=============================================================================
@@ -92,13 +92,12 @@ void BackgroundCosmology::solve(){
   auto t_array = t_ode.get_data_by_component(0);
   t_of_x_spline.create(x_array, t_array, "t(x) spline");
 
-  // Utils::EndTiming("t");
+  Utils::EndTiming("t");
 }
 
 
 // Solve the background
 void BackgroundCosmology::solve_eta(){
-  // Utils::StartTiming("Eta");
   //=============================================================================
   // Solve the ODE for eta(x), and create a Spline. 
   // Use for supernova fitting, to avoid unnecessary computations of t(x).
@@ -122,8 +121,6 @@ void BackgroundCosmology::solve_eta(){
   // Spline result 
   auto eta_array = eta_ode.get_data_by_component(0);
   eta_of_x_spline.create(x_array, eta_array, "Eta(x) spline");
-
-  // Utils::EndTiming("Eta");
 
 
 }

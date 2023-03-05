@@ -3,29 +3,39 @@ import matplotlib.pyplot as plt
 import astropy.units as u 
 from astropy.constants import c  
 import os 
-import plot
-
-
 import warnings 
 warnings.filterwarnings("ignore", category=DeprecationWarning )
 
-save = False
+
+
+"""
+All calculations and such are performed in this file,
+but the actual plotting is done in plot.py
+"""
+import plot
+
+
+
+save = False # If False, the figures produced are only displayed, not saved. 
+
+
 
 def data(fname="cosmology.txt"):
-    # simulation_data = plot.load("cosmology.txt") # (np.log(1e-10), 5)
-    # simulation_data = plot.load("cosmology_times.txt")
+    """
+    Some functions (table()) use data from another file. 
+    This is a stupid, but simple way of not having to change all functions for this one purpose. 
+    I would have made a class if I had more time.  
+    """
     global simulation_data
     global x 
     simulation_data = plot.load(fname)
     x = simulation_data[0]
 
 data()
-print(x[0], x[-1])
-# x = simulation_data[0]
 
 
 def load_H_parameters(convert_units=True):
-
+    # Load Hp, Hp'(x) and H''(x)
     H_params = simulation_data[1:4] / u.s 
 
     if convert_units: 
@@ -58,6 +68,9 @@ def load_omegas():
 
 
 def equality_times(idx=False):
+    # Find matter radiation equality and matter-dark energy equality
+    # Returns the corresponding x-values by default. 
+    # idx=True returns the index of these times. 
     OmegaM, OmegaRel, OmegaLambda = load_omegas()
 
     Rad_dom_end = np.where(OmegaRel < OmegaM+OmegaLambda)[0][0]
@@ -95,13 +108,11 @@ def radiation_matter_equality(idx=False):
 
 
 def Hp_plot(save):
-    ### OK ### 
+    ### Plot Hp(x) ### 
     Hp = load_H_parameters()[0]
     ylabel = r'$\mathcal{H}\: \left[ \frac{100\,\mathrm{km/s}}{\mathrm{Mpc}} \right] $'
 
     mr_eq, mL_eq = equality_times()
-    print(x[0])
-    exit()
     
     plot.plot_single_param(x, Hp, "compare_Hp.pdf", 
                             mr_eq=mr_eq, mL_eq=mL_eq, acc=acceleration_onset(),
@@ -112,7 +123,7 @@ def Hp_plot(save):
 
 
 def eta_plot(save):
-    ### OK ### 
+    ### Plot eta(x). Not included in report. ### 
     eta = load_eta_and_t()[0]
     ylabel = r'$\eta\:\:[\mathrm{Mpc}]$'
     mr_eq, mL_eq = equality_times()
@@ -124,7 +135,7 @@ def eta_plot(save):
 
 
 def eta_H_plot(save):
-    ### OK ### 
+    ### Plot eta*Hp/c ### 
     Hp = load_H_parameters()[0]
     eta = load_eta_and_t()[0]
     ylabel = r'$\eta \mathcal{H} / c $'
@@ -140,7 +151,7 @@ def eta_H_plot(save):
 
 
 def plot_omegas(save):
-    ### OK ### 
+    ### Plot density parameters ### 
     OmegaM, OmegaRel, OmegaLambda = load_omegas()
     title = r"$\Omega_i(x)$"
 
@@ -150,12 +161,10 @@ def plot_omegas(save):
 
 
 def dH_ddH_over_H(save):
-    ### OK ### 
+    ### Compare H'/H and H''/H with analytical approx. ### 
     Hp, dHp, ddHp = load_H_parameters()
     m_dom, L_dom = equality_times()
 
-    # dH_label = r"$\frac{1}{\mathcal{H}} \frac{\mathrm{d} \mathcal{H}}{\mathrm{d}x}$"
-    # ddH_label = r"$\frac{1}{\mathcal{H}} \frac{\mathrm{d}^2 \mathcal{H}}{\mathrm{d}x^2}$"
     dH_label = r"$\frac{\mathcal{H}'(x)}{\mathcal{H}(x)}$"
     ddH_label = r"$\frac{\mathcal{H}''(x)}{\mathcal{H}(x)}$"
 
@@ -165,18 +174,18 @@ def dH_ddH_over_H(save):
 
 
 def eta_t_plot(save):
-    ### OK ### 
+    ### Plot eta and t ### 
     eta, t = load_eta_and_t()
     eta_c = (eta / c).to(u.Gyr)
 
     mr_eq, mL_eq = equality_times()
-    acc = acceleration_onset()
 
     plot.plot_t_and_eta(x, t, eta_c, fname="t_and_eta_c.pdf", mr_eq=mr_eq, mL_eq=mL_eq, acc=None, save=save)
 
 
 def luminosity_distance(data):
-    
+    ### Return z and dL for a given data file
+    #  limited to region with observational data 
     x_sim =  data[0]
     dL_sim   = (data[-1]*u.m).to(u.Gpc)
 
@@ -190,6 +199,9 @@ def luminosity_distance(data):
 
 
 def plot_dL(save, plot_fit=False):
+    ### Plot dL from data and compare with simulation with Planck parameters  
+    ### plot_fit=True: Plot dL from the simulation with parameters obtained from supernovafit.
+    #       Planck results included for comparison
     z, dL, dL_error = plot.load("supernovadata.txt", skiprows=1)
     planck_data     = plot.load("cosmology_dL.txt" , skiprows=1)
     fit_data        = plot.load("bestfit_cosmology_dL.txt" , skiprows=1)
@@ -211,14 +223,15 @@ def plot_dL(save, plot_fit=False):
 
 
 def load_supernovafit(burn):
-    # supernova_mcmc_results = plot.load("supernovafit_h0_new.txt", skiprows=1)
+    # Load result from supernova fit 
+    # Leave out the first N=burn results  
     supernova_mcmc_results = plot.load("supernovafit.txt", skiprows=1+burn)
     chi2, h, OmegaM, OmegaK = supernova_mcmc_results
     return chi2, h, OmegaM, OmegaK
 
 
 def supernova_fit_omegas(save, burn=1000):
-
+    # Plot OmegaM-OmegaK confidence region.
     chi2, h, OmegaM, OmegaK = load_supernovafit(burn)
    
     OmegaLambda = 1 - OmegaM - OmegaK 
@@ -231,6 +244,7 @@ def supernova_fit_omegas(save, burn=1000):
 
 
 def supernova_fit_H0_pdf(save, burn=1000):
+    # Plot H0 pdf
     chi2, h, OmegaM, OmegaK = load_supernovafit(burn)
 
     H0 = h * (100*u.km / u.s / u.Mpc)
@@ -255,16 +269,15 @@ def supernova_fit_H0_pdf(save, burn=1000):
 
 
 def table():
-    data("cosmology_times.txt")
+    # make table. 
+    # Used pandas initially, but changed the table so much that it's not applicable anymore.
+
+    data("cosmology_times.txt") # load data with higher resolution
     MR_eq_idx, ML_eq_idx = equality_times(idx=True)
     acc_onset_idx = acceleration_onset(idx=True)
     x_today_idx = np.abs(x).argmin()
 
     eta, t = load_eta_and_t() 
-
-    Hp, dHp_dx = load_H_parameters()[0:2]
-
-
 
     x_mr = x[MR_eq_idx]
     x_ml = x[ML_eq_idx]
@@ -287,36 +300,31 @@ def table():
     print(f"t today= {t_today:.3f}")
     print(f"eta0   = {eta_over_c_today:.3f}")
 
-    # print(t[x_today_idx-1:x_today_idx+2])
-
     mr_eq = [x_mr, z_mr, t_mr.to(u.Gyr).value]
     ml_eq = [x_ml, z_ml, t_ml.value]
     acc   = [x_ac, z_ac, t_ac.value]
-    print(x[0], x[-1])
 
+    #### Previous table generating with pandas     
     # print('making table')
     # plot.time_table(mr_eq, ml_eq, acc, t_today, eta_over_c_today, show=True, save=False)
 
+    # Restore data set to the original one 
     data()
 
 
 
-# plot_dL_best()
-# table()
+dH_ddH_over_H(save)
+Hp_plot(save)
+eta_plot(save)
+eta_H_plot(save)
+eta_t_plot(save)
 
-# save=True
+plot_omegas(save)
 
-# dH_ddH_over_H(save)
-# Hp_plot(save)
-# eta_plot(save)
-# eta_H_plot(save)
-# eta_t_plot(save)
-
-# plot_omegas(save)
-
-# plot_dL(save)
-# plot_dL(save, True)
+plot_dL(save)
+plot_dL(save, True)
 
 supernova_fit_omegas(save)
-# supernova_fit_H0_pdf(save)
+supernova_fit_H0_pdf(save)
 
+table()

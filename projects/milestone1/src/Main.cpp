@@ -34,13 +34,18 @@ int main(int argc, char **argv){
 
   // Set up and solve the background
   BackgroundCosmology cosmo(h, OmegaB, OmegaCDM, OmegaK, Neff, TCMB);
-  // cosmo.solve();
-  // cosmo.info();
+  cosmo.solve();
+  cosmo.info();
   
   // Output background evolution quantities
-  // cosmo.output("data/cosmology.txt"); // Consistency checks and analysis  
-  // cosmo.output("data/cosmology_dL.txt"); // Comparing with supernova data 
-  // cosmo.output("data/cosmology_times.txt"); // High resolution for important times  
+  // cosmo.output("data/cosmology.txt");          // Consistency checks and analysis  
+  // cosmo.output("data/cosmology_dL.txt");       // Comparing with supernova data 
+  // cosmo.output("data/cosmology_times.txt");    // High resolution for important times  
+
+  //=====================
+  // Run simulation with parameters 
+  // from the best supernova fit 
+  //=====================
   double h_est          = 0.70189;
   double OmegaM_est     = 0.25932;
   double OmegaK_est     = 0.0673887;
@@ -50,10 +55,8 @@ int main(int argc, char **argv){
   bestSNfit.info();
   // bestSNfit.output("data/bestfit_cosmology_dL.txt");
 
-  // Do the supernova fits. Uncomment when you are ready to run this
-  // Make sure you read the comments on the top of src/SupernovaFitting.h
   // Utils::StartTiming("Supernova");
-  // mcmc_fit_to_supernova_data("data/supernovadata.txt", "data/supernovafit_h0_new.txt");
+  // mcmc_fit_to_supernova_data("data/supernovadata.txt", "data/supernovafit.txt");
   // Utils::EndTiming("Supernova"); 
 
   // Remove when module is completed
