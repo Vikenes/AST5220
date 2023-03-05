@@ -317,6 +317,6 @@ def table():
 # plot_dL(save)
 # plot_dL(save, True)
 
-# supernova_fit_omegas(save)
+supernova_fit_omegas(save)
 # supernova_fit_H0_pdf(save)
 
