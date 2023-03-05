@@ -13,6 +13,7 @@
 \setcitestyle{square,comma,numbers,compress}
 
 \usepackage{booktabs}
+\usepackage{array}
 
 %=================================
 %    Avoid compiler warning  
@@ -26,6 +27,10 @@
 %    Label commands  
 %==================================
 \newcommand{\figref}[1]{Fig. \ref{#1}}
+\newcommand{\secref}[1]{Sect. \ref{#1}}
+\newcommand{\appref}[1]{Appendix \ref{#1}}
+
+
 
 %=================================
 %    Text commands  
@@ -42,7 +47,9 @@
 \newcommand{\bracket}[1]{\left[ #1 \right]}
 
 %===== Formatting ============
-\newcommand{\unit}[1]{\,[\mathrm{#1}]}
+\newcommand{\unit}[1]{\,\mathrm{#1}}
+\newcommand{\bunit}[1]{\,[\mathrm{#1}]} % Unit with bracket 
+
 
 %===== Density parameter ============
 \newcommand{\obn}{\Omega_{b0}}
@@ -67,6 +74,7 @@
 %=== Cosmological quantities ====
 \renewcommand{\H}{\mathcal{H}}
 \newcommand{\Hx}{\H(x)}
+\newcommand{\tcmb}{T_\mathrm{CMB0}}
 
 
 %==== Parameter samples =======

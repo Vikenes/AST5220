@@ -2,7 +2,7 @@
 
 \begin{document} 
 
-   \title{Make a suitable title: my paper on the cosmic microwave background and formation of structures in our Universe}
+   \title{My paper on the cosmic microwave background and formation of structures in our Universe}
 
    \author{V. A. Vikenes\inst{1}}
 
@@ -81,9 +81,29 @@ Write a short summary and conclusion in the end.
 \bibliography{ref}
 
 \begin{appendix}
-\section{Bruh}
-wewe
-\section{sis}
+\section{Fiducial parameters} \label{app:M1:fiducial_parameters}
+The parameter values we use in this report are 
+\begin{equation} \label{eq:Appendix:Fiducial_cosmology_parameters}
+      \begin{split}
+            h &= 0.67, \\ 
+            \tcmb &= 2.7255\unit{K}, \\
+            N_\mathrm{eff} &= 3.046, \\
+            \obn &= 0.05, \\
+            \ocdmn &= 0.267,\\
+            \okn &=0,\\
+            \onun &= N_\mathrm{eff} \cdot \frac{7}{8} \closed{\frac{4}{11}}^{4/3} \ogn, \\
+            \oln &= 1 - (\okn + \obn + \ocdmn + \ogn + \onun), \\
+            n_s &= 0.965,\\
+            A_s &= 2.1\cdot 10^{-9},\\
+            Y_p &= 0.245, \\
+            z_\mathrm{reion} &= 8, \\
+            \Delta z_\mathrm{reion} &= 0.5, \\
+            z_\mathrm{Hereion} &= 3.5, \\
+            \Delta z_\mathrm{Hereion} &= 0.5, \\
+      \end{split}
+\end{equation}
+
+
 \end{appendix}
 
 \end{document}
