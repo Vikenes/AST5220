@@ -57,8 +57,8 @@ extern struct ConstantsAndUnits {
   // const double x_end   = 0.0;
 
   // Initial recombination testing
-  const double x_start = -11.0;
-  const double x_end   = 0.0;
+  const double x_start = -13.0;
+  const double x_end   = 1.0;
 
   // Include polarization and/or neutrinos?
   const bool polarization  = true;

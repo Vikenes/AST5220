@@ -283,27 +283,54 @@ void RecombinationHistory::solve_for_optical_depth_tau(){
 
   // Spline result 
 
+
   // Arbitrary IC
   auto tau_array = tau_ode.get_data_by_component(0);
-  double tau_today = tau_array[npts_tau-1];
-  
+
+
+  double tau_today = tau_array[npts_tau-1];  
   for(int i=0; i<npts_tau; i++){
     tau_array[i] -= tau_today;
   }
 
+
   tau_of_x_spline.create(x_array, tau_array, "tau_of_x");
 
-  // Vector dtau_dx_array(npts);
+
+  // Spline derivatives etc. 
+  Vector dtau_dx_array(npts_tau);
+  Vector g_tilde_array(npts_tau);
+
+  for(int i=0; i<npts_tau; i++){
+    dtau_dx_array[i] = - ne_of_x(x_array[i]) * Constants.c * Constants.sigma_T 
+                        / cosmo->H_of_x(x_array[i]);
+    g_tilde_array[i] = - dtau_dx_array[i] * exp(-tau_of_x(x_array[i]));
+
+  }
   // Vector ddtau_dxx_array(npts); 
   //=============================================================================
   // TODO: Compute visibility functions and spline everything
   //=============================================================================
 
-  Vector g_tilde_array(npts_tau);
-  for(int i=0; i<npts_tau; i++){
-    g_tilde_array[i] = - dtaudx_of_x(x_array[i]) * exp(-tau_of_x(x_array[i]));
-  } 
+  // for(int i=0; i<npts_tau; i++){
+    // g_tilde_array[i] = - dtaudx_of_x(x_array[i]) * exp(-tau_of_x(x_array[i]));
+  // } 
+
+  dtau_dx_spline.create(x_array, dtau_dx_array, "dtau_dx");
   g_tilde_of_x_spline.create(x_array, g_tilde_array, "g_tilde_of_x");
+
+
+  //=====================================
+  // dg_dx spline may be obsolete. 
+  //=====================================
+  Vector dg_dx_array(npts_tau);
+  for(int i=0; i<npts_tau; i++){
+    double x_ = x_array[i];
+    dg_dx_array[i] = (-ddtauddx_of_x(x_) + dtaudx_of_x(x_)*dtaudx_of_x(x_))
+                     * exp(-tau_of_x(x_));
+  }
+
+  dg_dx_spline.create(x_array, dg_dx_array, "dg_dx");
 
   Utils::EndTiming("opticaldepth");
 }
@@ -323,14 +350,14 @@ double RecombinationHistory::dtaudx_of_x(double x) const{
   //=============================================================================
   // 
   // Analytical value 
-  // double dtau = -ne_of_x(x) * Constants.c * Constants.sigma_T / cosmo->H_of_x(x);
+  // double dtau = - ne_of_x(x) * Constants.c * Constants.sigma_T / cosmo->H_of_x(x);
   //
-  // return double dtau;
-  return tau_of_x_spline.deriv_x(x);
+  // return tau_of_x_spline.deriv_x(x);
+  return dtau_dx_spline(x);
 }
 
 double RecombinationHistory::ddtauddx_of_x(double x) const{
-  return tau_of_x_spline.deriv_xx(x);;
+  return dtau_dx_spline.deriv_x(x);;
 }
 
 double RecombinationHistory::g_tilde_of_x(double x) const{
@@ -338,11 +365,11 @@ double RecombinationHistory::g_tilde_of_x(double x) const{
 }
 
 double RecombinationHistory::dgdx_tilde_of_x(double x) const{
-  return g_tilde_of_x_spline.deriv_x(x);
+  return dg_dx_spline(x);
 }
 
 double RecombinationHistory::ddgddx_tilde_of_x(double x) const{
-  return g_tilde_of_x_spline.deriv_xx(x);
+  return dg_dx_spline.deriv_x(x);
 }
 
 
@@ -359,16 +386,10 @@ double RecombinationHistory::nb_of_x(double x) const{
 
 
 double RecombinationHistory::Xe_of_x(double x) const{
-  //=============================================================================
-  // TODO: Implement
-  //=============================================================================
   return exp(log_Xe_of_x_spline(x));
 }
 
 double RecombinationHistory::ne_of_x(double x) const{
-  //=============================================================================
-  // TODO: Implement
-  //=============================================================================
   return exp(log_ne_of_x_spline(x));
 }
 
@@ -391,11 +412,15 @@ void RecombinationHistory::info() const{
 //====================================================
 void RecombinationHistory::output(const std::string filename) const{
   std::ofstream fp(filename.c_str());
-  const int npts       = 1e4;
+
+  std::cout << "Writing result to " << filename << std::endl; 
+
+  const int npts       = nx;
   const double x_min   = x_start;
   const double x_max   = x_end;
 
   Vector x_array = Utils::linspace(x_min, x_max, npts);
+  fp << "nx: " << npts << ", npts_rec: " << npts_rec_arrays << ", npts_tau_g: " << npts_tau << "\n";
   fp << "x Xe ne tau dtaudx ddtauddx g dgdx ddgddx \n";
   auto print_data = [&] (const double x) {
     fp << x                    << " ";

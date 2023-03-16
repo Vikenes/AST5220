@@ -71,10 +71,12 @@ int main(int argc, char **argv){
   // Solve the recombination history
   RecombinationHistory rec(&cosmo, Yp);
   rec.solve();
-  rec.info();
+  // rec.info();
 
   // Output recombination quantities
+  // rec.output("milestone2/data/recombination.txt");
   rec.output("milestone2/data/recombination.txt");
+
 
   
   // Remove when module is completed

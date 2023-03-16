@@ -21,10 +21,9 @@ class RecombinationHistory{
     // The start and end points for recombination arrays (can be modified)
     const double x_start  = Constants.x_start;
     const double x_end    = Constants.x_end;
-    const int nx          = 1e4;
-    
+
     // Numbers of points of Xe,ne array (modify as you see fit)
-    const int npts_rec_arrays = 4000;
+    const int npts_rec_arrays = 1e5;
   
     // Xe for when to switch between Saha and Peebles
     const double Xe_saha_limit = 0.99;
@@ -47,7 +46,7 @@ class RecombinationHistory{
     //===============================================================
 
     // Number of points of tau, g_tilde arrays, and their derivatives
-    const int npts_tau = 1e4;
+    const int npts_tau = 1e5;
 
     // The two things we need to solve: Xe/ne and tau
     void solve_for_optical_depth_tau();
@@ -56,12 +55,14 @@ class RecombinationHistory{
     Spline log_Xe_of_x_spline{"Xe"};
     Spline log_ne_of_x_spline{"ne"};
     Spline tau_of_x_spline{"tau"}; 
-    // Spline dtau_dx_spline{"dtau_dx"};
+    Spline dtau_dx_spline{"dtau_dx"};
     // Spline ddtau_dxx_spline{"ddtau_dxx"};
     Spline g_tilde_of_x_spline{"g"};  
-    // Spline dg_dx_spline{"dg_dx"};
+    Spline dg_dx_spline{"dg_dx"};
     // Spline ddg_dxx_spline{"ddg_dxx"};
 
+    // Number of points written to file
+    const int nx = 5e4;
 
   public:
 
