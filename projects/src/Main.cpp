@@ -6,7 +6,7 @@
 #include "SupernovaFitting.h"
 
 int main(int argc, char **argv){
-  Utils::StartTiming("Everything");
+  // Utils::StartTiming("Everything");
 
   //=========================================================================
   // Parameters
@@ -21,7 +21,9 @@ int main(int argc, char **argv){
   double TCMB        = 2.7255;
 
   // Recombination parameters
-  double Yp          = 0.245;
+  // double Yp          = 0.245;
+  double Yp          = 0.0;
+
 
   // Power-spectrum parameters
   double A_s         = 2.1e-9;
@@ -34,8 +36,8 @@ int main(int argc, char **argv){
 
   // Set up and solve the background
   BackgroundCosmology cosmo(h, OmegaB, OmegaCDM, OmegaK, Neff, TCMB);
-  cosmo.solve();
-  cosmo.info();
+  // cosmo.solve();
+  // cosmo.info();
   
   // Output background evolution quantities
   // cosmo.output("milestone1/data/cosmology.txt");          // Consistency checks and analysis  
@@ -60,7 +62,7 @@ int main(int argc, char **argv){
   // Utils::EndTiming("Supernova"); 
 
   // Remove when module is completed
-  return 0;
+  // return 0;
 
   //=========================================================================
   // Module II
@@ -72,7 +74,8 @@ int main(int argc, char **argv){
   rec.info();
 
   // Output recombination quantities
-  rec.output("recombination.txt");
+  rec.output("milestone2/data/recombination.txt");
+
   
   // Remove when module is completed
   return 0;
@@ -104,5 +107,5 @@ int main(int argc, char **argv){
   // Remove when module is completed
   return 0;
 
-  Utils::EndTiming("Everything");
+  // Utils::EndTiming("Everything");
 }

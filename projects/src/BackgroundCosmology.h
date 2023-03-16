@@ -62,6 +62,7 @@ class BackgroundCosmology{
     double Hp_of_x(double x) const;
     double dHpdx_of_x(double x) const;
     double ddHpddx_of_x(double x) const;
+    double Hp_over_H0_squared(double x) const;
     double get_OmegaB(double x = 0.0) const; 
     double get_OmegaM(double x = 0.0) const; 
     double get_OmegaR(double x = 0.0) const;
@@ -73,6 +74,7 @@ class BackgroundCosmology{
     double get_OmegaMnu(double x = 0.0) const; 
     double get_H0() const;
     double get_h() const;
+    double get_rho_c0() const;
     double get_Neff() const;
     double get_TCMB(double x = 0.0) const;
 

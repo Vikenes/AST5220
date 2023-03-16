@@ -23,8 +23,8 @@ BackgroundCosmology::BackgroundCosmology(
   // TODO: Compute OmegaR, OmegaNu, OmegaLambda, H0, ...
   //=============================================================================
   H0 = Constants.H0_over_h * h; 
-  double kT = Constants.k_b * TCMB;
 
+  double kT = Constants.k_b * TCMB;
   double hbar = Constants.hbar;
   double c = Constants.c;
   double hbar3_c5 = hbar*hbar*hbar * c*c*c*c*c;
@@ -183,39 +183,46 @@ double BackgroundCosmology::ddHpddx_of_x(double x) const{
   return ddHp;
 }
 
+/* Compute Hp(x)^2, needed
+*/
+double BackgroundCosmology::Hp_over_H0_squared(double x) const{
+  // Reduce number of exp-calls.
+  double Hp = Hp_of_x(x);
+  return Hp * Hp / (H0 * H0);
+}
+
 /*OmegaB(x)*/
 double BackgroundCosmology::get_OmegaB(double x) const{ 
   if(x == 0.0) return OmegaB;
-  return OmegaB / (exp(x) * pow(Hp_of_x(x) / H0 , 2) );
+  return OmegaB * exp(-x) / Hp_over_H0_squared(x);
 }
 
 /*OmegaR(x)*/
 double BackgroundCosmology::get_OmegaR(double x) const{ 
   if(x == 0.0) return OmegaR;
-  return OmegaR / (exp(2*x) * pow(Hp_of_x(x) / H0 , 2) );
+  return OmegaR * exp(-2*x) / Hp_over_H0_squared(x);
 }
 
 double BackgroundCosmology::get_OmegaNu(double x) const{ 
   if(x == 0.0) return OmegaNu;
-
-  return OmegaNu / (exp(2*x) * pow(Hp_of_x(x) / H0 , 2) );
+  return OmegaNu * exp(-2*x) / Hp_over_H0_squared(x);
 }
 
 /*OmegaCDM(x)*/
 double BackgroundCosmology::get_OmegaCDM(double x) const{ 
   if(x == 0.0) return OmegaCDM;
-  return OmegaCDM / (exp(x) * pow(Hp_of_x(x) / H0 , 2) );
+  return OmegaCDM * exp(-x) / Hp_over_H0_squared(x) ;
 }
 
 /*OmegaLambda(x)*/
 double BackgroundCosmology::get_OmegaLambda(double x) const{ 
   if(x == 0.0) return OmegaLambda;
-  return OmegaLambda / pow(H_of_x(x) / H0,2);
+  return OmegaLambda * H0 * H0 / (H_of_x(x) * H_of_x(x)) ;
 }
 
 double BackgroundCosmology::get_OmegaK(double x) const{ 
   if(x == 0.0) return OmegaK;
-  return OmegaK / pow(Hp_of_x(x) / H0, 2);
+  return OmegaK / Hp_over_H0_squared(x);
 }
 
 
@@ -250,6 +257,10 @@ double BackgroundCosmology::get_H0() const{
 
 double BackgroundCosmology::get_h() const{ 
   return h; 
+}
+
+double BackgroundCosmology::get_rho_c0() const{
+  return 3.0 * get_H0() * get_H0() / (8.0 * M_PI * Constants.G);
 }
 
 double BackgroundCosmology::get_Neff() const{ 
