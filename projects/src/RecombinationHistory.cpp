@@ -254,6 +254,8 @@ void RecombinationHistory::solve_for_optical_depth_tau(){
 
   // Set up x-arrays to integrate over. We split into three regions as we need extra points in reionisation
   Vector x_array = Utils::linspace(x_start, x_end, npts_tau);
+  Vector x_tilde_array = Utils::linspace(0, x_start, npts_tau);
+
 
   // The ODE system dtau/dx, dtau_noreion/dx and dtau_baryon/dx
   ODEFunction dtaudx = [&](double x, const double *tau, double *dtaudx){
@@ -264,7 +266,6 @@ void RecombinationHistory::solve_for_optical_depth_tau(){
     const double c       = Constants.c; 
     const double sigma_T = Constants.sigma_T;
     dtaudx[0] = - c * sigma_T * ne_of_x(x) / cosmo->H_of_x(x); // Arbitrary IC
-    // dtaudx[0] = c * sigma_T * ne_of_x(x) / cosmo->H_of_x(x);   // For x=0 as IC
     return GSL_SUCCESS;
   };
 
@@ -272,27 +273,31 @@ void RecombinationHistory::solve_for_optical_depth_tau(){
   // TODO: Set up and solve the ODE and make tau splines
   //=============================================================================
   
-  // Attempting x=0 as IC 
-  // Vector tau_ic{0.0};
 
-  // Arbitrary IC
-  Vector tau_ic{1.0};
+  // Solve from arbitrary IC
+  // Impose tau=0 today manually 
+  // Vector tau_ic{1.0};  
+  // ODESolver tau_ode;
+  // tau_ode.solve(dtaudx, x_array, tau_ic);
+  // auto tau_array_forwards = tau_ode.get_data_by_component(0);
+
+  // double tau_today = tau_array[npts_tau-1];  INCORRECT
+  // for(int i=0; i<npts_tau; i++){
+    // tau_array[i] -= tau_today;
+  // }
+
+  // Solve backwards, starting from x=0
+  Vector tau_ic_back{0.0};   
+  ODESolver tau_ode_backwards;
+  tau_ode_backwards.solve(dtaudx, x_tilde_array, tau_ic_back);
   
-  ODESolver tau_ode;
-  tau_ode.solve(dtaudx, x_array, tau_ic);
-
   // Spline result 
 
-
-  // Arbitrary IC
-  auto tau_array = tau_ode.get_data_by_component(0);
-
-
-  double tau_today = tau_array[npts_tau-1];  
+  auto tau_array_reversed = tau_ode_backwards.get_data_by_component(0);
+  Vector tau_array(npts_tau);
   for(int i=0; i<npts_tau; i++){
-    tau_array[i] -= tau_today;
+    tau_array[i] = tau_array_reversed[npts_tau-i-1];
   }
-
 
   tau_of_x_spline.create(x_array, tau_array, "tau_of_x");
 
@@ -307,14 +312,11 @@ void RecombinationHistory::solve_for_optical_depth_tau(){
     g_tilde_array[i] = - dtau_dx_array[i] * exp(-tau_of_x(x_array[i]));
 
   }
-  // Vector ddtau_dxx_array(npts); 
+
   //=============================================================================
   // TODO: Compute visibility functions and spline everything
   //=============================================================================
 
-  // for(int i=0; i<npts_tau; i++){
-    // g_tilde_array[i] = - dtaudx_of_x(x_array[i]) * exp(-tau_of_x(x_array[i]));
-  // } 
 
   dtau_dx_spline.create(x_array, dtau_dx_array, "dtau_dx");
   g_tilde_of_x_spline.create(x_array, g_tilde_array, "g_tilde_of_x");
@@ -324,6 +326,7 @@ void RecombinationHistory::solve_for_optical_depth_tau(){
   // dg_dx spline may be obsolete. 
   //=====================================
   Vector dg_dx_array(npts_tau);
+  
   for(int i=0; i<npts_tau; i++){
     double x_ = x_array[i];
     dg_dx_array[i] = (-ddtauddx_of_x(x_) + dtaudx_of_x(x_)*dtaudx_of_x(x_))

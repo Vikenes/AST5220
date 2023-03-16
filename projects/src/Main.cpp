@@ -75,7 +75,9 @@ int main(int argc, char **argv){
 
   // Output recombination quantities
   // rec.output("milestone2/data/recombination.txt");
+  // rec.output("milestone2/data/recombination.txt");
   rec.output("milestone2/data/recombination.txt");
+
 
 
   

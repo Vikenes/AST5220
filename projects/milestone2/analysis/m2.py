@@ -19,25 +19,54 @@ import plot
 save = False # If False, the figures produced are only displayed, not saved. 
 
 
-data = plot.load("recombination.txt", skiprows=1)
-x = data[0]
-Xe = data[1]
-ne = data[2] * u.m**(-3)
-tau, dtau, ddtau = data[3:6]
-g, dg, ddg = data[6:9]
+data1 = plot.load("recombination.txt", skiprows=2)
+# data2 = plot.load("recombination_1e4_1e5.txt", skiprows=2)
+# data2 = plot.load("recombination_newode.txt", skiprows=2)
 
-gint = simpson(g, x)
-# print(gint)
-# plt.plot(x, Xe)
-# plt.plot(x,   g)
-# plt.plot(x,  dg, "--")
-# plt.plot(x, ddg, ":")
+x1 = data1[0]
+# xmin = np.abs(x1 + 12).argmin()
+# xmax = np.abs(x1).argmin()
+# x1 = x1[xmin:xmax]
+# data1 = data1[:,xmin:xmax]
 
-# plt.plot(x,   tau)
-# plt.plot(x, -dtau, "--")
-# plt.plot(x, ddtau, ":")
-plt.plot(x[ddtau>0], ddtau[ddtau>0])
+# x2 = data2[0]
+
+def load_xe_ne(data):
+
+    Xe = data[1]
+    ne = data[2] * u.m**(-3)
+    return Xe, ne 
+
+def load_taus(data):
+    tau, dtau, ddtau = data[3:6]
+    return tau, dtau, ddtau 
+
+def load_gs(data):
+    g, dg, ddg = data[6:9]
+    return g, dg, ddg 
+
+# g2,dg2,ddg2 = load_gs(data2)
+
+# t2, dt2, ddt2 = load_taus(data2)
 
 
+def plot_tau():
+    t1, dt1, ddt1 = load_taus(data1)
+    plt.plot(x1, t1)
+    plt.plot(x1, -dt1, '--')
+    plt.plot(x1, ddt1, ':')
+    plt.xlim(-12,0)
+    plt.yscale('log')
+    plt.show()
 
-plt.show()
+def plot_g():
+    g1,dg1,ddg1 = load_gs(data1)
+    plt.plot(x1, g1)
+    plt.show()
+    plt.plot(x1, dg1)#, '--')
+    plt.show()
+    plt.plot(x1, ddg1)#, ':')
+    plt.show()
+
+
+plot_g()
