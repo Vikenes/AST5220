@@ -68,3 +68,23 @@ where $\tb$ is the temperature of the baryons, and $\epsn=13.6\unit{eV}$ is the 
     \alpha^{(2)} &= \frac{64\pi}{\sqrt{27\pi}} \frac{\alpha^2}{m_e^2} \sqrt{\frac{\epsn}{\tb}} \phi_2(\tb)\unit{m^2\,s^{-1}}, \\
     \phi_2(\tb) &= 0.448\ln(\epsn/\tb).
 \end{align}
+
+\note{Explain how equations are solved, etc.}
+
+
+\subsubsection{Sound Horizon \note{(working title)}} \label{sssec:M2:sound_horizon}
+We are interested in the sound horizon at decoupling, blah blah blah...
+
+
+\begin{equation} \label{eq:M2:theory:soundspeed}
+    c_s = c \sqrt{\frac{R}{3(1+3R)}},\quad R = \frac{4\ogn}{3\obn e^x}
+\end{equation}
+
+\begin{equation} \label{eq:M2:theory:sound_horizon_integral}
+    s(x)=\int_{-\infty}^x \frac{\dd x' c_s}{\H}
+\end{equation}
+
+\begin{equation} \label{eq:M2:theory:sound_horizon_ode}
+    \dv{s(x)}{x} = \frac{c_s}{\H},
+\end{equation}
+with $s(x_\mathrm{ini})=\frac{c_s(x_\mathrm{ini})}{\H(x_\mathrm{ini})}$.
