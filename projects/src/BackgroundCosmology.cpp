@@ -32,7 +32,7 @@ BackgroundCosmology::BackgroundCosmology(
   OmegaR = M_PI*M_PI / 15.0 * kT*kT*kT*kT / hbar3_c5 * 8.0 * M_PI * Constants.G / (3.0 * H0*H0);
   
   OmegaNu = Neff * 7.0 / 8.0 * pow(4.0/11.0, 4.0/3.0) * OmegaR;
-  OmegaLambda = 1 - (OmegaB + OmegaCDM + OmegaK + OmegaR + OmegaNu); 
+  OmegaLambda = 1.0 - (OmegaB + OmegaCDM + OmegaK + OmegaR + OmegaNu); 
 
   
 
@@ -132,9 +132,9 @@ void BackgroundCosmology::solve_eta(){
 /*Computes H(x)*/
 double BackgroundCosmology::H_of_x(double x) const{
 
-  double Hx = H0 * sqrt((OmegaB + OmegaCDM)*exp(-3*x) 
-                        + (OmegaR + OmegaNu) * exp(-4*x)
-                        + OmegaK * exp(-2*x) 
+  double Hx = H0 * sqrt((OmegaB + OmegaCDM)*exp(-3.*x) 
+                        + (OmegaR + OmegaNu) * exp(-4.*x)
+                        + OmegaK * exp(-2.*x) 
                         + OmegaLambda);
   return Hx;
 }
@@ -159,10 +159,10 @@ double BackgroundCosmology::Hp_of_x(double x) const{
 double BackgroundCosmology::dHpdx_of_x(double x) const{
   // Term inside square root. 
   double dv_sqrt_term = -      (OmegaB + OmegaCDM) * exp(-x)
-                        - 2 * (OmegaR + OmegaNu) * exp(-2*x) 
-                        + 2 * OmegaLambda * exp(2*x);
+                        - 2. * (OmegaR + OmegaNu) * exp(-2.*x) 
+                        + 2. * OmegaLambda * exp(2.*x);
 
-  double dHp = pow(H0,2) / (2 * Hp_of_x(x)) * dv_sqrt_term; 
+  double dHp = pow(H0,2.) / (2. * Hp_of_x(x)) * dv_sqrt_term; 
 
   return dHp;
 }
@@ -171,13 +171,13 @@ double BackgroundCosmology::dHpdx_of_x(double x) const{
 double BackgroundCosmology::ddHpddx_of_x(double x) const{
   // Derivative of square root term 
   double dv2_sqrt_term = (OmegaB + OmegaCDM) * exp(-x)
-                        + 4 * (OmegaR + OmegaNu) * exp(-2*x) 
-                        + 4 * OmegaLambda * exp(2*x);
+                        + 4. * (OmegaR + OmegaNu) * exp(-2.*x) 
+                        + 4. * OmegaLambda * exp(2.*x);
 
   // Derivative of 1/Hp, multiplied by square root term and simplified.
-  double dHp_term = - 2 / pow(H0,2) * pow(dHpdx_of_x(x),2);
+  double dHp_term = - 2. / pow(H0,2.) * pow(dHpdx_of_x(x),2.);
 
-  double ddHp = pow(H0,2) / (2 * Hp_of_x(x))
+  double ddHp = pow(H0,2.) / (2. * Hp_of_x(x))
                 * (dv2_sqrt_term + dHp_term);                       
 
   return ddHp;
@@ -200,12 +200,12 @@ double BackgroundCosmology::get_OmegaB(double x) const{
 /*OmegaR(x)*/
 double BackgroundCosmology::get_OmegaR(double x) const{ 
   if(x == 0.0) return OmegaR;
-  return OmegaR * exp(-2*x) / Hp_over_H0_squared(x);
+  return OmegaR * exp(-2.*x) / Hp_over_H0_squared(x);
 }
 
 double BackgroundCosmology::get_OmegaNu(double x) const{ 
   if(x == 0.0) return OmegaNu;
-  return OmegaNu * exp(-2*x) / Hp_over_H0_squared(x);
+  return OmegaNu * exp(-2.*x) / Hp_over_H0_squared(x);
 }
 
 /*OmegaCDM(x)*/
@@ -237,8 +237,8 @@ double BackgroundCosmology::get_comoving_distance_of_x(double x) const{
   if(OmegaK == 0.0) return chi;
 
   double OmegaK_factor = sqrt(fabs(OmegaK)) * H0 * chi / Constants.c; 
-  if(OmegaK < 0) return chi * sin(OmegaK_factor) / OmegaK_factor;
-  if(OmegaK > 0) return chi * std::sinh(OmegaK_factor) / OmegaK_factor;
+  if(OmegaK < 0.0) return chi * sin(OmegaK_factor) / OmegaK_factor;
+  if(OmegaK > 0.0) return chi * std::sinh(OmegaK_factor) / OmegaK_factor;
 
   return 0.0;
 }
@@ -260,7 +260,7 @@ double BackgroundCosmology::get_h() const{
 }
 
 double BackgroundCosmology::get_rho_c0() const{
-  return 3.0 * get_H0() * get_H0() / (8.0 * M_PI * Constants.G);
+  return 3.0 * H0*H0 / (8.0 * M_PI * Constants.G);
 }
 
 double BackgroundCosmology::get_Neff() const{ 

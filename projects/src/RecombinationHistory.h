@@ -23,7 +23,7 @@ class RecombinationHistory{
     const double x_end    = Constants.x_end;
 
     // Numbers of points of Xe,ne array (modify as you see fit)
-    const int npts_rec_arrays = 1e5;
+    const int npts_rec_arrays = 1e4;
   
     // Xe for when to switch between Saha and Peebles
     const double Xe_saha_limit = 0.99;
@@ -46,23 +46,31 @@ class RecombinationHistory{
     //===============================================================
 
     // Number of points of tau, g_tilde arrays, and their derivatives
-    const int npts_tau = 1e5;
+    const int npts_tau = 1e4;
 
     // The two things we need to solve: Xe/ne and tau
     void solve_for_optical_depth_tau();
 
+
+    //===============================================================
+    // [3] Compute sound horizon
+    //===============================================================
+    void solve_sound_horizon();
+    
+    
     // Splines contained in this class
-    Spline log_Xe_of_x_spline{"Xe"};
-    Spline log_ne_of_x_spline{"ne"};
+    Spline Xe_of_x_spline{"Xe"};
+    Spline ne_of_x_spline{"ne"};
     Spline tau_of_x_spline{"tau"}; 
     Spline dtau_dx_spline{"dtau_dx"};
-    // Spline ddtau_dxx_spline{"ddtau_dxx"};
+    Spline ddtau_ddx_spline{"ddtau_dxx"};
     Spline g_tilde_of_x_spline{"g"};  
     Spline dg_dx_spline{"dg_dx"};
-    // Spline ddg_dxx_spline{"ddg_dxx"};
+    Spline ddg_ddx_spline{"ddg_dxx"};
+    Spline s_of_x_spline{"s(x)"};
 
     // Number of points written to file
-    const int nx = 5e4;
+    const int nx = 1e4;
 
   public:
 
@@ -88,9 +96,11 @@ class RecombinationHistory{
     double g_tilde_of_x(double x) const;
     double dgdx_tilde_of_x(double x) const;
     double ddgddx_tilde_of_x(double x) const;
+    double s_of_x(double x) const;
     double nb_of_x(double x) const;
     double Xe_of_x(double x) const;
     double ne_of_x(double x) const;
+    double cs_of_x(double x) const;
     double get_Yp() const;
 };
 
