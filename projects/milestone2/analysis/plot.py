@@ -38,7 +38,9 @@ plt.rcParams['font.family'] = 'Times New Roman'
 
 # Paths 
 here = os.path.abspath(".")
-data_path = here + "/../data/"
+# data_path = here + "/../data/"
+data_path = "/home/vetle/Documents/master_studies/subjects/V23/AST5220/projects/milestone2/data/"
+
 latex_path = here + "/../report/tables/"
 # temp_path = here + "/../../output/plots/temp/"
 fig_path = here +"/figures/"
