@@ -27,8 +27,9 @@ which is normalized as
 \begin{equation} \label{eq:M2:theory:g_tilde_normalization}
     \int_{-\infty}^0\dd x\,\gx = 1.
 \end{equation}
-The normalization means that $\gx$ is a probability distribution, and we may interpret it as the probability of an observed CMB photon today having experienced its last scattering at a time $x$. \note{Why do we need derivatives?} Once we have an expression for $n_e(x)$, we have all the constituents needed 
-to compute $\tau$ and $\g$.
+The normalization means that $\gx$ is a probability distribution, and we may interpret it as the probability of an observed CMB photon today having experienced its last scattering at a time $x$. \note{Why do we need derivatives?} Once we have an expression for $n_e(x)$, we have all the constituents needed to compute $\tau$ and $\g$.
+
+The visibility function is sharply peaked around the time when recombination takes place \note{(cite?)}, and the period of recombination is thus often referred to as the surface of last scattering. We therefore have two ways of estimating when photon baryon decoupling occurred, either as the time when the Universe became optically thin, i.e. when $\tau=1$, or as the peak of the visibility function. \note{(Fix last paragraph later.)}  
 
 \subsubsection{Electron density \note{(working title)}} \label{sssec:M2_electron_density}
 Instead of computing $n_e$ directly, we will compute the fractional electron density
@@ -53,38 +54,40 @@ where $\tb$ is the temperature of the baryons, and $\epsn=13.6\unit{eV}$ is the 
 \end{equation}
 \note{Cite stuff above, and reference to quantities.}
 
+
+
 \begin{equation}
     \dv{\X}{x} = \frac{C_r(\tb)}{H}\bracket{\beta(\tb)(1-\X) - n_H \alpha^{(2)}(\tb) \X^2 }
 \end{equation}
 
-
-\begin{align}
-    C_r(\tb) &= \frac{\Lambda_{2s\to1s} + \Lambda_\alpha}{\Lambda_{2s\to1s} + \Lambda_\alpha + \beta^{(2)}(\tb)}, \\
-    \Lambda_{2s\to1s} &= 8.227\unit{s^{-1}}, \\
-    \Lambda_\alpha &= H \frac{(3\epsn)^3}{(8\pi)^2 n_{1s}}\unit{s^{-1}}, \\
-    n_{1s} &= (1-\X) n_H \unit{m^{-3}}, \\
-    \beta^{(2)}(\tb) &= \beta(\tb) e^{3\epsn/4\tb} \unit{s^{-1}},\\
-    \beta(\tb) &= \alpha^{(2)}(\tb) \closed{\frac{m_e \tb}{2\pi}}^3/2 e^{-\epsn/\tb} \unit{s^{-1}}, \\
-    \alpha^{(2)} &= \frac{64\pi}{\sqrt{27\pi}} \frac{\alpha^2}{m_e^2} \sqrt{\frac{\epsn}{\tb}} \phi_2(\tb)\unit{m^2\,s^{-1}}, \\
-    \phi_2(\tb) &= 0.448\ln(\epsn/\tb).
-\end{align}
-
+\begin{subequations}
+    \begin{align}
+        C_r(\tb) &= \frac{\Lambda_{2s\to1s} + \Lambda_\alpha}{\Lambda_{2s\to1s} + \Lambda_\alpha + \beta^{(2)}(\tb)}, \\
+        \Lambda_{2s\to1s} &= 8.227\unit{s^{-1}}, \\
+        \Lambda_\alpha &= H \frac{(3\epsn)^3}{(8\pi)^2 n_{1s}}\unit{s^{-1}}, \\
+        n_{1s} &= (1-\X) n_H \unit{m^{-3}}, \\
+        \beta^{(2)}(\tb) &= \beta(\tb) e^{3\epsn/4\tb} \unit{s^{-1}},\\
+        \beta(\tb) &= \alpha^{(2)}(\tb) \closed{\frac{m_e \tb}{2\pi}}^3/2 e^{-\epsn/\tb} \unit{s^{-1}}, \\
+        \alpha^{(2)} &= \frac{64\pi}{\sqrt{27\pi}} \frac{\alpha^2}{m_e^2} \sqrt{\frac{\epsn}{\tb}} \phi_2(\tb)\unit{m^2\,s^{-1}}, \\
+        \phi_2(\tb) &= 0.448\ln(\epsn/\tb).
+    \end{align}
+\end{subequations}
+    
 \note{Explain how equations are solved, etc.}
 
 
+
 \subsubsection{Sound Horizon \note{(working title)}} \label{sssec:M2:sound_horizon}
-We are interested in the sound horizon at decoupling, blah blah blah...
-
-
+Before recombination happens, baryons and photons are tightly coupled. For this reason, the baryons and photons behave as if they were a single fluid, and the sound speed of this fluid is given by \note{(citation)}
 \begin{equation} \label{eq:M2:theory:soundspeed}
-    c_s = c \sqrt{\frac{R}{3(1+3R)}},\quad R = \frac{4\ogn}{3\obn e^x}
+    c_s = c \sqrt{\frac{R}{3(1+3R)}},\quad R = \frac{4\ogn}{3\obn e^x},
 \end{equation}
-
+and we see that during radiation domination, we have $c_s \approx c/\sqrt{3}$. After recombination happens, photons will still have a sound speed of $c_s=c/\sqrt{3}$, while the sound speed of baryons will drop. \note{Is the previous sentence obsolete?} The total co-moving distance of these sound waves since the Big Bang is given as    
 \begin{equation} \label{eq:M2:theory:sound_horizon_integral}
-    s(x)=\int_{-\infty}^x \frac{\dd x' c_s}{\H}
+    s(x)=\int_{-\infty}^x \frac{\dd x' c_s}{\H}.
 \end{equation}
-
+The size of this co-moving distance at recombination is known as the sound horizon, $r_s = s(x_\mathrm{rec})$. This allows us to estimate the angular separation of the CMB, over which we may expect there to have been causal contact. Thus, we have an additional ODE to solve, 
 \begin{equation} \label{eq:M2:theory:sound_horizon_ode}
     \dv{s(x)}{x} = \frac{c_s}{\H},
 \end{equation}
-with $s(x_\mathrm{ini})=\frac{c_s(x_\mathrm{ini})}{\H(x_\mathrm{ini})}$.
+with $s(x_\mathrm{ini})=\frac{c_s(x_\mathrm{ini})}{\H(x_\mathrm{ini})}$ as the initial condition, following the same reasoning as we did for $\eta'(x)$ in Eq. \eqref{eq:M1:theory:eta_of_xstart_analytical_approximation}. \note{Relate the sound-horizon to the Power Spectrum as well.}
