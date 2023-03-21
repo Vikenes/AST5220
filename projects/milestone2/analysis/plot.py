@@ -37,15 +37,15 @@ plt.rcParams['font.family'] = 'Times New Roman'
 
 
 # Paths 
-here = os.path.abspath(".")
-# data_path = here + "/../data/"
-data_path = "/home/vetle/Documents/master_studies/subjects/V23/AST5220/projects/milestone2/data/"
+# project_path = os.path.abspath(".")
+project_path = "/home/vetle/Documents/master_studies/subjects/V23/AST5220/projects/milestone2"
 
-latex_path = here + "/../report/tables/"
-# temp_path = here + "/../../output/plots/temp/"
-fig_path = here +"/figures/"
+data_path = project_path + "/data/"
+latex_path = project_path + "/report/tables/"
+fig_path = project_path + "/analysis/figures/"
 
-def save_push(fig, pdf_name, save=True, push=False, show=False, tight=True):
+
+def save_push(fig, pdf_name, save=True, push=False, show=False, tight=True, temp=False):
     """
     This function handles whether you want to show,
     save and/or push the file to git.
@@ -57,14 +57,24 @@ def save_push(fig, pdf_name, save=True, push=False, show=False, tight=True):
     if tight:
         fig.tight_layout()
 
-    pdfname = pdf_name.replace('.pdf', '').strip() + ".pdf"
-    file = fig_path + pdfname
+    if temp:
+        fig_name = "TEMP" + pdf_name.replace(".pdf", ".png")
+    else: 
+        fig_name = pdf_name 
     
+    file = fig_path + fig_name
+
+
     if save:
-        print(f'Saving plot: {pdfname}')
-        fig.savefig(file)
+        print(f'Saving plot: {fig_name}')
+        if not temp:
+            fig.savefig(file)
+        else:
+            fig.savefig(file, dpi=50)
+    
     else:
         plt.show()
+
     if push:
         os.system(f"git add {file}")
         os.system("git commit -m 'upload plot'")
@@ -116,218 +126,33 @@ def load(file, folder=data_path, skiprows=0):
 
 
 
-def plot_single_param(x, quantity, fname, mr_eq=None, mL_eq=None, acc=None, 
-                        xlabel=None, ylabel=None, xlim=None, ylim=None, 
-                        title=None, legend=False, legendloc='best', yticks=None, 
-                        figsize=(8,6), log=True, save=True, push=False):
+def plot_quantity_with_derivatives(x, y, dy, ddy,
+                                   y_legend, dy_legend, ddy_legend, 
+                                   fname, xlabel=r"$x$", ylabel=None, 
+                                   xlim=None, ylim=None, 
+                                   legendloc='best', yticks=None, 
+                                   figsize=(8,6), log=True, 
+                                   save=True, temp=False):
 
     fig, ax = plt.subplots(figsize=figsize)
-    ax.plot(x, quantity, color='blue')
-
-    if ylim is None:
-        ymin = np.min(quantity)
-        ymax = np.max(quantity)
-    else:
-        ymin, ymax = ylim
+    ax.plot(x, y  ,ls='solid' , color='blue'  , label=y_legend)
+    ax.plot(x, dy ,ls='dashed', color='orange', label=dy_legend)
+    ax.plot(x, ddy,ls='dotted', color='green' , label=ddy_legend)
 
 
-    if mr_eq is not None:
-        ax.vlines(mr_eq, ymin, ymax, ls='dashed', alpha=0.5,
-                    color='red', label=r'$\Omega_\mathrm{rel}=\Omega_m$')
-
-    if mL_eq is not None:
-        ax.vlines(mL_eq, ymin, ymax, ls='dashed', alpha=0.5,
-                    color='green', label=r'$\Omega_m=\Omega_\Lambda$')
-    if acc is not None:
-        ax.vlines(acc, ymin, ymax, ls='dashed', alpha=0.5, color='purple', label=r'$\ddot{a}=0$')
-        
     ax.set_ylim(ylim)
     ax.set_xlim(xlim)
 
     if log:
         ax.set_yscale('log')
     
-    set_ax_info(ax, xlabel, ylabel, title, legend=legend, legendloc=legendloc)
+    set_ax_info(ax, xlabel, ylabel, legendloc=legendloc)
+
     if yticks is not None:
         ax.set_yticks(yticks)
-    save_push(fig, fname, save, push)
+
+    save_push(fig, fname, save, temp=temp)
     
-
-def plot_omega_params(x, m, r, L, fname, xlabel=None, ylabel=None, title=None, 
-                    xlim=[-15,3], ylim=[0,1.1], save=True, push=False):
-
-    fig, ax = plt.subplots(figsize=(9,7))
-
-    r_, = ax.plot(x, r, color='red', label=r'$\Omega_\mathrm{r} = \Omega_\gamma + \Omega_\nu$')
-    m_, = ax.plot(x, m, color='green', label=r'$\Omega_\mathrm{m}=\Omega_\mathrm{b} + \Omega_\mathrm{CDM}$')
-    l_, = ax.plot(x, L, color='orange', label=r'$\Omega_\Lambda$')
-
-
-
-    if xlim is not None:
-        ax.set_xlim(xlim)
-    if ylim is not None:
-        ax.set_ylim(ylim)
-
-    leg1 = plt.legend(handles=[r_], loc='center left' , handlelength=1, fontsize=20)
-    leg3 = plt.legend(handles=[l_], loc='center right', handlelength=1, fontsize=20)
-    leg2 = plt.legend(handles=[m_], loc=(0.44, 0.48)     ,handlelength=1, fontsize=20)
-
-    ax.add_artist(leg1)
-    ax.add_artist(leg2)
-    ax.add_artist(leg3)
-
-    set_ax_info(ax, xlabel, ylabel, title, legend=False)#, legendloc="center")
-    
-    save_push(fig, fname, save, push)
-
-
-
-def compare_dH_and_ddH_over_H(x, dH_over_H, ddH_over_H, dH_label, ddH_label, x_mr_eq, x_mL_eq, 
-                        title=None, xlim=[-16,5], save=True, push=False):
-    
-    fig, ax = plt.subplots(figsize=(10,8))
-
-    dH_,  = ax.plot(x, dH_over_H, color='blue', label=dH_label)
-    ddH_, = ax.plot(x, ddH_over_H, color='k', label=ddH_label)
-
-    l1 = ax.hlines(-1, xmin=xlim[0], xmax=x_mr_eq,  ls='dashed',color='r', label=r'$w=1/3$')
-    l2 = ax.hlines(-1/2, xmin=x_mr_eq, xmax=x_mL_eq,ls='dashed',color='green', label=r'$w=0$')
-    l3 = ax.hlines(1, xmin=x_mL_eq, xmax=xlim[-1],  ls='dashed',color='orange', label=r'$w=-1$')
-
-    ax.hlines(1, xmin=xlim[0], xmax=x_mr_eq,  ls='dashed',color='r')
-    ax.hlines(1/4, xmin=x_mr_eq, xmax=x_mL_eq,ls='dashed',color='green')
-    ax.hlines(1, xmin=x_mL_eq, xmax=xlim[-1],  ls='dashed',color='orange')
-
-    leg1 = plt.legend(handles=[dH_, ddH_], loc='center left', fontsize=40, handlelength=1)
-    leg2 = plt.legend(handles=[l1,l2,l3])
-    ax.add_artist(leg1)
-    ax.add_artist(leg2)
-
-    ax.set_xlim(xlim)
-
-    set_ax_info(ax, xlabel='$x$', title=title, legend=False)
-    # ax.set_xticks([-15,-12,-9, -6, -3, 0, 3])
-    ax.set_xticks([-15,-10,-5, 0, 5])
-
-
-    save_push(fig, 'dH_and_ddH_over_H.pdf', save)
-
-
-        
-def compare_ddH_over_H(x, ddH_H, H_label, x_mr_eq, x_mL_eq, 
-                        title=None, xlim=[-20,5], save=True, push=False):
-    
-    fig, ax = plt.subplots(figsize=(12,10))
-
-    ax.plot(x, ddH_H, label=H_label)
-    ax.hlines(1, xmin=xlim[0], xmax=x_mr_eq,  ls='dashed',color='r', label=r'$\omega=1/3$')
-    ax.hlines(1/4, xmin=x_mr_eq, xmax=x_mL_eq,ls='dashed',color='green', label=r'$\omega=0$')
-    ax.hlines(1, xmin=x_mL_eq, xmax=xlim[-1],  ls='dashed',color='orange', label=r'$\omega=-1$')
-
-    ax.set_xlim(xlim)
-
-    set_ax_info(ax, xlabel='$x$', title=title)
-    save_push(fig, 'ddH_over_H.pdf', save)
-
-
-
-def plot_t_and_eta(x, t, etac, fname, xlim=[-17,5], 
-                   mr_eq=None, mL_eq=None, acc=None, save=True):
-    fig, ax = plt.subplots(figsize=(8,6))
-
-    ax.set_xlim(xlim)
-    ax.plot(x, etac, color='blue', label=r'$\eta(x)/c$')
-    ax.plot(x, t, color='k', label=r'$t(x)$')
-    ylims = ax.get_ylim()
-    if mr_eq is not None:
-        ax.vlines(mr_eq, *ylims, ls='dashed', color='red', alpha=0.5, label=r'$\Omega_\mathrm{rad}=\Omega_m$')
-    if mL_eq is not None:
-        ax.vlines(mL_eq, *ylims, ls='dashed', color='green', alpha=0.5, label=r'$\Omega_m=\Omega_\Lambda$')
-    if acc is not None:
-        ax.vlines(acc, *ylims, ls='dashed', color='purple', alpha=0.5, label=r'$\ddot{a}=0$')
-
-    ylabel=r'Time $[\mathrm{Gyr}]$'
-    xlabel=r"$x$"
-
-
-    set_ax_info(ax, xlabel, ylabel)
-    save_push(fig, fname, save=save)
-
-
-
-def plot_dL(data, planck=None, fit=[None,None], 
-            fname="dL_z_compare.pdf", save=True):
-
-    z_data,   dL_data, dL_error = data 
-    z_planck, dL_planck         = planck 
-    z_fit,    dL_fit            = fit         
-    fig, ax = plt.subplots(figsize=(8,7))
-
-    if dL_fit is not None:
-        ax.plot(z_fit, dL_fit/z_fit, color='blue', label='Best fit')
-
-        ax.plot(z_planck, dL_planck/z_planck, color='green', ls='dashed', alpha=0.7, label='Planck Cosmology')
-    else:
-        ax.plot(z_planck, dL_planck/z_planck, color='green', label='Planck Cosmology')
-
-    ax.errorbar(z_data, dL_data/z_data, yerr=dL_error/z_data, barsabove=True, fmt='o', 
-                capthick=1.5, capsize=5, elinewidth=2, color='r', ms=3,
-                label='Data')
-
-    xlabel=r'$z$'
-    ylabel=r'$d_L(z)/z \:[\mathrm{Gpc}]$'
-
-    ax.set_xscale('log')
-    ax.set_yscale('log')
-
-    set_ax_info(ax, xlabel, ylabel)#, title="Supernova fit")
-    ax.set_ylabel(ylabel, labelpad=10)
-    # formatter = ScalarFormatter()
-    # formatter.set_scientific(False)
-    # ax.yaxis.set_minor_formatter(ScalarFormatter())
-    ax.set_yticks([4,5,6,7,8])
-    ax.set_yticklabels(['$4$','$5$','$6$','$7$','$8$'])
-    # ax.set_axes_locator()
-    # ax.yaxis.set_minor_formatter(FormatStrFormatter("%d"))
-    # ax.yaxis.set_major_formatter(ScalarFormatter())
-
-    # plt.ticklabel_format(axis='y', style='plain')
-    save_push(fig, fname, save=save)
-
-
-
-def plot_OmegaM_OmegaLambda_plane(OmegaM, OmegaLambda, chi2_1sigma, chi2_2sigma, chi2_min, fname, save=True):
-
-    fig, ax = plt.subplots(figsize=(10,8))
-
-    ax.plot(OmegaM[chi2_2sigma], OmegaLambda[chi2_2sigma],'ro',ms=1)
-    ax.plot(OmegaM[chi2_1sigma], OmegaLambda[chi2_1sigma],'bo',ms=1)
-    ax.plot([], 'ro', label=r'$2\sigma$')
-    ax.plot([], 'bo', label=r'$1\sigma$')
-    omega_k_zero = np.linspace(0, 1, 20)
-    ax.plot(omega_k_zero, 1 - omega_k_zero, 'k--', label=r'$\Omega_k=0$')
-    ax.plot(OmegaM[chi2_min], OmegaLambda[chi2_min], 'D', color='orange', ms=10, label='Best fit')
-
-    ax.set_xlim(0,0.8)
-    ax.set_ylim(0.1,1.2)
-    set_ax_info(ax, xlabel=r"$\Omega_m$", ylabel=r"$\Omega_\Lambda$")
-    save_push(fig, fname, save)
-
-    print('best fit:')
-    print(f'{OmegaM[chi2_min]:.5f}')
-    print(f'{OmegaLambda[chi2_min]:.5f}')
-    print(f'{1 - OmegaM[chi2_min] - OmegaLambda[chi2_min]:.5f}')
-
-
-
-def plot_H0_posterior_pdf(H0, bins, H0_gaussian, fname, save=True):
-    fig, ax = plt.subplots(figsize=(12,8))
-
-    ax.plot(bins, H0_gaussian, color='blue', label=r"$H_0\sim \mathcal{N}(\mu,\sigma^2)$")
-    ax.hist(H0, bins=bins, density=True, color='green', edgecolor='k')
-    set_ax_info(ax, xlabel=r"$H_0\:[\mathrm{km/s/Mpc}]$")
-    save_push(fig, fname, save)
 
 
 def time_table(mr_eq, ml_eq, acc_onset, t0, eta0, save=False, show=False):

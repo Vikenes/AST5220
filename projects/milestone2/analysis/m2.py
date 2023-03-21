@@ -18,7 +18,10 @@ import plot
 # data_path = os.path.abspath(".") + "/../data/"
 data_path = "/home/vetle/Documents/master_studies/subjects/V23/AST5220/projects/milestone2/data/"
 
-
+global SAVE 
+global TEMP
+SAVE = False 
+TEMP = False 
 
 
 class Recombination:
@@ -112,9 +115,10 @@ class Recombination:
         plt.show()
 
 
-    def plot_visibility_functions(self, dg_dx_scaling=30, 
-                                        ddg_ddx_scaling=500,
-                                        xlim=[-7.5, -6.5]):
+    def plot_visibility_functions(self, dg_dx_scaling=10, 
+                                        ddg_ddx_scaling=300,
+                                        xlim=[-7.5, -6],
+                                        ylim=None):
         
         """
         Plot g(x), g'(x) and g''(x)
@@ -124,24 +128,41 @@ class Recombination:
         dg_dx_scaled = self.dg_tilde_dx / dg_dx_scaling
         ddg_ddx_scaled = self.ddg_tilde_ddx / ddg_ddx_scaling
 
-        plt.plot(self.x, self.g_tilde  , label=r"$\tilde{g}(x)$")
-        plt.plot(self.x, dg_dx_scaled  , ls='dashed', label=r"$\tilde{g}'(x)$" + f"/{dg_dx_scaling:.0f}")
-        plt.plot(self.x, ddg_ddx_scaled, ls='dotted', label=r"$\tilde{g}''(x)$"+ f"/{ddg_ddx_scaling:.0f}")
-        plt.legend()
-        plt.xlim(xlim)
-        plt.show()
+        x   = self.x 
+        y   = self.g_tilde
+        dy  = dg_dx_scaled 
+        ddy = ddg_ddx_scaled
+
+        dg_str = str(dg_dx_scaling)
+
+        y_legend    = r"$\tilde{g}(x)$"
+        dy_legend   = r"$\tilde{g}'(x)$" + rf"$/{str(dg_dx_scaling)}$"
+        ddy_legend  = r"$\tilde{g}''(x)$" + rf"$/{str(ddg_ddx_scaling)}$"
 
 
-    def plot_tau_with_derivatives(self, xlim=[-12,0]):
-        
-        plt.plot(self.x, self.tau       , ls='solid', label=r"$\tau(x)$")
-        plt.plot(self.x, -self.dtau_dx  , ls='dashed', label=r"$-\tau'(x)$")
-        plt.plot(self.x, self.ddtau_ddx , ls='dotted', label=r"$\tau''(x)$")
-        plt.legend()
-        plt.xlim(xlim)
-        plt.yscale('log')
-        plt.show()
+        plot.plot_quantity_with_derivatives(x, y, dy, ddy, 
+                                            y_legend, dy_legend, ddy_legend,
+                                            fname="g_plot.pdf",
+                                            xlim=xlim, log=False,
+                                            save=SAVE, temp=TEMP)
 
+
+    def plot_tau_with_derivatives(self, xlim=[-10,0], ylim=[1e-8, 1e6]):
+
+        x   = self.x 
+        y   = self.tau 
+        dy  = - self.dtau_dx
+        ddy = self.ddtau_ddx
+
+        y_legend   = r"$\tau(x)$"
+        dy_legend  = r"$- \tau'(x)$"
+        ddy_legend = r"$\tau''(x)$"
+
+        plot.plot_quantity_with_derivatives(x, y, dy, ddy, 
+                                            y_legend, dy_legend, ddy_legend,
+                                            fname="tau_plot.pdf",
+                                            xlim=xlim, ylim=ylim,
+                                            save=SAVE, temp=TEMP)
 
 
 class recomb_and_decoupling_times:
@@ -166,23 +187,26 @@ class recomb_and_decoupling_times:
         # x_dec_tau, z_dec_tau, t_dec_tau, rs_dec_tau = self.data[0]
         # x_dec_gmax, z_dec_gmax, t_dec_gmax, rs_dec_gmax = self.data[1]
         # x_rec, z_rec, t_rec, rs_rec = self.data[2]
-        print(self.x_dec_tau, self.x_dec_gmax, self.x_rec)
 
-        print(self.rs_dec_gmax)
-        print(self.t_rec)
-    # def load_data_
 
 
 
 
 rec = Recombination("recombination.txt")
-
 rec_saha_only = Recombination("recombination_saha.txt")
+
+rec_times = recomb_and_decoupling_times("rec_times.txt")
 
 # x_saha, Xe_saha = rec_saha_only.x, rec_saha_only.Xe
 rec.assert_valid_recombination_value()
 rec.assert_normalized_g_tilde()
-# rec.plot_visibility_functions()
+
+SAVE = True
+TEMP = True
+
+# rec.plot_tau_with_derivatives()
+rec.plot_visibility_functions()
+
+
 # rec.compare_Xe(x_saha, Xe_saha)
 
-rec_times = recomb_and_decoupling_times("rec_times.txt")
