@@ -95,7 +95,6 @@ void BackgroundCosmology::solve(){
   Utils::EndTiming("t");
 }
 
-
 // Solve the background
 void BackgroundCosmology::solve_eta(){
   //=============================================================================
@@ -124,6 +123,35 @@ void BackgroundCosmology::solve_eta(){
 
 
 }
+
+
+void BackgroundCosmology::solve_t(){
+  Utils::StartTiming("t");
+  //=============================================================================
+  // Solve ODE for t(x) and Spline result.
+  //=============================================================================
+
+  Vector x_array = Utils::linspace(x_start, x_end, nx);
+
+  ODEFunction dtdx = [&](double x, const double *t, double *dtdx){
+    dtdx[0] = 1.0 / H_of_x(x);
+    return GSL_SUCCESS;
+  };
+
+  double t_ini = 1.0 / (2.0 * H_of_x(x_start));
+  Vector t_ic{t_ini};
+
+  // Solve ODE 
+  ODESolver t_ode;
+  t_ode.solve(dtdx, x_array, t_ic);
+
+  // Spline 
+  auto t_array = t_ode.get_data_by_component(0);
+  t_of_x_spline.create(x_array, t_array, "t(x) spline");
+
+  Utils::EndTiming("t");
+}
+
 
 //====================================================
 // Get methods

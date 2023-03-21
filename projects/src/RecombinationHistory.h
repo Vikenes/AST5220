@@ -26,7 +26,6 @@ class RecombinationHistory{
     const int npts_rec_arrays = 1e5;
   
     // Xe for when to switch between Saha and Peebles
-    // const double Xe_saha_limit = 0.000000001;
     // const double Xe_saha_limit = 1e-15;
     const double Xe_saha_limit = 0.99;
 
@@ -50,7 +49,7 @@ class RecombinationHistory{
     //===============================================================
 
     // Number of points of tau, g_tilde arrays, and their derivatives
-    const int npts_tau = 1e5;
+    const int npts_tau = 5e4;
 
     // The two things we need to solve: Xe/ne and tau
     void solve_for_optical_depth_tau();
@@ -74,7 +73,7 @@ class RecombinationHistory{
     Spline s_of_x_spline{"s(x)"};
 
     // Number of points written to file
-    const int nx_write = 5e4;
+    const int nx_write = 1e5;
 
   public:
 
@@ -92,6 +91,8 @@ class RecombinationHistory{
 
     // Output some data to file
     void output(const std::string filename) const;
+    void output_important_times(const std::string filename) const;
+
 
     // Get functions that we must implement
     double tau_of_x(double x) const;

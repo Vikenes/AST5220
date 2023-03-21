@@ -128,7 +128,7 @@ std::pair<double,double> RecombinationHistory::electron_fraction_from_saha_equat
 
   // Fetch cosmological parameters
   const double Tb          = cosmo->get_TCMB(x);
-  const double kT      = k_b * Tb;
+  const double kT          = k_b * Tb;
   const double nb          = nb_of_x(x); 
 
 
@@ -422,3 +422,96 @@ void RecombinationHistory::output(const std::string filename) const{
   std::for_each(x_array.begin(), x_array.end(), print_data);
 }
 
+void RecombinationHistory::output_important_times(const std::string filename) const{
+  std::ofstream fp(filename.c_str());
+
+  std::cout << "Computing decoupling and recombination time. " << std::endl
+  << "Writing to: " << filename << std::endl;
+
+  double tau_at_dec = 1.0; 
+  auto x_range_tau = std::pair<double,double>(x_start, x_end);
+  double x_dec_tau = Utils::binary_search_for_value(tau_of_x_spline, 
+                                                  tau_at_dec,
+                                                  x_range_tau);
+  
+  double dg_dx_at_dec = 0.0;
+  auto x_range_g_peak = std::pair<double,double>(x_dec_tau - 0.1, x_dec_tau + 0.1);
+  double x_dec_g_peak = Utils::binary_search_for_value(dg_dx_spline, 
+                                                      dg_dx_at_dec,
+                                                      x_range_g_peak);
+  
+
+  double log_Xe_at_recomb = log(0.1);
+  auto x_range_recomb = std::pair<double,double>(x_start, x_end);
+  double x_recomb = Utils::binary_search_for_value(log_Xe_of_x_spline,
+                                                      log_Xe_at_recomb,
+                                                      x_range_recomb);
+
+  
+  cosmo->solve_t();
+  auto z_of_x = [&](double x){ return exp(-x) - 1.0; };
+  auto t_of_x = [&](double x){ return cosmo->get_t_of_x(x); }; 
+
+  Vector decoupl_tau;
+  Vector decoupl_gpeak;
+  Vector recomb;
+
+  Vector x_times = Vector({x_dec_tau, x_dec_g_peak, x_recomb});
+  std::vector x_names ({"dec_tau", "dec_g_peak", "recomb"});
+
+  auto print_data = [&] (const double x) {
+    fp << x         << " ";
+    fp << z_of_x(x) << " ";
+    fp << t_of_x(x) << " ";
+    fp << s_of_x(x) << " ";
+    fp << "\n";
+  }; 
+
+  fp << "x z t r_s (r1=dec_tau=1, r2=dec_gmax, r3=rec)\n";
+  // fp << x_dec_tau << " " << x_dec_g_peak << " " << x_recomb << " \n";
+  // fp << z_of_x(x_dec_tau) << " " << z_of_x(x_dec_g_peak) << " " << z_of_x(x_recomb) << " \n";
+  // fp << t_of_x(x_dec_tau) << " " << t_of_x(x_dec_g_peak) << " " << t_of_x(x_recomb) << " \n";
+  // fp << s_of_x(x_dec_tau) << " " << s_of_x(x_dec_g_peak) << " " << s_of_x(x_recomb) << " \n";
+
+
+  std::for_each(x_times.begin(), x_times.end(), print_data);
+
+  /*
+  double z_dec_tau       = z_of_x(x_dec_tau);
+  double z_dec_g_peak    = z_of_x(x_dec_g_peak);
+  double z_recomb        = z_of_x(x_recomb);
+
+  double t_dec_tau       = cosmo->get_t_of_x(x_dec_tau);
+  double t_dec_g_peak    = cosmo->get_t_of_x(x_dec_tau);
+  double t_recomb        = cosmo->get_t_of_x(x_recomb);
+
+  double r_s_dec_tau     = s_of_x(x_dec_tau);
+  double r_s_dec_g_peak  = s_of_x(x_dec_g_peak);
+  double r_s_recomb      = s_of_x(x_recomb);
+
+
+
+  std::cout << "Decoupling: " << "tau = " << tau_of_x(x_dec_tau) << std::endl;
+  std::cout << "   x  = " << x_dec_tau << std::endl;
+  std::cout << "   z  = " << z_dec_tau << std::endl;
+  std::cout << "   t  = " << t_dec_tau << std::endl;
+  std::cout << "   rs = " << r_s_dec_tau << std::endl << std::endl;
+
+  std::cout << "Decoupling: " << "gmax = " << g_tilde_of_x(x_dec_g_peak)
+  << ", dgdx = " << dgdx_tilde_of_x(x_dec_g_peak) << std::endl;
+  std::cout << "   x  = " << x_dec_g_peak << std::endl;
+  std::cout << "   z  = " << z_dec_g_peak << std::endl;
+  std::cout << "   t  = " << t_dec_g_peak << std::endl;
+  std::cout << "   rs = " << r_s_dec_g_peak << std::endl << std::endl;
+
+  std::cout << "Recombination: " << "Xe = " << Xe_of_x(x_recomb) << std::endl;
+  std::cout << "   x  = " << x_recomb << std::endl;
+  std::cout << "   z  = " << z_recomb << std::endl;
+  std::cout << "   t  = " << t_recomb << std::endl;
+  std::cout << "   rs = " << r_s_recomb << std::endl;
+
+  */
+
+
+
+}

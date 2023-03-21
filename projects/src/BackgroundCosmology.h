@@ -52,6 +52,7 @@ class BackgroundCosmology{
     // Do all the solving
     void solve();
     void solve_eta();
+    void solve_t();
 
     // Output some results to file
     void output(const std::string filename) const;
