@@ -46,24 +46,45 @@ class Recombination:
     def x_to_redshift(self, x):
         return np.exp(-x) - 1 
     
-    def recomb_tau(self):
+    def assert_valid_solution(self, print_x=False, stop=False):
         tau_equal_1_idx = np.argmin(np.abs(self.tau - 1))
         g_peak_idx      = np.argmax(self.g_tilde)
-        x_rec = self.x[tau_equal_1_idx]
-        x_rec2= self.x[g_peak_idx]
-        x_rec_Nanna = -6.98
-        print(" ")
-        print(f"Vetle: {self.x_to_redshift(x_rec):.5f}, x={x_rec:.5f}", " | ", self.x_to_redshift(x_rec2))
-        print("Nanna: ", self.x_to_redshift(x_rec_Nanna))
-        # print(" ")
-        # print(self.x[0], self.x[-1])
-        # print("tau: ", self.tau[-5:-1], self.tau[-1])
+        x_rec_tau = self.x[tau_equal_1_idx]
+        x_rec_g= self.x[g_peak_idx]
+        z_rec_tau = self.x_to_redshift(x_rec_tau)
+        z_rec_g   = self.x_to_redshift(x_rec_g)
+    
+
+        if z_rec_tau < 1050 or z_rec_tau > 1150:
+            print(" ")
+            print("### ERROR ###")
+            print("Invlaid solution. tau=1 at z outside [1050, 1150]")
+            print_x = True 
+            stop = True  
+
+        elif z_rec_g < 1050 or z_rec_g > 1150:
+            print("### ERROR ###")
+            print("Invlaid solution. g peaks at z outside [1050, 1150]")
+            print_x = True 
+            stop = True 
+
+        if print_x:
+            print(f"z(tau=1) = {z_rec_tau:.5f}, x={x_rec_tau:.5f}")
+            print(f"z(g_max) = {z_rec_g:.5f}, x={x_rec_g:.5f}")
+
+        if stop:
+            exit()
 
 
-    def plotfrac(self):
-        # plt.plot(self.x, self.ne)
-        plt.plot(self.x, self.Xe)
-        plt.xlim(-8,-6)
+
+    def compare_Xe(self, x_saha, Xe_saha):
+        
+        plt.plot(self.x, self.Xe, label='Saha+peebles')
+        plt.plot(x_saha, Xe_saha, ls='dashed', label='saha only')
+
+        plt.ylim(1e-4, 2)
+        plt.xlim(-10,0)
+        plt.legend()
         plt.yscale('log')
         plt.show()
 
@@ -99,15 +120,85 @@ class Recombination:
         plt.show()
 
 
+def compare_gs(dg_dx_scaling=30, 
+                ddg_ddx_scaling=500,
+                xlim=[-8, -6]):
+        
+        """
+        Plot g(x), g'(x) and g''(x)
+        scale g'(x) and g''(x) to fit in the same plot as g(x)
+        """
+        rec1 = Recombination("recombination.txt")
+        rec2 = Recombination("rec2.txt")
+        x1 = rec1.x 
+        x2 = rec2.x 
+        g1, dg1, ddg1 = rec1.g_tilde, rec1.dg_tilde_dx/dg_dx_scaling, rec1.ddg_tilde_ddx/ddg_ddx_scaling 
+        g2, dg2, ddg2 = rec2.g_tilde, rec2.dg_tilde_dx/dg_dx_scaling, rec2.ddg_tilde_ddx/ddg_ddx_scaling
 
-    
-rec_sound = Recombination("rec.txt")
-# rec_sound.plot_tau_with_derivatives()
-rec_sound.recomb_tau()
-rec_sound.plotfrac()
+        plt.plot(x1, g1  , label="old")
+        plt.plot(x1, dg1 , ls='solid', label="old")
+        plt.plot(x1, ddg1, ls='solid', label="old")
+        plt.plot(x2, g2  , ls='solid' ,alpha=0.5,  label="new")
+        plt.plot(x2, dg2 , ls='dashed',alpha=0.5, label="new")
+        plt.plot(x2, ddg2, ls='dotted',alpha=0.5, label="new")
+
+
+        plt.legend()
+        plt.xlim(xlim)
+        plt.show()
+
+
+def compare_taus(xlim=[-8,-6]):
+        rec1 = Recombination("rec2.txt")
+        rec2 = Recombination("recombination.txt")
+        x1 = rec1.x 
+        x2 = rec2.x 
+        t1, dt1, ddt1 = rec1.tau, rec1.dtau_dx, rec1.ddtau_ddx 
+        t2, dt2, ddt2 = rec2.tau, rec2.dtau_dx, rec2.ddtau_ddx
+
+        plt.plot(x1, t1  , ls='solid' , label=r"$\tau(x)$")
+        plt.plot(x1, -dt1, ls='solid', label=r"$-\tau'(x)$")
+        plt.plot(x1, ddt1, ls='solid', label=r"$-\tau'(x)$")
+        plt.plot(x2, t2  , ls='solid' ,alpha=0.5, label="old")
+        plt.plot(x2, -dt2, ls='dashed',alpha=0.5, label="old")
+        plt.plot(x2, ddt2, ls='dotted',alpha=0.5, label="old")
+        
+        plt.legend()
+        # plt.xlim(xlim)
+        plt.yscale('log')
+        plt.show()
+
+
+
+
+
+
+# rec = Recombination("recombination.txt")
+rec = Recombination("r.txt")
+
+rec_saha_only = Recombination("recombination_saha.txt")
+x_saha, Xe_saha = rec_saha_only.x, rec_saha_only.Xe
+rec.assert_valid_solution()
+# rec.compare_Xe(x_saha, Xe_saha)
+
+# compare_gs()
+# compare_taus()    
+
+# rec_sound.plotfrac()
 # rec_sound.plot_tau_with_derivatives(xlim=[-7.5,-6.5])
-# rec_sound.plot_visibility_functions()
+# rec.plot_visibility_functions()
 
+
+# z1 = rec_sound.x_to_redshift(rec_sound.x)
+# z2 = rec_saha.x_to_redshift(rec_saha.x)
+
+# plt.plot(z1, rec_sound.Xe, label="peb")
+# plt.plot(z2, rec_saha.Xe, '--', label="saha")
+# plt.xscale('log')
+# plt.yscale('log')
+# plt.xlim(5e3,1e2)
+# plt.legend()
+# plt.show()
 exit()
 
 

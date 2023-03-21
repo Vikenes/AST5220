@@ -73,14 +73,10 @@ int main(int argc, char **argv){
   rec.solve();
   // rec.info();
 
+
   // Output recombination quantities
-  // rec.output("milestone2/data/recombination.txt");
-  // rec.output("milestone2/data/recombination_sound.txt");
-  rec.output("milestone2/data/rec.txt");
-
-
-
-
+  rec.output("milestone2/data/recombination.txt");
+  // rec.output("milestone2/data/recombination_saha.txt");
 
   
   // Remove when module is completed

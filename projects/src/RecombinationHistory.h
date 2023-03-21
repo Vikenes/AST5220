@@ -27,7 +27,9 @@ class RecombinationHistory{
   
     // Xe for when to switch between Saha and Peebles
     // const double Xe_saha_limit = 0.000000001;
+    // const double Xe_saha_limit = 1e-15;
     const double Xe_saha_limit = 0.99;
+
 
 
     //===============================================================
@@ -72,7 +74,7 @@ class RecombinationHistory{
     Spline s_of_x_spline{"s(x)"};
 
     // Number of points written to file
-    // const int nx = 1e4;
+    const int nx_write = 5e4;
 
   public:
 
