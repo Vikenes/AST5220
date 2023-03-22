@@ -3,14 +3,7 @@
 
 \subsubsection{Solving the Saha Equation}\label{sssec:M2:implementations:solving_saha}
 
-In order to compute the optical depth and the visibility we must first compute the electron density. At early times all Hydrogen is ionized, and we therefore have $X_e\approx 1$, and $X_e$ can thus be approximated by the Saha equation, which involves solving a quadratic formula for $X_e$. 
-
-\begin{equation} \label{eq:M2:implementations:Xe_saha_quadratic_formula}
-    X_e = \frac{y}{2}\bclosed{-1 + \sqrt{1 + 4/y}},
-\end{equation}
-where $y$ is the RHS of Eq. \eqref{eq:M2:theory:saha_equation}, and we have neglected the negative solution, as $X_e$ is a strictly positive quantity. 
-
-At early times, however, the RHS of Eq. \eqref{eq:M2:theory:saha_equation} will be \note{huge}, and may result in numerical errors when we implement the quadratic formula numerically. To avoid this, we use the first order approximation $\sqrt{1+x}\approx 1 + \frac{x}{2}$ for $\abs{x}\ll1$ at early times. The equation we will solve is thus 
+In order to compute the optical depth and the visibility we must first compute the electron density. At early times all Hydrogen is ionized, and we therefore have $X_e\approx 1$, and $X_e$ can thus be approximated by the Saha equation, which involves solving a quadratic formula for $X_e$. At early times, however, the RHS of Eq. \eqref{eq:M2:theory:saha_equation} will be \note{huge}, and may result in numerical errors when we implement the quadratic formula numerically. To avoid this, we use the first order approximation $\sqrt{1+x}\approx 1 + \frac{x}{2}$ for $\abs{x}\ll1$ at early times. The equation we will solve is thus 
 \begin{equation}
     X_e = \begin{cases}
         1, \quad & y>10^7, \\
