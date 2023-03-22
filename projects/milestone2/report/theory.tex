@@ -46,7 +46,7 @@ where $\rhocn\equiv \frac{ H_0^2}{8\pi G}$ is the critical density of the univer
 
 The Saha equation is given as 
 \begin{equation} \label{eq:M2:theory:saha_equation}
-    \frac{\X^2}{1-\X} = \frac{1}{n_b} \closed{\frac{m_e \tb}{2\pi}}^{3/2} e^{-\epsn / \tb},
+    \frac{\X^2}{1-\X} = \frac{1}{n_b} \pclosed{\frac{m_e \tb}{2\pi}}^{3/2} e^{-\epsn / \tb},
 \end{equation}
 where $\tb$ is the temperature of the baryons, and $\epsn=13.6\unit{eV}$ is the Hydrogen ionization energy. The time evolution of the baryon temperature is governed by a differential equation coupled to $\X$. However, we will assume that $\tb$ follows the photon temperature, $T_\gamma$, evolving as 
 \begin{equation}
@@ -57,7 +57,7 @@ where $\tb$ is the temperature of the baryons, and $\epsn=13.6\unit{eV}$ is the 
 
 
 \begin{equation}
-    \dv{\X}{x} = \frac{C_r(\tb)}{H}\bracket{\beta(\tb)(1-\X) - n_H \alpha^{(2)}(\tb) \X^2 }
+    \dv{\X}{x} = \frac{C_r(\tb)}{H}\bclosed{\beta(\tb)(1-\X) - n_H \alpha^{(2)}(\tb) \X^2 }
 \end{equation}
 
 \begin{subequations}
@@ -67,7 +67,7 @@ where $\tb$ is the temperature of the baryons, and $\epsn=13.6\unit{eV}$ is the 
         \Lambda_\alpha &= H \frac{(3\epsn)^3}{(8\pi)^2 n_{1s}}\unit{s^{-1}}, \\
         n_{1s} &= (1-\X) n_H \unit{m^{-3}}, \\
         \beta^{(2)}(\tb) &= \beta(\tb) e^{3\epsn/4\tb} \unit{s^{-1}},\\
-        \beta(\tb) &= \alpha^{(2)}(\tb) \closed{\frac{m_e \tb}{2\pi}}^3/2 e^{-\epsn/\tb} \unit{s^{-1}}, \\
+        \beta(\tb) &= \alpha^{(2)}(\tb) \pclosed{\frac{m_e \tb}{2\pi}}^3/2 e^{-\epsn/\tb} \unit{s^{-1}}, \\
         \alpha^{(2)} &= \frac{64\pi}{\sqrt{27\pi}} \frac{\alpha^2}{m_e^2} \sqrt{\frac{\epsn}{\tb}} \phi_2(\tb)\unit{m^2\,s^{-1}}, \\
         \phi_2(\tb) &= 0.448\ln(\epsn/\tb).
     \end{align}

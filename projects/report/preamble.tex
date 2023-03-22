@@ -43,8 +43,14 @@
 %==================================
 
 %===== Parenthesis and brackets ==========
-\newcommand{\closed}[1]{\left( #1 \right)}
-\newcommand{\bracket}[1]{\left[ #1 \right]}
+\newcommand{\pclosed}[1]{\left( #1 \right)}
+\newcommand{\bclosed}[1]{\left[ #1 \right]}
+\newcommand{\Bclosed}[1]{\{ #1 \}}
+\newcommand{\BBclosed}[1]{\left{ #1 \right}}
+\newcommand{\vclosed}[1]{\left| #1 \right|}
+
+
+
 
 %===== Formatting ============
 \newcommand{\unit}[1]{\,\mathrm{#1}}
@@ -99,5 +105,7 @@
 
 % \newcommand{\midrule}{\colrule}
 % \newcommand{\bottomrule}{\botrule}
+
+\newcommand{\tablesMilestoneTwo}[1]{\input{../milestone2/report/tables/#1}}
 
 \graphicspath{{../milestone1/analysis/figures/}{../milestone2/analysis/figures/}}

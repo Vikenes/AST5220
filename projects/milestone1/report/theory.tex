@@ -19,7 +19,7 @@ Matter, radiation and dark energy have densities evolving according to Eq. \eqre
 where $H\equiv\dot{a}/a$ is the Hubble parameter, with the dot denoting a derivative with respect to cosmic time, $t$. For the radiation, $\ogn$ and $\onun$ follow from the temperature of the CMB today, $\tcmb$, and the effective number of massless neutrinos, $N_\mathrm{eff}$. They are given by 
 \begin{align}
     \ogn &= 2 \cdot \frac{\pi^2}{30} \frac{(k_b T_\mathrm{CMB0})^4}{\hbar^3 c^5} \cdot \frac{8\pi G}{3H_0^2}, \label{eq:M1:theory:omega_gamma0_T} \\
-    \onun &= N_\mathrm{eff} \cdot \frac{7}{8} \cdot \closed{\frac{4}{11}}^{4/3} \ogn. \label{eq:M1:theory:omega_nu0_T}
+    \onun &= N_\mathrm{eff} \cdot \frac{7}{8} \cdot \pclosed{\frac{4}{11}}^{4/3} \ogn. \label{eq:M1:theory:omega_nu0_T}
 \end{align}
 %
 %
@@ -94,7 +94,7 @@ The supernova data we will study has distances measured in terms of luminosity d
 \end{equation} 
 Here, $r$ represents the radial coordinate of the emitted photon. To get an expression for $r$, we consider a photon's line-element in spherical coordinates,
 \begin{equation}
-    ds^2 = -c^2 dt^2 + a^2 \closed{\frac{dr^2}{1-kr^2} + r^2 d\theta^2 + r^2 \sin^2\theta d\phi^2}. \label{eq:M1:theory:FLRW_general_nonflat_spherical}
+    ds^2 = -c^2 dt^2 + a^2 \pclosed{\frac{dr^2}{1-kr^2} + r^2 d\theta^2 + r^2 \sin^2\theta d\phi^2}. \label{eq:M1:theory:FLRW_general_nonflat_spherical}
 \end{equation} 
 For photons travelling radially towards us, we have $\dd \theta=\dd\phi=0$. Since $ds^2=0$ for photons, integrating the line-element of a photon emitted at, $(t,r)$, reaching an observer at $(t_0, 0)$, yields 
 \begin{equation}
@@ -109,9 +109,9 @@ The RHS of Eq. \eqref{eq:M1:theory:comoving_distance_integral_expression} is kno
 Solving Eq. \eqref{eq:M1:theory:comoving_distance_integral_expression} with respect to $r$, we get
 \begin{equation}
     r = \begin{cases}
-        \chi\cdot \frac{\sin\closed{\sqrt{\abs{\okn}} H_0 \chi / c}}{\closed{\sqrt{\abs{\okn}} H_0 \chi / c}},\quad &\okn < 0, \\ 
+        \chi\cdot \frac{\sin\pclosed{\sqrt{\abs{\okn}} H_0 \chi / c}}{\pclosed{\sqrt{\abs{\okn}} H_0 \chi / c}},\quad &\okn < 0, \\ 
         \chi,\quad &\okn=0, \\ 
-        \chi\cdot \frac{\sinh\closed{\sqrt{\abs{\okn}} H_0 \chi / c}}{\closed{\sqrt{\abs{\okn}} H_0 \chi / c}},\quad &\okn > 0.
+        \chi\cdot \frac{\sinh\pclosed{\sqrt{\abs{\okn}} H_0 \chi / c}}{\pclosed{\sqrt{\abs{\okn}} H_0 \chi / c}},\quad &\okn > 0.
     \end{cases}
 \end{equation} 
 Eq. \eqref{eq:m1:theory:dL_of_a_general expression} can now be used to compute $d_L$, and the expression to use depends on the curvature.     
@@ -127,7 +127,7 @@ In \secref{sssec:M1:theory:conformal_time} we discussed how $\eta(x)$ can be use
 The first two derivatives of $\Hx$ are easily seen to be   
 \begin{align} 
     \dv{\H(x)}{x} &= \frac{H_0^2}{2\Hx}g(x), \label{eq:M1:theory:dHp_dx} \\
-    \dv[2]{\Hx}{x} &= \frac{H_0^2}{2\Hx}\bracket{g'(x) - \frac{1}{2}\closed{\frac{H_0 g(x)}{\Hx}}^2}. \label{eq:M1:theory:ddHp_ddx}
+    \dv[2]{\Hx}{x} &= \frac{H_0^2}{2\Hx}\bclosed{g'(x) - \frac{1}{2}\pclosed{\frac{H_0 g(x)}{\Hx}}^2}. \label{eq:M1:theory:ddHp_ddx}
 \end{align}
 %
 
