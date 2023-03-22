@@ -44,7 +44,8 @@ project_path = "/home/vetle/Documents/master_studies/subjects/V23/AST5220/projec
 
 data_path = project_path + "/data/"
 latex_path = project_path + "/report/tables/"
-fig_path = project_path + "/analysis/figures/"
+pdf_path = project_path + "/analysis/figures/"
+png_path = pdf_path + "temp/" 
 
 
 def save_push(fig, pdf_name, save=True, push=False, show=False, tight=True, temp=False):
@@ -60,9 +61,11 @@ def save_push(fig, pdf_name, save=True, push=False, show=False, tight=True, temp
         fig.tight_layout()
 
     if temp:
-        fig_name = "TEMP" + pdf_name.replace(".pdf", ".png")
+        fig_name = pdf_name.replace(".pdf", ".png")
+        fig_path = png_path
     else: 
-        fig_name = pdf_name 
+        fig_name = pdf_name
+        fig_path = pdf_path 
     
     file = fig_path + fig_name
 
@@ -216,10 +219,12 @@ def time_table(x, z, t, saha=False, save=False, temp=False):
 
     table_caption   = "Times when decoupling and recombination occurs, computed from the " 
     table_caption   += method + " equation."
-    table_label     = "tab:M2:results:dec_and_rec_times_" + method
+
+    table_name      = "rec_and_dec_time_table_" + method
+    table_label     = "tab:M2:results:" + table_name
+    table_fname     = table_name + ".tex"
 
     if save:
-        table_fname = "time_table_" + method + ".tex"
         if temp:
             table_fname = "TEMP" + table_fname
 

@@ -37,13 +37,18 @@ plt.rcParams['font.family'] = 'Times New Roman'
 
 
 # Paths 
-here = os.path.abspath(".")
-data_path = here + "/../data/"
-latex_path = here + "/../report/tables/"
-# temp_path = here + "/../../output/plots/temp/"
-fig_path = here +"/figures/"
+project_path = "/home/vetle/Documents/master_studies/subjects/V23/AST5220/projects/milestone1"
 
-def save_push(fig, pdf_name, save=True, push=False, show=False, tight=True):
+
+here = os.path.abspath(".")
+data_path = project_path + "/data/"
+latex_path = project_path + "/report/tables/"
+# temp_path = here + "/../../output/plots/temp/"
+# fig_path = here +"/figures/"
+pdf_path = project_path + "/analysis/figures/"
+png_path = pdf_path + "temp/"
+
+def save_push(fig, pdf_name, save=True, push=False, show=False, tight=True, temp=False):
     """
     This function handles whether you want to show,
     save and/or push the file to git.
@@ -55,12 +60,21 @@ def save_push(fig, pdf_name, save=True, push=False, show=False, tight=True):
     if tight:
         fig.tight_layout()
 
-    pdfname = pdf_name.replace('.pdf', '').strip() + ".pdf"
-    file = fig_path + pdfname
+    if temp:
+        fig_name = pdf_name.replace(".pdf", ".png")
+        fig_path = png_path
+    else:
+        fig_name = pdf_name 
+        fig_path = pdf_path
+
+    file = fig_path + fig_name
     
     if save:
-        print(f'Saving plot: {pdfname}')
-        fig.savefig(file)
+        print(f'Saving plot: {fig_name}')
+        if not temp:
+            fig.savefig(file)
+        else:
+            fig.savefig(file, dpi=50)
     else:
         plt.show()
     if push:
@@ -117,7 +131,7 @@ def load(file, folder=data_path, skiprows=0):
 def plot_single_param(x, quantity, fname, mr_eq=None, mL_eq=None, acc=None, 
                         xlabel=None, ylabel=None, xlim=None, ylim=None, 
                         title=None, legend=False, legendloc='best', yticks=None, 
-                        figsize=(8,6), log=True, save=True, push=False):
+                        figsize=(8,6), log=True, save=True, push=False, temp=False):
 
     fig, ax = plt.subplots(figsize=figsize)
     ax.plot(x, quantity, color='blue')
@@ -148,11 +162,11 @@ def plot_single_param(x, quantity, fname, mr_eq=None, mL_eq=None, acc=None,
     set_ax_info(ax, xlabel, ylabel, title, legend=legend, legendloc=legendloc)
     if yticks is not None:
         ax.set_yticks(yticks)
-    save_push(fig, fname, save, push)
+    save_push(fig, fname, save, push, temp=temp)
     
 
 def plot_omega_params(x, m, r, L, fname, xlabel=None, ylabel=None, title=None, 
-                    xlim=[-15,3], ylim=[0,1.1], save=True, push=False):
+                    xlim=[-15,3], ylim=[0,1.1], save=True, push=False, temp=False):
 
     fig, ax = plt.subplots(figsize=(9,7))
 
@@ -177,12 +191,12 @@ def plot_omega_params(x, m, r, L, fname, xlabel=None, ylabel=None, title=None,
 
     set_ax_info(ax, xlabel, ylabel, title, legend=False)#, legendloc="center")
     
-    save_push(fig, fname, save, push)
+    save_push(fig, fname, save, push, temp=temp)
 
 
 
 def compare_dH_and_ddH_over_H(x, dH_over_H, ddH_over_H, dH_label, ddH_label, x_mr_eq, x_mL_eq, 
-                        title=None, xlim=[-16,5], save=True, push=False):
+                        title=None, xlim=[-16,5], save=True, push=False, temp=False):
     
     fig, ax = plt.subplots(figsize=(10,8))
 
@@ -209,12 +223,12 @@ def compare_dH_and_ddH_over_H(x, dH_over_H, ddH_over_H, dH_label, ddH_label, x_m
     ax.set_xticks([-15,-10,-5, 0, 5])
 
 
-    save_push(fig, 'dH_and_ddH_over_H.pdf', save)
+    save_push(fig, 'dH_and_ddH_over_H.pdf', save, temp=temp)
 
 
         
 def compare_ddH_over_H(x, ddH_H, H_label, x_mr_eq, x_mL_eq, 
-                        title=None, xlim=[-20,5], save=True, push=False):
+                        title=None, xlim=[-20,5], save=True, push=False, temp=False):
     
     fig, ax = plt.subplots(figsize=(12,10))
 
@@ -226,12 +240,12 @@ def compare_ddH_over_H(x, ddH_H, H_label, x_mr_eq, x_mL_eq,
     ax.set_xlim(xlim)
 
     set_ax_info(ax, xlabel='$x$', title=title)
-    save_push(fig, 'ddH_over_H.pdf', save)
+    save_push(fig, 'ddH_over_H.pdf', save, temp=temp)
 
 
 
 def plot_t_and_eta(x, t, etac, fname, xlim=[-17,5], 
-                   mr_eq=None, mL_eq=None, acc=None, save=True):
+                   mr_eq=None, mL_eq=None, acc=None, save=True, temp=False):
     fig, ax = plt.subplots(figsize=(8,6))
 
     ax.set_xlim(xlim)
@@ -250,12 +264,12 @@ def plot_t_and_eta(x, t, etac, fname, xlim=[-17,5],
 
 
     set_ax_info(ax, xlabel, ylabel)
-    save_push(fig, fname, save=save)
+    save_push(fig, fname, save=save, temp=temp)
 
 
 
 def plot_dL(data, planck=None, fit=[None,None], 
-            fname="dL_z_compare.pdf", save=True):
+            fname="dL_z_compare.pdf", save=True, temp=False):
 
     z_data,   dL_data, dL_error = data 
     z_planck, dL_planck         = planck 
@@ -291,11 +305,12 @@ def plot_dL(data, planck=None, fit=[None,None],
     # ax.yaxis.set_major_formatter(ScalarFormatter())
 
     # plt.ticklabel_format(axis='y', style='plain')
-    save_push(fig, fname, save=save)
+    save_push(fig, fname, save=save, temp=temp)
 
 
 
-def plot_OmegaM_OmegaLambda_plane(OmegaM, OmegaLambda, chi2_1sigma, chi2_2sigma, chi2_min, fname, save=True):
+def plot_OmegaM_OmegaLambda_plane(OmegaM, OmegaLambda, chi2_1sigma, chi2_2sigma, chi2_min, 
+                                  fname, save=True, temp=False):
 
     fig, ax = plt.subplots(figsize=(10,8))
 
@@ -310,7 +325,7 @@ def plot_OmegaM_OmegaLambda_plane(OmegaM, OmegaLambda, chi2_1sigma, chi2_2sigma,
     ax.set_xlim(0,0.8)
     ax.set_ylim(0.1,1.2)
     set_ax_info(ax, xlabel=r"$\Omega_m$", ylabel=r"$\Omega_\Lambda$")
-    save_push(fig, fname, save)
+    save_push(fig, fname, save, temp=temp)
 
     print('best fit:')
     print(f'{OmegaM[chi2_min]:.5f}')
@@ -319,13 +334,13 @@ def plot_OmegaM_OmegaLambda_plane(OmegaM, OmegaLambda, chi2_1sigma, chi2_2sigma,
 
 
 
-def plot_H0_posterior_pdf(H0, bins, H0_gaussian, fname, save=True):
+def plot_H0_posterior_pdf(H0, bins, H0_gaussian, fname, save=True, temp=False):
     fig, ax = plt.subplots(figsize=(12,8))
 
     ax.plot(bins, H0_gaussian, color='blue', label=r"$H_0\sim \mathcal{N}(\mu,\sigma^2)$")
     ax.hist(H0, bins=bins, density=True, color='green', edgecolor='k')
     set_ax_info(ax, xlabel=r"$H_0\:[\mathrm{km/s/Mpc}]$")
-    save_push(fig, fname, save)
+    save_push(fig, fname, save, temp=temp)
 
 
 def time_table(mr_eq, ml_eq, acc_onset, t0, eta0, save=False, show=False):

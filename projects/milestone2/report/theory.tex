@@ -7,15 +7,15 @@
 
 The optical depth is defined in terms of the scale factor, $a$, as 
 \begin{equation} \label{eq:M2:theory:optical_depth_integral_definition}
-    \tau(\eta) = \int_\eta^{\eta_0} \dd \eta' \,n_e \sigma_T a,
+    \tau(\eta) = \int_\eta^{\eta_0} \dd \eta' \,\ne \sigma_T a,
 \end{equation}
-where $n_e(\eta)$ is the electron number density,
+where $\ne(\eta)$ is the electron number density,
 \begin{equation} \label{eq:M2:theory:thomspon_cross_section}
     \sigma_T=\frac{8\pi\alpha^2}{3 m_e^2} = 6.6524587158\cdot 10^{-29}\unit{m^2} 
 \end{equation}
-is the Thompson cross-section and $a$ is the scale factor. $\alpha$ is the fine-structure constant and $m_e$ is the electron mass. Using Eq. \eqref{eq:M1:theory:eta_ODE}, we can rewrite Eq. \eqref{eq:M2:theory:optical_depth_integral_definition} as a differential equation 
+is the Thompson cross-section and $a$ is the scale factor. $\alpha$ is the fine-structure constant and $m_e$ is the electron mass. Using \Eqref{eq:M1:theory:eta_ODE}, we can rewrite \Eqref{eq:M2:theory:optical_depth_integral_definition} as a differential equation 
 \begin{equation} \label{eq:M2:theory:tau_ODE}
-    \dv{\tau}{x} = - \frac{n_e \sigma_T}{H},
+    \dv{\tau}{x} = - \frac{\ne \sigma_T}{H},
 \end{equation}
 which we will solve numerically. The initial condition is $\tau(x=0)=0$.
 
@@ -27,14 +27,14 @@ which is normalized as
 \begin{equation} \label{eq:M2:theory:g_tilde_normalization}
     \int_{-\infty}^0\dd x\,\gx = 1.
 \end{equation}
-The normalization means that $\gx$ is a probability distribution, and we may interpret it as the probability of an observed CMB photon today having experienced its last scattering at a time $x$. \note{Why do we need derivatives?} Once we have an expression for $n_e(x)$, we have all the constituents needed to compute $\tau$ and $\g$.
+The normalization means that $\gx$ is a probability distribution, and we may interpret it as the probability of an observed CMB photon today having experienced its last scattering at a time $x$. \note{Why do we need derivatives?} Once we have an expression for $\nex$, we have all the constituents needed to compute $\tau$ and $\g$.
 
 The visibility function is sharply peaked around the time when recombination takes place \note{(cite?)}, and the period of recombination is thus often referred to as the surface of last scattering. We therefore have two ways of estimating when photon baryon decoupling occurred, either as the time when the Universe became optically thin, i.e. when $\tau=1$, or as the peak of the visibility function. \note{(Fix last paragraph later.)}  
 
 \subsubsection{Electron density \note{(working title)}} \label{sssec:M2_electron_density}
-Instead of computing $n_e$ directly, we will compute the fractional electron density
+Instead of computing $\ne$ directly, we will compute the fractional electron density
 \begin{equation} \label{eq:M2:theory:X_e_definition}
-    \X \equiv \frac{n_e}{n_H},
+    \xe \equiv \frac{\ne}{n_H},
 \end{equation}
 where $n_H$ is the proton density. We will neglect Helium and heavier elements, i.e. assume that all baryons are protons, giving  
 \begin{equation} \label{eq:M2:theory:helium_baryon_number_density}
@@ -46,9 +46,9 @@ where $\rhocn\equiv \frac{ H_0^2}{8\pi G}$ is the critical density of the univer
 
 The Saha equation is given as 
 \begin{equation} \label{eq:M2:theory:saha_equation}
-    \frac{\X^2}{1-\X} = \frac{1}{n_b} \pclosed{\frac{m_e \tb}{2\pi}}^{3/2} e^{-\epsn / \tb},
+    \frac{\xe^2}{1-\xe} = \frac{1}{n_b} \pclosed{\frac{m_e \tb}{2\pi}}^{3/2} e^{-\epsn / \tb},
 \end{equation}
-where $\tb$ is the temperature of the baryons, and $\epsn=13.6\unit{eV}$ is the Hydrogen ionization energy. The time evolution of the baryon temperature is governed by a differential equation coupled to $\X$. However, we will assume that $\tb$ follows the photon temperature, $T_\gamma$, evolving as 
+where $\tb$ is the temperature of the baryons, and $\epsn=13.6\unit{eV}$ is the Hydrogen ionization energy. The time evolution of the baryon temperature is governed by a differential equation coupled to $\xe$. However, we will assume that $\tb$ follows the photon temperature, $T_\gamma$, evolving as 
 \begin{equation}
     \tb = T_\gamma = \tcmb e^{-x}.
 \end{equation}
@@ -56,20 +56,20 @@ where $\tb$ is the temperature of the baryons, and $\epsn=13.6\unit{eV}$ is the 
 
 
 
-\begin{equation}
-    \dv{\X}{x} = \frac{C_r(\tb)}{H}\bclosed{\beta(\tb)(1-\X) - n_H \alpha^{(2)}(\tb) \X^2 }
+\begin{equation} \label{eq:M2:theory:Xe_peebles_ODE}
+    \dv{\xe}{x} = \frac{C_r(\tb)}{H}\bclosed{\beta(\tb)(1-\xe) - n_H \alpha^{(2)}(\tb) \xe^2 }
 \end{equation}
 
-\begin{subequations}
+\begin{subequations} \label{eq:M2:theory:peebles:ODE_all_individual_terms}
     \begin{align}
-        C_r(\tb) &= \frac{\Lambda_{2s\to1s} + \Lambda_\alpha}{\Lambda_{2s\to1s} + \Lambda_\alpha + \beta^{(2)}(\tb)}, \\
-        \Lambda_{2s\to1s} &= 8.227\unit{s^{-1}}, \\
-        \Lambda_\alpha &= H \frac{(3\epsn)^3}{(8\pi)^2 n_{1s}}\unit{s^{-1}}, \\
-        n_{1s} &= (1-\X) n_H \unit{m^{-3}}, \\
-        \beta^{(2)}(\tb) &= \beta(\tb) e^{3\epsn/4\tb} \unit{s^{-1}},\\
-        \beta(\tb) &= \alpha^{(2)}(\tb) \pclosed{\frac{m_e \tb}{2\pi}}^3/2 e^{-\epsn/\tb} \unit{s^{-1}}, \\
-        \alpha^{(2)} &= \frac{64\pi}{\sqrt{27\pi}} \frac{\alpha^2}{m_e^2} \sqrt{\frac{\epsn}{\tb}} \phi_2(\tb)\unit{m^2\,s^{-1}}, \\
-        \phi_2(\tb) &= 0.448\ln(\epsn/\tb).
+        C_r(\tb) &= \frac{\Lambda_{2s\to1s} + \Lambda_\alpha}{\Lambda_{2s\to1s} + \Lambda_\alpha + \beta^{(2)}(\tb)}, \label{eq:M2:theory:peebles:C_r} \\
+        \Lambda_{2s\to1s} &= 8.227\unit{s^{-1}}, \label{eq:M2:theory:peebles:Lambda_2s_1s} \\
+        \Lambda_\alpha &= H \frac{(3\epsn)^3}{(8\pi)^2 n_{1s}}\unit{s^{-1}}, \label{eq:M2:theory:peebles:Lambda_alpha} \\
+        n_{1s} &= (1-\xe) n_H \unit{m^{-3}}, \label{eq:M2:theory:peebles:n_1s} \\
+        \beta^{(2)}(\tb) &= \beta(\tb) e^{3\epsn/4\tb} \unit{s^{-1}}, \label{eq:M2:theory:peebles:beta2} \\
+        \beta(\tb) &= \alpha^{(2)}(\tb) \pclosed{\frac{m_e \tb}{2\pi}}^3/2 e^{-\epsn/\tb} \unit{s^{-1}}, \label{eq:M2:theory:peebles:beta} \\
+        \alpha^{(2)} &= \frac{64\pi}{\sqrt{27\pi}} \frac{\alpha^2}{m_e^2} \sqrt{\frac{\epsn}{\tb}} \phi_2(\tb)\unit{m^2\,s^{-1}}, \label{eq:M2:theory:peebles:alpha_2} \\
+        \phi_2(\tb) &= 0.448\ln(\epsn/\tb). \label{eq:M2:theory:peebles:phi_2} 
     \end{align}
 \end{subequations}
     
@@ -79,7 +79,7 @@ where $\tb$ is the temperature of the baryons, and $\epsn=13.6\unit{eV}$ is the 
 
 \subsubsection{Sound Horizon \note{(working title)}} \label{sssec:M2:sound_horizon}
 Before recombination happens, baryons and photons are tightly coupled. For this reason, the baryons and photons behave as if they were a single fluid, and the sound speed of this fluid is given by \note{(citation)}
-\begin{equation} \label{eq:M2:theory:soundspeed}
+\begin{equation} \label{eq:M2:theory:soundspeed_R_baryons_and_photons}
     c_s = c \sqrt{\frac{R}{3(1+3R)}},\quad R = \frac{4\ogn}{3\obn e^x},
 \end{equation}
 and we see that during radiation domination, we have $c_s \approx c/\sqrt{3}$. After recombination happens, photons will still have a sound speed of $c_s=c/\sqrt{3}$, while the sound speed of baryons will drop. \note{Is the previous sentence obsolete?} The total co-moving distance of these sound waves since the Big Bang is given as    
@@ -87,7 +87,7 @@ and we see that during radiation domination, we have $c_s \approx c/\sqrt{3}$. A
     s(x)=\int_{-\infty}^x \frac{\dd x' c_s}{\H}.
 \end{equation}
 The size of this co-moving distance at recombination is known as the sound horizon, $r_s = s(x_\mathrm{rec})$. This allows us to estimate the angular separation of the CMB, over which we may expect there to have been causal contact. Thus, we have an additional ODE to solve, 
-\begin{equation} \label{eq:M2:theory:sound_horizon_ode}
+\begin{equation} \label{eq:M2:theory:sound_horizon_ODE}
     \dv{s(x)}{x} = \frac{c_s}{\H},
 \end{equation}
-with $s(x_\mathrm{ini})=\frac{c_s(x_\mathrm{ini})}{\H(x_\mathrm{ini})}$ as the initial condition, following the same reasoning as we did for $\eta'(x)$ in Eq. \eqref{eq:M1:theory:eta_of_xstart_analytical_approximation}. \note{Relate the sound-horizon to the Power Spectrum as well.}
+with $s(x_\mathrm{ini})=\frac{c_s(x_\mathrm{ini})}{\H(x_\mathrm{ini})}$ as the initial condition, following the same reasoning as we did for $\eta'(x)$ in \Eqref{eq:M1:theory:eta_of_xstart_analytical_approximation}. \note{Relate the sound-horizon to the Power Spectrum as well.}

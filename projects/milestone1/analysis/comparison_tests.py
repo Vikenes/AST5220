@@ -15,9 +15,10 @@ but the actual plotting is done in plot.py
 import plot
 
 
-
-save = False # If False, the figures produced are only displayed, not saved. 
-
+global SAVE
+global TEMP
+SAVE = False # If False, the figures produced are only displayed, not saved. 
+TEMP = False  
 
 
 def data(fname="cosmology.txt"):
@@ -107,7 +108,7 @@ def radiation_matter_equality(idx=False):
 
 
 
-def Hp_plot(save):
+def Hp_plot():
     ### Plot Hp(x) ### 
     Hp = load_H_parameters()[0]
     ylabel = r'$\mathcal{H}\: \left[ \frac{100\,\mathrm{km/s}}{\mathrm{Mpc}} \right] $'
@@ -118,11 +119,12 @@ def Hp_plot(save):
                             mr_eq=mr_eq, mL_eq=mL_eq, acc=acceleration_onset(),
                             xlabel=r"$x$", ylabel=ylabel, 
                             xlim=[-16,3], ylim=[1e-1, 1e4], 
-                            legend=True, legendloc='lower left', save=save)
+                            legend=True, legendloc='lower left', 
+                            save=SAVE, temp=TEMP)
 
 
 
-def eta_plot(save):
+def eta_plot():
     ### Plot eta(x). Not included in report. ### 
     eta = load_eta_and_t()[0]
     ylabel = r'$\eta\:\:[\mathrm{Mpc}]$'
@@ -131,10 +133,10 @@ def eta_plot(save):
                             xlabel=r"x", ylabel=ylabel, 
                             xlim=[-15,5], ylim=[0.1, 5e5],
                             mr_eq=mr_eq, mL_eq=mL_eq, log=False,
-                            legend=True, save=save)
+                            legend=True, save=SAVE, temp=TEMP)
 
 
-def eta_H_plot(save):
+def eta_H_plot():
     ### Plot eta*Hp/c ### 
     Hp = load_H_parameters()[0]
     eta = load_eta_and_t()[0]
@@ -147,20 +149,20 @@ def eta_H_plot(save):
                             xlabel=r"x", ylabel=ylabel, 
                             xlim=[-16,2], ylim=[0.75, 4], 
                             yticks=[1,2,3,4],
-                            log=False, save=save)
+                            log=False, save=SAVE, temp=TEMP)
 
 
-def plot_omegas(save):
+def plot_omegas():
     ### Plot density parameters ### 
     OmegaM, OmegaRel, OmegaLambda = load_omegas()
     title = r"$\Omega_i(x)$"
 
     plot.plot_omega_params(x, OmegaM, OmegaRel, OmegaLambda, xlabel=r'$x$', 
-                        fname="omega_i_of_x.pdf", title=title, save=save)
+                        fname="omega_i_of_x.pdf", title=title, save=SAVE, temp=TEMP)
     
 
 
-def dH_ddH_over_H(save):
+def dH_ddH_over_H():
     ### Compare H'/H and H''/H with analytical approx. ### 
     Hp, dHp, ddHp = load_H_parameters()
     m_dom, L_dom = equality_times()
@@ -170,17 +172,18 @@ def dH_ddH_over_H(save):
 
 
     plot.compare_dH_and_ddH_over_H(x, dHp/Hp, ddHp/Hp, dH_label, ddH_label, m_dom, L_dom, 
-                                   title=None, save=save)
+                                   title=None, save=SAVE, temp=TEMP)
 
 
-def eta_t_plot(save):
+def eta_t_plot():
     ### Plot eta and t ### 
     eta, t = load_eta_and_t()
     eta_c = (eta / c).to(u.Gyr)
 
     mr_eq, mL_eq = equality_times()
 
-    plot.plot_t_and_eta(x, t, eta_c, fname="t_and_eta_c.pdf", mr_eq=mr_eq, mL_eq=mL_eq, acc=None, save=save)
+    plot.plot_t_and_eta(x, t, eta_c, fname="t_and_eta_c.pdf", mr_eq=mr_eq, mL_eq=mL_eq, 
+                        acc=None, save=SAVE, temp=TEMP)
 
 
 def luminosity_distance(data):
@@ -198,7 +201,7 @@ def luminosity_distance(data):
     return z_sim, dL_sim 
 
 
-def plot_dL(save, plot_fit=False):
+def plot_dL(plot_fit=False):
     ### Plot dL from data and compare with simulation with Planck parameters  
     ### plot_fit=True: Plot dL from the simulation with parameters obtained from supernovafit.
     #       Planck results included for comparison
@@ -215,9 +218,9 @@ def plot_dL(save, plot_fit=False):
 
 
     if plot_fit:
-        plot.plot_dL(data, planck, fit, fname="dL_z_compare_fitted.pdf", save=save)
+        plot.plot_dL(data, planck, fit, fname="dL_z_compare_fitted.pdf", save=SAVE, temp=TEMP)
     else:
-        plot.plot_dL(data, planck, fname='dL_z_compare_planck.pdf', save=save)
+        plot.plot_dL(data, planck, fname='dL_z_compare_planck.pdf', save=SAVE, temp=TEMP)
 
 
 
@@ -230,7 +233,7 @@ def load_supernovafit(burn):
     return chi2, h, OmegaM, OmegaK
 
 
-def supernova_fit_omegas(save, burn=1000):
+def supernova_fit_omegas(burn=1000):
     # Plot OmegaM-OmegaK confidence region.
     chi2, h, OmegaM, OmegaK = load_supernovafit(burn)
    
@@ -239,11 +242,13 @@ def supernova_fit_omegas(save, burn=1000):
     chi2_1sigma = chi2 < chi2min + 3.53
     chi2_2sigma = chi2 < chi2min + 8.02
 
-    plot.plot_OmegaM_OmegaLambda_plane(OmegaM, OmegaLambda, chi2_1sigma, chi2_2sigma, chi2_min=np.argmin(chi2),
-                    fname=f"mcmc_supernova_fit_Nburn{burn}.pdf", save=save)
+    plot.plot_OmegaM_OmegaLambda_plane(OmegaM, OmegaLambda, 
+                                       chi2_1sigma, chi2_2sigma, chi2_min=np.argmin(chi2),
+                                       fname=f"mcmc_supernova_fit_Nburn{burn}.pdf", 
+                                       save=SAVE, temp=TEMP)
 
 
-def supernova_fit_H0_pdf(save, burn=1000):
+def supernova_fit_H0_pdf(burn=1000):
     # Plot H0 pdf
     chi2, h, OmegaM, OmegaK = load_supernovafit(burn)
 
@@ -265,7 +270,7 @@ def supernova_fit_H0_pdf(save, burn=1000):
     H0_gaussian_distr = (2*np.pi*H0_std**2)**(-1/2) * np.exp(-(bins - H0_mean)**2 / (2 * H0_var))
 
     plot.plot_H0_posterior_pdf(H0, bins, H0_gaussian_distr,
-                                fname=f'H0_pdf_Nburn{burn}.pdf', save=save)
+                                fname=f'H0_pdf_Nburn{burn}.pdf', save=SAVE, temp=TEMP)
 
 
 def table():
@@ -312,19 +317,20 @@ def table():
     data()
 
 
+SAVE=True 
+TEMP=True 
+dH_ddH_over_H()
+Hp_plot()
+eta_plot()
+eta_H_plot()
+eta_t_plot()
 
-dH_ddH_over_H(save)
-Hp_plot(save)
-eta_plot(save)
-eta_H_plot(save)
-eta_t_plot(save)
+plot_omegas()
 
-plot_omegas(save)
+plot_dL()
+plot_dL(plot_fit=True)
 
-plot_dL(save)
-plot_dL(save, True)
+supernova_fit_omegas()
+supernova_fit_H0_pdf()
 
-supernova_fit_omegas(save)
-supernova_fit_H0_pdf(save)
-
-table()
+# table()

@@ -259,28 +259,27 @@ rec.assert_normalized_g_tilde()
 
 SAVE        = True
 # TEMP        = True
-# DECOUPLING  = True 
+DECOUPLING  = True 
 
 # rec.plot_tau_with_derivatives()
 # rec.plot_visibility_functions()
-# rec_saha_only = Recombination("recombination_saha.txt")
-# rec_saha_only.load_Xe()
-# x_saha, Xe_saha = rec_saha_only.x, rec_saha_only.Xe
+rec_saha_only = Recombination("recombination_saha.txt")
+rec_saha_only.load_Xe()
+x_saha, Xe_saha = rec_saha_only.x, rec_saha_only.Xe
 
 # exit()
 rec_times = recomb_and_decoupling_times("rec_times.txt", saha=False)
-# x_dec = rec_times.x_dec_tau
+x_dec = rec_times.x_dec_tau
 # x_rec = rec_times.x_rec
 
 rec_times_saha = recomb_and_decoupling_times("rec_times_saha.txt", saha=True)
-# x_dec_saha = rec_times_saha.x_dec_tau
+x_dec_saha = rec_times_saha.x_dec_tau
 
-# rec.compare_Xe(x_saha=x_saha, Xe_saha=Xe_saha,
-#                xdec_peebles=x_dec, xdec_saha=x_dec_saha,
-#                )
+rec.compare_Xe(x_saha=x_saha, Xe_saha=Xe_saha,
+               xdec_peebles=x_dec, xdec_saha=x_dec_saha)
 
-rec_times.make_table()
-rec_times_saha.make_table()
+# rec_times.make_table()
+# rec_times_saha.make_table()
 
 
 

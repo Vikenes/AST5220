@@ -29,7 +29,7 @@
 \newcommand{\figref}[1]{Fig. \ref{#1}}
 \newcommand{\secref}[1]{Sect. \ref{#1}}
 \newcommand{\appref}[1]{Appendix \ref{#1}}
-
+\newcommand{\Eqref}[1]{Eq. \eqref{#1}}
 
 
 %=================================
@@ -96,16 +96,28 @@
 %===== Recombination quantities =====
 \newcommand{\g}{\tilde{g}}
 \newcommand{\gx}{\g(x)}
-\newcommand{\X}{X_e}
+\newcommand{\xe}{X_e}
+\newcommand{\xex}{X_e(x)}
 \newcommand{\epsn}{\eps_0}
 \newcommand{\tb}{T_b}
+\renewcommand{\ne}{n_e}
+\newcommand{\nex}{n_e(x)}
 
 
 
 
-% \newcommand{\midrule}{\colrule}
-% \newcommand{\bottomrule}{\botrule}
+
 
 \newcommand{\tablesMilestoneTwo}[1]{\input{../milestone2/report/tables/#1}}
 
-\graphicspath{{../milestone1/analysis/figures/}{../milestone2/analysis/figures/}}
+% \newcommand{\figext}{pdf}
+% \graphicspath{{../milestone1/analysis/figures/}{../milestone2/analysis/figures/}}
+
+
+\newcommand{\figext}{png}
+\graphicspath{{../milestone1/analysis/figures/temp/}{../milestone2/analysis/figures/temp/}}
+
+
+
+
+\newcommand{\includefig}[2][width=\linewidth]{\includegraphics[#1]{#2.\figext}}

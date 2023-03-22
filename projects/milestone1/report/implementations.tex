@@ -1,6 +1,6 @@
 
 \subsection{Implementation details}\label{ssec:M1:implementations} 
-To solve the differential equations for $\eta$ and $t$ (Eq. \eqref{eq:M1:theory:eta_ODE} and \eqref{eq:M1:theory:cosmic_time_ODE}) we use the \texttt{C++} library \texttt{GSL} \cite{gough2009gnu}, and use their Runge-Kutta4 solver. From the solution we create a spline of the results for the given $x$ domain we have considered. 
+To solve the differential equations for $\eta$ and $t$ (\Eqref{eq:M1:theory:eta_ODE} and \eqref{eq:M1:theory:cosmic_time_ODE}) we use the \texttt{C++} library \texttt{GSL} \cite{gough2009gnu}, and use their Runge-Kutta4 solver. From the solution we create a spline of the results for the given $x$ domain we have considered. 
 
 We will consider three different ranges of $x$-values. For the initial testing, we will use $x\in[\ln 10^{-10},\,5]$. For fitting cosmological parameters to the supernova data, we will use $x\in[\ln 10^{-2},\,0]$. When we want to estimate important times during the cosmic evolution, we will consider $x\in[-10,\,1]$, for increased resolution, as the result may vary by a noticeable amount between step sizes. In all cases, we use $N_x=10^5$ number of points.  
 
