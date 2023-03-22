@@ -27,16 +27,35 @@ DECOUPLING  = False
 
 
 class Recombination:
-    def __init__(self, filename, length_unit=u.Mpc):
+    def __init__(self, 
+                 filename,
+                 rec_and_dec_times_fname, 
+                 saha=False,
+                 length_unit=u.Mpc,
+                 time_unit=u.Myr):
+        
         self.data           = self.load_data(filename)
-        self.length_unit    = length_unit
         self.x              = self.data[0]
+
+        self.rec_dec_file   = rec_and_dec_times_fname
+
+        self.length_unit    = length_unit
+        self.time_unit      = time_unit
+
+        self.saha = saha 
 
 
     
     def load_data(self, filename, skiprows=2):
         return np.loadtxt(data_path + filename, unpack=True, skiprows=skiprows)
     
+
+    def load_x_decoupling_tau(self):
+        self.xdec_tau = np.loadtxt(data_path + self.rec_dec_file, skiprows=1).T[0][0] 
+
+    
+
+
     def load_Xe(self):
         self.Xe             = self.data[1]
         
@@ -67,6 +86,9 @@ class Recombination:
         # Convert from x to redshift 
         return np.exp(-x) - 1 
     
+    ##########################################
+    # Make use of the times data in the class 
+    ##########################################
     def assert_valid_recombination_value(self, print_x=False, stop=False):
         """
         Check that recombination occurs at z in [1050, 1150]
@@ -136,13 +158,22 @@ class Recombination:
             exit() 
 
 
-    def compare_Xe(self, x_saha, Xe_saha,
-                   xdec_peebles, xdec_saha, 
+    def compare_Xe(self, x_saha, Xe_saha, 
+                   xdec_peebles=None, xdec_saha=None,
                    ylim=[1e-4, 2], xlim=[-8,-5]):
+        
         if hasattr(self, 'Xe'):
             pass
         else:
             self.load_Xe()
+
+        if DECOUPLING:
+            if not hasattr(self, "xdec_tau"):
+                self.load_x_decoupling_tau()
+            
+            xdec_peebles = self.xdec_tau
+
+            
 
         plot.compare_Xe_peebles_and_saha(self.x, x_saha,
                                          self.Xe, Xe_saha,
@@ -214,36 +245,22 @@ class Recombination:
                                             save=SAVE, temp=TEMP)
 
 
-class recomb_and_decoupling_times:
-    def __init__(self, 
-                 data_filename, 
-                 length_unit=u.Mpc, 
-                 time_unit=u.Myr,
-                 saha=False):
-
-        data = np.loadtxt(data_path + data_filename, skiprows=1).T 
-        
-        self.x_values  = data[0]
-        self.z_values  = data[1]
-        self.t_values  = data[2] * u.s 
-        self.rs_values = data[3] * u.m
-
-        self.t_values  = self.t_values.to(time_unit)
-        self.rs_values = self.rs_values.to(length_unit) 
-
-
-        self.x_dec_tau, self.x_dec_gmax, self.x_rec     = self.x_values
-        self.z_dec_tau, self.z_dec_gmax, self.z_rec     = self.z_values
-        self.t_dec_tau, self.t_dec_gmax, self.t_rec     = self.t_values
-        self.rs_dec_tau, self.rs_dec_gmax, self.rs_rec  = self.rs_values
-
-        self.saha = saha 
-
     def make_table(self):
 
-        plot.time_table(self.x_values,
-                        self.z_values,
-                        self.t_values,
+        rec_dec_times = np.loadtxt(data_path + self.rec_dec_file, skiprows=1).T 
+
+        self.x_times_data  = rec_dec_times[0]
+        self.z_times_data  = rec_dec_times[1]
+        self.t_times_data  = rec_dec_times[2] * u.s 
+        self.rs_times_data = rec_dec_times[3] * u.m 
+
+        self.t_times_data  = self.t_times_data.to(self.time_unit)
+        self.rs_times_data = self.rs_times_data.to(self.length_unit)
+
+
+        plot.time_table(self.x_times_data,
+                        self.z_times_data,
+                        self.t_times_data,
                         saha=self.saha,
                         save=SAVE,
                         temp=TEMP)
@@ -252,36 +269,37 @@ class recomb_and_decoupling_times:
 
 
 
-rec = Recombination("recombination.txt")
+
+rec = Recombination(filename="recombination.txt", 
+                    rec_and_dec_times_fname="rec_times.txt",
+                    saha=False)
+
+rec_saha_only = Recombination(filename="recombination_saha.txt", 
+                              rec_and_dec_times_fname="rec_times_saha.txt",
+                              saha=True)
+rec_saha_only.load_Xe()
+x_saha, Xe_saha = rec_saha_only.x, rec_saha_only.Xe
+
+rec_saha_only.load_x_decoupling_tau()
+x_dec_saha = rec_saha_only.xdec_tau
+
 
 rec.assert_valid_recombination_value()
 rec.assert_normalized_g_tilde()
 
-SAVE        = True
+
+
+# SAVE        = True
 # TEMP        = True
 DECOUPLING  = True 
 
 # rec.plot_tau_with_derivatives()
 # rec.plot_visibility_functions()
-rec_saha_only = Recombination("recombination_saha.txt")
-rec_saha_only.load_Xe()
-x_saha, Xe_saha = rec_saha_only.x, rec_saha_only.Xe
+# rec.compare_Xe(x_saha=x_saha, Xe_saha=Xe_saha, xdec_saha=x_dec_saha)
 
-# exit()
-rec_times = recomb_and_decoupling_times("rec_times.txt", saha=False)
-x_dec = rec_times.x_dec_tau
-# x_rec = rec_times.x_rec
-
-rec_times_saha = recomb_and_decoupling_times("rec_times_saha.txt", saha=True)
-x_dec_saha = rec_times_saha.x_dec_tau
-
-rec.compare_Xe(x_saha=x_saha, Xe_saha=Xe_saha,
-               xdec_peebles=x_dec, xdec_saha=x_dec_saha)
-
-# rec_times.make_table()
-# rec_times_saha.make_table()
+# rec.make_table()
+# rec_saha_only.make_table()
 
 
 
-# rec.compare_Xe(x_saha, Xe_saha)
 
