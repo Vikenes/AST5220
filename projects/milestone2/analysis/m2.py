@@ -20,31 +20,48 @@ data_path = "/home/vetle/Documents/master_studies/subjects/V23/AST5220/projects/
 
 global SAVE 
 global TEMP
-SAVE = False 
-TEMP = False 
+global DECOUPLING
+SAVE        = False 
+TEMP        = False 
+DECOUPLING  = False 
 
 
 class Recombination:
-    def __init__(self, filename, length_units=u.Mpc):
+    def __init__(self, filename, length_unit=u.Mpc):
         self.data           = self.load_data(filename)
+        self.length_unit    = length_unit
         self.x              = self.data[0]
-        self.Xe             = self.data[1]
-        self.ne             = self.data[2] * u.Gpc**(-3)
-        self.tau            = self.data[3]
-        self.dtau_dx        = self.data[4]
-        self.ddtau_ddx      = self.data[5]
-        self.g_tilde        = self.data[6]
-        self.dg_tilde_dx    = self.data[7]
-        self.ddg_tilde_ddx  = self.data[8]
-        self.sound_horizon  = self.data[9] * u.m 
 
-        self.ne             = self.ne.to(length_units**(-3))
-        self.sound_horizon  = self.sound_horizon.to(length_units)
 
     
     def load_data(self, filename, skiprows=2):
         return np.loadtxt(data_path + filename, unpack=True, skiprows=skiprows)
     
+    def load_Xe(self):
+        self.Xe             = self.data[1]
+        
+
+    def load_ne(self, convert_unit=True):
+        self.ne     = self.data[2] * u.m**(-3) 
+        if convert_unit:
+            self.ne = self.ne.to(self.length_unit**(-3))
+
+
+    def load_taus(self):
+        self.tau            = self.data[3]
+        self.dtau_dx        = self.data[4]
+        self.ddtau_ddx      = self.data[5]
+
+
+    def load_g(self):
+        self.g_tilde        = self.data[6]
+        self.dg_tilde_dx    = self.data[7]
+        self.ddg_tilde_ddx  = self.data[8]
+
+    def load_sound_horizon(self, convert_unit=True):
+        self.sound_horizon = self.data[9] * u.m 
+        if convert_unit:
+            self.sound_horizon = self.sound_horizon.to(self.length_unit)
 
     def x_to_redshift(self, x):
         # Convert from x to redshift 
@@ -55,6 +72,16 @@ class Recombination:
         Check that recombination occurs at z in [1050, 1150]
         both via tau(x_rec)=1 and g_tilde(x_rec)=max(g_tilde)
         """
+        if hasattr(self, 'tau'):
+            pass
+        else:
+            self.load_taus()
+
+        if hasattr(self, 'g_tilde'):
+            pass
+        else:
+            self.load_g()
+
         tau_equal_1_idx = np.argmin(np.abs(self.tau - 1))
         g_peak_idx      = np.argmax(self.g_tilde)
         x_rec_tau = self.x[tau_equal_1_idx]
@@ -88,6 +115,12 @@ class Recombination:
         Check that g_tilde is sufficiently normalized to 1
         by checking whether abs(g-1) > tol   
         """
+
+        if hasattr(self, 'g_tilde'):
+            pass
+        else:
+            self.load_g()
+
         g_integrated = simpson(self.g_tilde, self.x)
         delta_g_norm = abs(g_integrated - 1)
         if delta_g_norm > tol:
@@ -103,16 +136,22 @@ class Recombination:
             exit() 
 
 
-    def compare_Xe(self, x_saha, Xe_saha):
-        
-        plt.plot(self.x, self.Xe, label='Saha+peebles')
-        plt.plot(x_saha, Xe_saha, ls='dashed', label='saha only')
+    def compare_Xe(self, x_saha, Xe_saha,
+                   xdec_peebles, xdec_saha, 
+                   ylim=[1e-4, 2], xlim=[-8,-5]):
+        if hasattr(self, 'Xe'):
+            pass
+        else:
+            self.load_Xe()
 
-        plt.ylim(1e-4, 2)
-        plt.xlim(-10,0)
-        plt.legend()
-        plt.yscale('log')
-        plt.show()
+        plot.compare_Xe_peebles_and_saha(self.x, x_saha,
+                                         self.Xe, Xe_saha,
+                                         xdec_peebles=xdec_peebles, xdec_saha=xdec_saha,
+                                         fname="compare_Xe_peebles_saha.pdf",
+                                         xlim=xlim, ylim=ylim,
+                                         decoupling_times=DECOUPLING,
+                                         save=SAVE, temp=TEMP)
+
 
 
     def plot_visibility_functions(self, dg_dx_scaling=10, 
@@ -124,6 +163,11 @@ class Recombination:
         Plot g(x), g'(x) and g''(x)
         scale g'(x) and g''(x) to fit in the same plot as g(x)
         """
+
+        if hasattr(self, 'g_tilde'):
+            pass
+        else:
+            self.load_g()
 
         dg_dx_scaled = self.dg_tilde_dx / dg_dx_scaling
         ddg_ddx_scaled = self.ddg_tilde_ddx / ddg_ddx_scaling
@@ -149,6 +193,11 @@ class Recombination:
 
     def plot_tau_with_derivatives(self, xlim=[-10,0], ylim=[1e-8, 1e6]):
 
+        if hasattr(self, 'tau'):
+            pass
+        else:
+            self.load_taus()
+
         x   = self.x 
         y   = self.tau 
         dy  = - self.dtau_dx
@@ -166,46 +215,73 @@ class Recombination:
 
 
 class recomb_and_decoupling_times:
-    def __init__(self, filename, length_unit=u.Mpc, time_unit=u.Myr):
+    def __init__(self, 
+                 data_filename, 
+                 length_unit=u.Mpc, 
+                 time_unit=u.Myr,
+                 saha=False):
 
-        data = np.loadtxt(data_path + filename, skiprows=1).T 
+        data = np.loadtxt(data_path + data_filename, skiprows=1).T 
         
-        x_values  = data[0]
-        z_values  = data[1]
-        t_values  = data[2] * u.s 
-        rs_values = data[3] * u.m
+        self.x_values  = data[0]
+        self.z_values  = data[1]
+        self.t_values  = data[2] * u.s 
+        self.rs_values = data[3] * u.m
 
-        t_values  = t_values.to(time_unit)
-        rs_values = rs_values.to(length_unit) 
+        self.t_values  = self.t_values.to(time_unit)
+        self.rs_values = self.rs_values.to(length_unit) 
 
 
-        self.x_dec_tau, self.x_dec_gmax, self.x_rec     = x_values
-        self.z_dec_tau, self.z_dec_gmax, self.z_rec     = z_values
-        self.t_dec_tau, self.t_dec_gmax, self.t_rec     = t_values
-        self.rs_dec_tau, self.rs_dec_gmax, self.rs_rec  = rs_values
+        self.x_dec_tau, self.x_dec_gmax, self.x_rec     = self.x_values
+        self.z_dec_tau, self.z_dec_gmax, self.z_rec     = self.z_values
+        self.t_dec_tau, self.t_dec_gmax, self.t_rec     = self.t_values
+        self.rs_dec_tau, self.rs_dec_gmax, self.rs_rec  = self.rs_values
 
-        # x_dec_tau, z_dec_tau, t_dec_tau, rs_dec_tau = self.data[0]
-        # x_dec_gmax, z_dec_gmax, t_dec_gmax, rs_dec_gmax = self.data[1]
-        # x_rec, z_rec, t_rec, rs_rec = self.data[2]
+        self.saha = saha 
+
+    def make_table(self):
+
+        plot.time_table(self.x_values,
+                        self.z_values,
+                        self.t_values,
+                        saha=self.saha,
+                        save=SAVE,
+                        temp=TEMP)
 
 
 
 
 
 rec = Recombination("recombination.txt")
-rec_saha_only = Recombination("recombination_saha.txt")
 
-rec_times = recomb_and_decoupling_times("rec_times.txt")
-
-# x_saha, Xe_saha = rec_saha_only.x, rec_saha_only.Xe
 rec.assert_valid_recombination_value()
 rec.assert_normalized_g_tilde()
 
-SAVE = True
-TEMP = True
+SAVE        = True
+# TEMP        = True
+# DECOUPLING  = True 
 
 # rec.plot_tau_with_derivatives()
-rec.plot_visibility_functions()
+# rec.plot_visibility_functions()
+# rec_saha_only = Recombination("recombination_saha.txt")
+# rec_saha_only.load_Xe()
+# x_saha, Xe_saha = rec_saha_only.x, rec_saha_only.Xe
+
+# exit()
+rec_times = recomb_and_decoupling_times("rec_times.txt", saha=False)
+# x_dec = rec_times.x_dec_tau
+# x_rec = rec_times.x_rec
+
+rec_times_saha = recomb_and_decoupling_times("rec_times_saha.txt", saha=True)
+# x_dec_saha = rec_times_saha.x_dec_tau
+
+# rec.compare_Xe(x_saha=x_saha, Xe_saha=Xe_saha,
+#                xdec_peebles=x_dec, xdec_saha=x_dec_saha,
+#                )
+
+rec_times.make_table()
+rec_times_saha.make_table()
+
 
 
 # rec.compare_Xe(x_saha, Xe_saha)

@@ -8,6 +8,8 @@ import pandas as pd
 
 import warnings 
 warnings.filterwarnings("ignore", category=DeprecationWarning )
+warnings.filterwarnings("ignore", category=FutureWarning )
+
 
 
 
@@ -155,37 +157,94 @@ def plot_quantity_with_derivatives(x, y, dy, ddy,
     
 
 
-def time_table(mr_eq, ml_eq, acc_onset, t0, eta0, save=False, show=False):
-    """
-    Complete mess...
-    """
+def compare_Xe_peebles_and_saha(x_peebles, x_saha, 
+                                Xe_peebles, Xe_saha,
+                                xdec_peebles, xdec_saha,
+                                fname, 
+                                decoupling_times=False,
+                                   xlim=None, ylim=None, 
+                                   legendloc='best', yticks=None, 
+                                   figsize=(8,6), log=True, 
+                                   save=True, temp=False):
+
+
+    fig, ax = plt.subplots(figsize=figsize)
+
+    ax.plot(x_peebles, Xe_peebles ,ls='solid' , color='blue'  , label="Peebles")
+    ax.plot(x_saha   , Xe_saha    ,ls='dashed', color='green', label="Saha")
+
+    if decoupling_times:
+        ax.vlines(xdec_peebles, *ylim, ls='dotted', color='black'  , alpha=1, label="Decoupling, Peebles")
+        ax.vlines(xdec_saha   , *ylim, ls='dotted', color='red', alpha=1, label="Decoupling, Saha")
+        fname = "decoupling_" + fname 
+
+
+    ax.set_ylim(ylim)
+    ax.set_xlim(xlim)
+
+    if log:
+        ax.set_yscale('log')
+
+    
+    xlabel = r"$x$"
+    ylabel = r"$X_e$"
+
+    set_ax_info(ax, xlabel, ylabel, legendloc=legendloc)
+
+    if yticks is not None:
+        ax.set_yticks(yticks)
+
+    save_push(fig, fname, save, temp=temp)
 
 
 
-    eta_col_name = r"$\eta_0 / c\: [\mathrm{Gyr}]$"
-    t0_col_name = r"$t_0\:[\mathrm{Gyr}]$"
-    column_names = [r"$\Omega_m=\Omega_r$", r"$\Omega_m=\Omega_\Lambda$", r"Acceleration onset", t0_col_name, eta_col_name]
+def time_table(x, z, t, saha=False, save=False, temp=False):
+   
 
-    row_labels = np.asarray([r"$x$", r"$z$", r"$t$"])
-    data = {
-        r"var"                      : row_labels, 
-        r"$\Omega_m=\Omega_r$"      : mr_eq,
-        r"$\Omega_m=\Omega_\Lambda$": ml_eq,
-        r"Acceleration onset"       : acc_onset,
-        t0_col_name                 : t0,
-        eta_col_name                : eta0
-    }
+    if saha:
+        method = "Saha"
+    else:
+        method = "Peebles"
 
+    col_labels = [method, r"$x$", r"$z$", r"$t\,\mathrm{[Myr]}$"]
 
-    df = pd.DataFrame(data, index=None)
+    row_labels = [r"Decoupling ($\tau=1$)", 
+                    r"Decoupling $\max\{ \tilde{g}(x) \}$",
+                    r"Recombination"]
+
+    data = np.array([row_labels, x, z, np.round(t,5)]).T 
+
+    table_caption   = "Times when decoupling and recombination occurs, computed from the " 
+    table_caption   += method + " equation."
+    table_label     = "tab:M2:results:dec_and_rec_times_" + method
+
     if save:
-        fname = latex_path+"time_valuesDONTOVERWRITE.tex"
-        df.style.format("{:.3f}", subset=column_names).hide(axis="index").to_latex(buf=fname, hrules=True)
+        table_fname = "time_table_" + method + ".tex"
+        if temp:
+            table_fname = "TEMP" + table_fname
 
-    if show:
-        df.style.format("{:.3f}", subset=column_names).hide(axis="index")
-        print(df.to_string())
+        buffer = latex_path + table_fname 
+    else:
+        buffer = None 
 
+
+    table = pd.DataFrame(data).to_latex(
+            index=False, 
+            header=col_labels, 
+            escape=False, 
+            column_format='l|ccc',
+            caption=table_caption,
+            label=table_label,
+            position="h",
+            buf=buffer
+        )
+
+
+    if save:
+        print(f"Saving time table for {method}:")
+        print(f"   {table_fname}")
+    else:
+        print(table)
 
 
 if __name__=='__main__':
