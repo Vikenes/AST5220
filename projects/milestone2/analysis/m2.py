@@ -291,7 +291,7 @@ rec.assert_normalized_g_tilde()
 
 # SAVE        = True
 # TEMP        = True
-DECOUPLING  = True 
+# DECOUPLING  = True 
 
 # rec.plot_tau_with_derivatives()
 # rec.plot_visibility_functions()

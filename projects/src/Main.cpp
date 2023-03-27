@@ -79,7 +79,9 @@ int main(int argc, char **argv){
   // rec.output("milestone2/data/recombination_saha.txt");
 
   //===== Find decoupling times ======
-  rec.output_important_times("milestone2/data/rec_times.txt");
+  // rec.output_important_times("milestone2/data/rec_times.txt");
+  // rec.output_important_times("milestone2/data/rec_times_saha.txt");
+
   
   // Remove when module is completed
   return 0;

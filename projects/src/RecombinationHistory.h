@@ -26,8 +26,8 @@ class RecombinationHistory{
     const int npts_rec_arrays = 1e5;
   
     // Xe for when to switch between Saha and Peebles
-    // const double Xe_saha_limit = 1e-15;
-    const double Xe_saha_limit = 0.99;
+    const double Xe_saha_limit = 1e-6;
+    // const double Xe_saha_limit = 0.99;
 
 
 
