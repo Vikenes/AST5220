@@ -32,9 +32,29 @@ The normalization means that $\gx$ is a probability distribution, and we may int
 The visibility function is sharply peaked around the time when recombination takes place \note{(cite?)}, and the period of recombination is thus often referred to as the surface of last scattering. We therefore have two ways of estimating when photon baryon decoupling occurred, either as the time when the Universe became optically thin, i.e. when $\tau=1$, or as the peak of the visibility function. \note{(Fix last paragraph later.)}  
 
 \subsubsection{Electron density \note{(working title)}} \label{sssec:M2_electron_density}
+To compute the evolution of free electrons, we have to consider the Boltzmann equation 
+\begin{equation} \label{eq:M2:theory:Boltzmann_equation}
+    \dv{f}{t} = C[f],
+\end{equation}
+where $f$ is the distribution function and $C[f]$ is a collision term. \note{Include parameters in f?} 
+
+\note{Explain underlying assumptions here}
+
+The Boltzmann equation we will consider is 
+\begin{equation}
+    a^{-3}\dv{(n_1 a^3)}{t} = \equilibriumn[1] \equilibriumn[2] \expval{\sigma v} \BBclosed{\frac{n_3 n_4}{\equilibriumn[3] \equilibriumn[4]} - \frac{n_1 n_2}{\equilibriumn[1] \equilibriumn[2]}},
+\end{equation}
+
+\note{(Explain Saha approximation here)}
+
+\begin{equation} \label{eq:M2:theory:saha_equation_recombination_approximation}
+    \frac{n_e n_p}{n_H} = \frac{\equilibriumn[e]\equilibriumn[p]}{\equilibriumn[H]}.
+\end{equation}
+
+
 Instead of computing $\ne$ directly, we will compute the fractional electron density
 \begin{equation} \label{eq:M2:theory:X_e_definition}
-    \xe \equiv \frac{\ne}{n_H},
+    \Xe \equiv \frac{\ne}{n_H},
 \end{equation}
 where $n_H$ is the proton density. We will neglect Helium and heavier elements, i.e. assume that all baryons are protons, giving  
 \begin{equation} \label{eq:M2:theory:helium_baryon_number_density}
@@ -46,30 +66,30 @@ where $\rhocn\equiv \frac{ H_0^2}{8\pi G}$ is the critical density of the univer
 
 The Saha equation is given as 
 \begin{equation} \label{eq:M2:theory:saha_equation}
-    \frac{\xe^2}{1-\xe} = \frac{1}{n_b} \pclosed{\frac{m_e \tb}{2\pi}}^{3/2} e^{-\epsn / \tb},
+    \frac{\Xe^2}{1-\Xe} = \frac{1}{n_b} \pclosed{\frac{m_e \Tb}{2\pi}}^{3/2} e^{-\epsn / \Tb},
 \end{equation}
-where $\tb$ is the temperature of the baryons, and $\epsn=13.6\unit{eV}$ is the Hydrogen ionization energy. The time evolution of the baryon temperature is governed by a differential equation coupled to $\xe$. However, we will assume that $\tb$ follows the photon temperature, $T_\gamma$, evolving as 
+where $\Tb$ is the temperature of the baryons, and $\epsn=13.6\unit{eV}$ is the Hydrogen ionization energy. The time evolution of the baryon temperature is governed by a differential equation coupled to $\Xe$. However, we will assume that $\Tb$ follows the photon temperature, $T_\gamma$, evolving as 
 \begin{equation}
-    \tb = T_\gamma = \tcmb e^{-x}.
+    \Tb = T_\gamma = \tcmb e^{-x}.
 \end{equation}
 \note{Cite stuff above, and reference to quantities.}
 
 
 
 \begin{equation} \label{eq:M2:theory:Xe_peebles_ODE}
-    \dv{\xe}{x} = \frac{C_r(\tb)}{H}\bclosed{\beta(\tb)(1-\xe) - n_H \alpha^{(2)}(\tb) \xe^2 }
+    \dv{\Xe}{x} = \frac{C_r(\Tb)}{H}\bclosed{\beta(\Tb)(1-\Xe) - n_H \alpha^{(2)}(\Tb) \Xe^2 }
 \end{equation}
 
 \begin{subequations} \label{eq:M2:theory:peebles:ODE_all_individual_terms}
     \begin{align}
-        C_r(\tb) &= \frac{\Lambda_{2s\to1s} + \Lambda_\alpha}{\Lambda_{2s\to1s} + \Lambda_\alpha + \beta^{(2)}(\tb)}, \label{eq:M2:theory:peebles:C_r} \\
+        C_r(\Tb) &= \frac{\Lambda_{2s\to1s} + \Lambda_\alpha}{\Lambda_{2s\to1s} + \Lambda_\alpha + \beta^{(2)}(\Tb)}, \label{eq:M2:theory:peebles:C_r} \\
         \Lambda_{2s\to1s} &= 8.227\unit{s^{-1}}, \label{eq:M2:theory:peebles:Lambda_2s_1s} \\
-        \Lambda_\alpha &= H \frac{(3\epsn)^3}{(8\pi)^2 n_{1s}}\unit{s^{-1}}, \label{eq:M2:theory:peebles:Lambda_alpha} \\
-        n_{1s} &= (1-\xe) n_H \unit{m^{-3}}, \label{eq:M2:theory:peebles:n_1s} \\
-        \beta^{(2)}(\tb) &= \beta(\tb) e^{3\epsn/4\tb} \unit{s^{-1}}, \label{eq:M2:theory:peebles:beta2} \\
-        \beta(\tb) &= \alpha^{(2)}(\tb) \pclosed{\frac{m_e \tb}{2\pi}}^3/2 e^{-\epsn/\tb} \unit{s^{-1}}, \label{eq:M2:theory:peebles:beta} \\
-        \alpha^{(2)} &= \frac{64\pi}{\sqrt{27\pi}} \frac{\alpha^2}{m_e^2} \sqrt{\frac{\epsn}{\tb}} \phi_2(\tb)\unit{m^2\,s^{-1}}, \label{eq:M2:theory:peebles:alpha_2} \\
-        \phi_2(\tb) &= 0.448\ln(\epsn/\tb). \label{eq:M2:theory:peebles:phi_2} 
+        \Lambda_\alpha &= H \frac{(3\epsn)^3}{(8\pi)^2 n_{1s}}, \label{eq:M2:theory:peebles:Lambda_alpha} \\
+        n_{1s} &= (1-\Xe) n_H , \label{eq:M2:theory:peebles:n_1s} \\
+        \beta^{(2)}(\Tb) &= \beta(\Tb) e^{3\epsn/4\Tb}, \label{eq:M2:theory:peebles:beta2} \\
+        \beta(\Tb) &= \alpha^{(2)}(\Tb) \pclosed{\frac{m_e \Tb}{2\pi}}^{3/2} e^{-\epsn/\Tb}, \label{eq:M2:theory:peebles:beta} \\
+        \alpha^{(2)} &= \frac{64\pi}{\sqrt{27\pi}} \frac{\alpha^2}{m_e^2} \sqrt{\frac{\epsn}{\Tb}} \phi_2(\Tb), \label{eq:M2:theory:peebles:alpha_2} \\
+        \phi_2(\Tb) &= 0.448\ln(\epsn/\Tb). \label{eq:M2:theory:peebles:phi_2} 
     \end{align}
 \end{subequations}
     
