@@ -1,17 +1,17 @@
 
 \subsection{Implementation details}\label{ssec:M2:implementations} 
 
-In order to compute the optical depth and the visibility we must first compute the electron density. At early times all Hydrogen is ionized, and we therefore have $\Xe\approx 1$ \note{(equal to?)}, and $\Xe$ can thus be well approximated by the Saha equation in this regime. As $\Xe$ decreases, the Saha approximation is no longer valid, and we must resort to the Peebles equation to compute $\Xe$. We compute $\Xe$ by first solving the Saha equation, and when $\Xe<\Xe^\mathrm{tol}$ we resort to the Peebles equation, using the preceding value of from the Saha equation as our initial condition.   
+In order to compute the optical depth and the visibility we must first compute the electron density. At early times nearly all Hydrogen is ionized, and we therefore have $\Xe \approx 1$. In this regime the Peebles equation is numerically unstable. However, this regime is also where the Saha approximation is valid. We therefore start by solving \Eqref{eq:M2:theory:saha_equation}. Once $\Xe<\Xe^\mathrm{tol}$, the Saha approximation fails, and we must resort the Peebles equation. We can solve \Eqref{eq:M2:theory:Xe_peebles_ODE} numerically with the final value of $\Xe$ obtained by Saha as the initial condition. 
 
 \subsubsection{Solving the Saha Equation}\label{sssec:M2:implementations:solving_saha}
-Solving the Saha equation is done by solving a quadratic formula for $\Xe$. At early times, however, the RHS of \Eqref{eq:M2:theory:saha_equation} will be \note{huge}, and may result in numerical errors when we implement the quadratic formula numerically. To avoid this, we use the first order approximation $\sqrt{1+x}\approx 1 + \frac{x}{2}$ for $\abs{x}\ll1$ at early times. The equation we will solve is thus 
+Solving the Saha equation is done by solving a quadratic formula for $\Xe$. At early times, however, the RHS of \Eqref{eq:M2:theory:saha_equation} will be \note{huge}, and may result in errors when solving the quadratic formula numerically. To avoid this, we use the first order approximation $\sqrt{1+x}\approx 1 + \frac{x}{2}$ for $\abs{x}\ll1$ at early times. The equation we will solve is thus 
 \begin{equation}
     \Xe = \begin{cases}
         1, \quad & y>10^7, \\
         \frac{y}{2}\bclosed{-1 + \sqrt{1 + 4/y}},\quad & y\leq 10^7,
     \end{cases}
 \end{equation}  
-where we have used $y$ as an abbreviation for the RHS of \Eqref{eq:M2:theory:saha_equation}, and omitted the negative solution as $\Xe$ is a strictly positive quantity. The exact value of $10^7$ is chosen to ensure $\Xe \ngtr 1$. 
+where we have used $y$ as an abbreviation for the RHS of \Eqref{eq:M2:theory:saha_equation}, and omitted the negative solution as $\Xe$ is a strictly positive quantity. The exact value of $10^7$ is chosen to ensure $\Xe \ngtr 1$. \note{(I STOPPED BEFORE I FINISHED THIS PARAGRAPH)}
 
 \subsubsection{Solving the Peebles Equation}\label{sssec:M2:implementations:solving_peebles}
 We will solve the Peebles equation using Saha as the initial condition. To solve \Eqref{eq:M2:theory:Xe_peebles_ODE} numerically, we follow the same procedure as we did for $\eta(x)$, but for the initial condition we use the final value of $\Xe$ that we obtained from the Saha equation. Once $\Xe$ is obtained we get $\nex$ from \Eqref{eq:M2:theory:X_e_definition}. However, at late times, when the baryon temperature gets low, the exponent term in \Eqref{eq:M2:theory:peebles:beta2} for $\beta^{(2)}(T_b)$ will yield an overflow. However, the exponential factor in $\beta(\Tb)\to0$ results in $\beta^{(2)}(T_b)\to0$ at these temperatures. To avoid numerical errors, we therefore compute 

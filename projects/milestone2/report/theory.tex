@@ -3,13 +3,12 @@
 \subsection{Theory}\label{ssec:M2:theory}
 
 \subsubsection{Optical depth and visibility function} \label{sssec:M2:optical_depth_and_visibility_function}
-\note{Write about the basics of optical depth.}
 
-The optical depth is defined in terms of the scale factor, $a$, as 
+A source that emits light with an intensity $I_0$ is attenuated by a factor $e^{-\tau(x)}$ as it travels through a medium, where $\tau$ is the optical depth of the medium. In the early universe we have $\tau\gg1$, and the universe is said to be optically thick, as light is unable to \note{emerge}. As the universe expands and neutral atoms form, the universe becomes optically thin, $\tau\ll1$, and light is able to escape the primordial plasma and reach us. A common way to define when recombination occurs is the time when we have $\tau=1$. Considering Thompson scattering only, the optical depth is defined in terms of the scale factor, $a$, as \cite[Eq. (5)]{callin} 
 \begin{equation} \label{eq:M2:theory:optical_depth_integral_definition}
     \tau(\eta) = \int_\eta^{\eta_0} \dd \eta' \,\ne \sigma_T a,
 \end{equation}
-where $\ne(\eta)$ is the electron number density,
+where $\ne$ is the number density of free electrons,
 \begin{equation} \label{eq:M2:theory:thomspon_cross_section}
     \sigma_T=\frac{8\pi\alpha^2}{3 m_e^2} = 6.6524587158\cdot 10^{-29}\unit{m^2} 
 \end{equation}
@@ -17,9 +16,9 @@ is the Thompson cross-section and $a$ is the scale factor. $\alpha$ is the fine-
 \begin{equation} \label{eq:M2:theory:tau_ODE}
     \dv{\tau}{x} = - \frac{\ne \sigma_T}{H},
 \end{equation}
-which we will solve numerically. The initial condition is $\tau(x=0)=0$.
+which we can solve numerically once we know $n_e$. The initial condition is $\tau(x=0)=0$.
 
-From the optical depth, we obtain the so-called \textit{visibility function}, which is defined as 
+From the optical depth, we obtain the so-called \textit{visibility function} \cite[Eq. (8)]{callin} 
 \begin{equation} \label{eq:M2:theory:g_tilde_of_x_definition}
     \gx = -\tau' e^{-\tau},
 \end{equation}
@@ -27,59 +26,54 @@ which is normalized as
 \begin{equation} \label{eq:M2:theory:g_tilde_normalization}
     \int_{-\infty}^0\dd x\,\gx = 1.
 \end{equation}
-The normalization means that $\gx$ is a probability distribution, and we may interpret it as the probability of an observed CMB photon today having experienced its last scattering at a time $x$. \note{Why do we need derivatives?} Once we have an expression for $\nex$, we have all the constituents needed to compute $\tau$ and $\g$.
-
-The visibility function is sharply peaked around the time when recombination takes place \note{(cite?)}, and the period of recombination is thus often referred to as the surface of last scattering. We therefore have two ways of estimating when photon baryon decoupling occurred, either as the time when the Universe became optically thin, i.e. when $\tau=1$, or as the peak of the visibility function. \note{(Fix last paragraph later.)}  
+The normalization means that $\gx$ is a probability distribution, and we may interpret it as the probability of an observed CMB photon today having experienced its last scattering at a time $x$. The visibility function is sharply peaked around the time when recombination takes place, and the period of recombination is thus often referred to as the surface of last scattering. We therefore have two ways of estimating when photon baryon decoupling occurred, either as the time when the universe became optically thin, i.e. when $\tau=1$, or as the time when the visibility function is at its maximum value.
 
 \subsubsection{Electron density \note{(working title)}} \label{sssec:M2_electron_density}
-To compute the evolution of free electrons, we have to consider the Boltzmann equation 
+The final thing we need to compute $\tau$ and $\g$ is the number density of free electrons. To compute the evolution of free electrons, we have to consider the Boltzmann equation \cite[Eq. (3.19)]{Dodelson}
 \begin{equation} \label{eq:M2:theory:Boltzmann_equation}
     \dv{f}{t} = C[f],
 \end{equation}
-where $f$ is the distribution function and $C[f]$ is a collision term. \note{Include parameters in f?} 
+where $f$ is the distribution function and $C[f]$ is a collision term. 
 
-\note{Explain underlying assumptions here}
-
-The Boltzmann equation we will consider is 
-\begin{equation}
+The Boltzmann equation we will consider is \cite[Eq. (4.8)]{Dodelson} \note{(explain assumptions and simplifications.)}
+\begin{equation} \label{eq:M2:theory:Boltzmann_equation_four_particles_scale_factor}
     a^{-3}\dv{(n_1 a^3)}{t} = \equilibriumn[1] \equilibriumn[2] \expval{\sigma v} \BBclosed{\frac{n_3 n_4}{\equilibriumn[3] \equilibriumn[4]} - \frac{n_1 n_2}{\equilibriumn[1] \equilibriumn[2]}},
 \end{equation}
-
-\note{(Explain Saha approximation here)}
-
-\begin{equation} \label{eq:M2:theory:saha_equation_recombination_approximation}
-    \frac{n_e n_p}{n_H} = \frac{\equilibriumn[e]\equilibriumn[p]}{\equilibriumn[H]}.
-\end{equation}
+where $n_i$ denotes the number density of a particle species $i$, and $\equilibriumn[i]$ denotes the number density in equilibrium. We are interested in recombination, and thus consider the reaction 
+\begin{equation} \label{eq:M2:theory:electron_proton_to_hydrogen_photon}
+    e^- + p^+ \leftrightarrow H + \gamma.
+\end{equation}   
+For the photons we will assume $n_\gamma = \equilibriumn[\gamma]$. We adopt the notation of Dodelson \cite{Dodelson}, where $e$ and $p$ denotes free electrons and protons, respectively, while $H$ stands for neutral Hydrogen. 
 
 
 Instead of computing $\ne$ directly, we will compute the fractional electron density
 \begin{equation} \label{eq:M2:theory:X_e_definition}
-    \Xe \equiv \frac{\ne}{n_H},
+    \Xe \equiv \frac{\ne}{n_b},
 \end{equation}
-where $n_H$ is the proton density. We will neglect Helium and heavier elements, i.e. assume that all baryons are protons, giving  
+where $n_b\approx\ne+n_H$ is the total baryon density. Since we neglect Hydrogen, the baryon density can be written as    
 \begin{equation} \label{eq:M2:theory:helium_baryon_number_density}
-    n_H=n_b \approx \frac{\rho_b}{m_H} = \frac{\obn \rhocn}{m_H a^3},
+    n_b \approx \frac{\rho_b}{m_H} = \frac{\obn \rhocn}{m_H a^3},
 \end{equation}
-where $\rhocn\equiv \frac{ H_0^2}{8\pi G}$ is the critical density of the universe today and $m_H$ is the hydrogen mass. We have assumed the small difference between the proton mass and Hydrogen mass to be negligible.
+where $\rhocn\equiv \frac{ H_0^2}{8\pi G}$ is the critical density of the universe today and $m_H$ is the hydrogen mass. Here, we also assume the small difference between the proton mass and Hydrogen mass to be negligible.
 
-\note{"Derive" Saha?}
-
-The Saha equation is given as 
+At early times, we can assume that the \note{particles} are in equilibrium, and \Eqref{eq:M2:theory:Boltzmann_equation_four_particles_scale_factor} reduces to 
+\begin{equation} \label{eq:M2:theory:Boltzmann_equation_recombination_approximation}
+    \frac{n_e n_p}{n_H} = \frac{\equilibriumn[e]\equilibriumn[p]}{\equilibriumn[H]}.
+\end{equation}
+This gives us the Saha equation 
 \begin{equation} \label{eq:M2:theory:saha_equation}
     \frac{\Xe^2}{1-\Xe} = \frac{1}{n_b} \pclosed{\frac{m_e \Tb}{2\pi}}^{3/2} e^{-\epsn / \Tb},
 \end{equation}
-where $\Tb$ is the temperature of the baryons, and $\epsn=13.6\unit{eV}$ is the Hydrogen ionization energy. The time evolution of the baryon temperature is governed by a differential equation coupled to $\Xe$. However, we will assume that $\Tb$ follows the photon temperature, $T_\gamma$, evolving as 
-\begin{equation}
+where $\Tb$ is the temperature of the baryons, and $\epsn$ is the Hydrogen ionization energy. The time evolution of $\Tb$ is governed by a differential equation coupled to $\Xe$. However, we will assume that it follows the photon temperature, $T_\gamma$, evolving as  
+\begin{equation} \label{eq:M2:theory:baryon_temperature_evolution}
     \Tb = T_\gamma = \tcmb e^{-x}.
 \end{equation}
-\note{Cite stuff above, and reference to quantities.}
-
-
-
+%==
+At later times, \Eqref{eq:M2:theory:Boltzmann_equation_recombination_approximation} is no longer a valid approximation, and we have to solve \Eqref{eq:M2:theory:Boltzmann_equation_four_particles_scale_factor}. Taking atomic physics into account, the differential equation we will consider is the Peebles equation  
 \begin{equation} \label{eq:M2:theory:Xe_peebles_ODE}
-    \dv{\Xe}{x} = \frac{C_r(\Tb)}{H}\bclosed{\beta(\Tb)(1-\Xe) - n_H \alpha^{(2)}(\Tb) \Xe^2 }
+    \dv{\Xe}{x} = \frac{C_r(\Tb)}{H}\bclosed{\beta(\Tb)(1-\Xe) - n_H \alpha^{(2)}(\Tb) \Xe^2 },
 \end{equation}
-
+where $C_r(\Tb),\: \beta(\Tb)$ and $\alpha^{(2)}(\Tb)$ are quantities related to interaction effects, and are given by 
 \begin{subequations} \label{eq:M2:theory:peebles:ODE_all_individual_terms}
     \begin{align}
         C_r(\Tb) &= \frac{\Lambda_{2s\to1s} + \Lambda_\alpha}{\Lambda_{2s\to1s} + \Lambda_\alpha + \beta^{(2)}(\Tb)}, \label{eq:M2:theory:peebles:C_r} \\
@@ -92,22 +86,21 @@ where $\Tb$ is the temperature of the baryons, and $\epsn=13.6\unit{eV}$ is the 
         \phi_2(\Tb) &= 0.448\ln(\epsn/\Tb). \label{eq:M2:theory:peebles:phi_2} 
     \end{align}
 \end{subequations}
-    
-\note{Explain how equations are solved, etc.}
-
-
+The initial condition is chosen as the final value of $\Xe$ obtained from the Saha equation, as we further discuss in \secref{ssec:M2:implementations}   
 
 \subsubsection{Sound Horizon \note{(working title)}} \label{sssec:M2:sound_horizon}
 Before recombination happens, baryons and photons are tightly coupled. For this reason, the baryons and photons behave as if they were a single fluid, and the sound speed of this fluid is given by \note{(citation)}
 \begin{equation} \label{eq:M2:theory:soundspeed_R_baryons_and_photons}
-    c_s = c \sqrt{\frac{R}{3(1+3R)}},\quad R = \frac{4\ogn}{3\obn e^x},
+    c_s(x) = \frac{c}{\sqrt{3}} \sqrt{\frac{R(x)}{1+R(x)}},\quad R(x) = \frac{4\og(x)}{3\ob(x)}.
 \end{equation}
-and we see that during radiation domination, we have $c_s \approx c/\sqrt{3}$. After recombination happens, photons will still have a sound speed of $c_s=c/\sqrt{3}$, while the sound speed of baryons will drop. \note{Is the previous sentence obsolete?} The total co-moving distance of these sound waves since the Big Bang is given as    
+\note{(Explicit x-dependence?)} The total co-moving distance a sound wave in this plasma could have travelled since the Big Bang is known as the sound-horizon, which is given as 
 \begin{equation} \label{eq:M2:theory:sound_horizon_integral}
     s(x)=\int_{-\infty}^x \frac{\dd x' c_s}{\H}.
 \end{equation}
-The size of this co-moving distance at recombination is known as the sound horizon, $r_s = s(x_\mathrm{rec})$. This allows us to estimate the angular separation of the CMB, over which we may expect there to have been causal contact. Thus, we have an additional ODE to solve, 
+From this we can compute the sound horizon at decoupling, $r_s = s(x_\mathrm{rec})$, which is an important quantity of the CMB. Thus, we have an additional ODE to solve, 
 \begin{equation} \label{eq:M2:theory:sound_horizon_ODE}
     \dv{s(x)}{x} = \frac{c_s}{\H},
 \end{equation}
-with $s(x_\mathrm{ini})=\frac{c_s(x_\mathrm{ini})}{\H(x_\mathrm{ini})}$ as the initial condition, following the same reasoning as we did for $\eta'(x)$ in \Eqref{eq:M1:theory:eta_of_xstart_analytical_approximation}. \note{Relate the sound-horizon to the Power Spectrum as well.}
+with $s(x_\mathrm{ini})=\frac{c_s(x_\mathrm{ini})}{\H(x_\mathrm{ini})}$ as the initial condition, following the same reasoning as we did for $\eta'(x)$ in \Eqref{eq:M1:theory:eta_of_xstart_analytical_approximation}.
+
+\note{Relate the sound-horizon to the Power Spectrum as well.}
