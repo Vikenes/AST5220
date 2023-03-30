@@ -1,20 +1,21 @@
 
 \subsection{Implementation details}\label{ssec:M2:implementations} 
-
-In order to compute the optical depth and the visibility we must first compute the electron density. At early times nearly all Hydrogen is ionized, and we therefore have $\Xe \approx 1$. In this regime the Peebles equation is numerically unstable. However, this regime is also where the Saha approximation is valid. We therefore start by solving \Eqref{eq:M2:theory:saha_equation}. Once $\Xe<\Xe^\mathrm{tol}$, the Saha approximation fails, and we must resort the Peebles equation. We can solve \Eqref{eq:M2:theory:Xe_peebles_ODE} numerically with the final value of $\Xe$ obtained by Saha as the initial condition. 
+To compute $\Xe$, we use the Saha equation initially, as it is a good approximation at early times when $\Xe \approx 1$. This is also the regime where the Peebles equation is unstable, and we therefore consider the Saha equation for $\Xe>\Xe^\mathrm{tol}$. Once we reach $\Xe<\Xe^\mathrm{tol}$ we use the final value from the Saha equation as our initial condition to solve the Peebles equation. The Peebles equation is then used all the way to today, at $x=0$. \note{MENTION THE TOLERANCE VALUE CHOSEN.}
 
 \subsubsection{Solving the Saha Equation}\label{sssec:M2:implementations:solving_saha}
-Solving the Saha equation is done by solving a quadratic formula for $\Xe$. At early times, however, the RHS of \Eqref{eq:M2:theory:saha_equation} will be \note{huge}, and may result in errors when solving the quadratic formula numerically. To avoid this, we use the first order approximation $\sqrt{1+x}\approx 1 + \frac{x}{2}$ for $\abs{x}\ll1$ at early times. The equation we will solve is thus 
+Solving the Saha equation is done by solving a quadratic formula for $\Xe$. At early times, however, the RHS of \Eqref{eq:M2:theory:saha_equation} will be enormous, and may cause numerical errors when solving the quadratic formula. To avoid this, we use the first order approximation $\sqrt{1+x}\approx 1 + \frac{x}{2}$ for $\abs{x}\ll1$ at early times. The Saha equation is thus implemented as   
 \begin{equation}
     \Xe = \begin{cases}
         1, \quad & y>10^7, \\
         \frac{y}{2}\bclosed{-1 + \sqrt{1 + 4/y}},\quad & y\leq 10^7,
     \end{cases}
 \end{equation}  
-where we have used $y$ as an abbreviation for the RHS of \Eqref{eq:M2:theory:saha_equation}, and omitted the negative solution as $\Xe$ is a strictly positive quantity. The exact value of $10^7$ is chosen to ensure $\Xe \ngtr 1$. \note{(I STOPPED BEFORE I FINISHED THIS PARAGRAPH)}
+where $y$ refers to the RHS of \Eqref{eq:M2:theory:saha_equation}. Since $\Xe$ is strictly positive, we have omitted the negative solution. The exact value of $10^7$ is chosen to ensure both $\Xe \ngtr 1$, and $\Xe\nless\Xe^\mathrm{tol}$ when the quadratic formula is to be used.
 
 \subsubsection{Solving the Peebles Equation}\label{sssec:M2:implementations:solving_peebles}
-We will solve the Peebles equation using Saha as the initial condition. To solve \Eqref{eq:M2:theory:Xe_peebles_ODE} numerically, we follow the same procedure as we did for $\eta(x)$, but for the initial condition we use the final value of $\Xe$ that we obtained from the Saha equation. Once $\Xe$ is obtained we get $\nex$ from \Eqref{eq:M2:theory:X_e_definition}. However, at late times, when the baryon temperature gets low, the exponent term in \Eqref{eq:M2:theory:peebles:beta2} for $\beta^{(2)}(T_b)$ will yield an overflow. However, the exponential factor in $\beta(\Tb)\to0$ results in $\beta^{(2)}(T_b)\to0$ at these temperatures. To avoid numerical errors, we therefore compute 
+To solve \Eqref{eq:M2:theory:Xe_peebles_ODE} numerically, we follow the same procedure as we did for $\eta(x)$, but for the initial condition we use the final value of $\Xe$ that we obtained from the Saha equation. 
+
+At late times, when the baryon temperature gets low, the exponent term in \Eqref{eq:M2:theory:peebles:beta2} for $\beta^{(2)}(T_b)$ become sufficiently large to yield an overflow. However, this is also where $\beta(\Tb)\to0$, due to its exponential factor (\Eqref{eq:M2:theory:peebles:beta}). This exponential factor causes $\beta^{(2)}(T_b)\to0$ at late times. To avoid overflow, we implement the equation for $\beta^{(2)}(T_b)$ as 
 \begin{equation}
     \beta^{(2)}(T_b) = \begin{cases}
         0,\quad &\epsn/\Tb > 200, \\
@@ -22,6 +23,13 @@ We will solve the Peebles equation using Saha as the initial condition. To solve
     \end{cases}
 \end{equation} 
 
-\subsubsection{Optical depth} \label{sssec:M2:implementations:optical_depth}
-With $\nex$ computed, we can solve \Eqref{eq:M2:theory:tau_ODE} for $\tau(x)$ with the aforementioned initial condition of $\tau(x=0)=0$. Its derivative, $\tau'(x)$, is given by the ODE and is thus \note{trivial}. From this, we get immediately $\gx$. For the second derivative of $\tau$, we compute it by \note{numerical differentiation of the splines.}   
+\note{(Mention splining of log's and so forth?)}
 
+\subsubsection{Optical depth and visibility function} \label{sssec:M2:implementations:optical_depth}
+Once $\Xe$ is obtained we get $\nex$ from \Eqref{eq:M2:theory:X_e_definition}, and can then solve \Eqref{eq:M2:theory:tau_ODE} for $\tau(x)$ with the aforementioned initial condition of $\tau(x=0)=0$. We therefore integrate backwards, starting from $x=0$. The visibility function is now easily obtained, as $\tau'(x)$ is given analytically by \Eqref{eq:M2:theory:tau_ODE}. From this, we get immediately $\gx$. 
+
+We also need the second derivative of $\tau$, as well as the first two derivatives of $\g$. For $\tau''(x)$, we compute it from numerically differentiating the $\tau'(x)$ data. \footnote{Couldn't we just compute it analytically? I get a tiny "bump" in $\tau''$ near $X_e^\mathrm{tol}$, and I don't know if this will cause problems later on, and therefore didn't want to spend too much time on it if wasn't needed.} We use this to compute 
+\begin{equation} \label{eq:M2:implementations:dg_dx}
+    \g'(x) = \vclosed{\tau'(x)^2 - \tau''(x)} e^{-\tau(x)}, 
+\end{equation}
+and obtain $\g''(x)$ by numerically differentiating $\g'(x)$. This is done to avoid potential errors that may occur when numerically computing the second derivative of $\g(x)$, if $\g(x)$ is somewhat ill-behaved at certain times. \footnote{I don't know if this is useful, or helps, at all. I don't know if we care about the derivatives at $x$-values where this might be an issue.} 

@@ -2,26 +2,16 @@
 
 
 \subsubsection{Electron fraction} \label{sssec:M2:results:electron_fraction}
-The evolution of the electron fraction \note{(mention neutral in general)} with time is shown in \figref{fig:M2:results:compare_Xe_peebles_saha}. Here, we have included the solution obtained through the Saha equation alone for comparison. We see that the Peebles equation predicts a more slowly declining behaviour for $\Xe$, compared to the Saha approximation. Towards $x=1$ we have $\Xe\ll1$, but we never reach $\Xe=0$ entirely. \note{(Elaborate on differences once you know the theory better.)}
-
+The evolution of the electron fraction \note{(mention neutral in general)} with time is shown in \figref{fig:M2:results:decoupling_compare_Xe_peebles_saha}. Here, we have included the solution obtained through the Saha equation alone for comparison. In the figure we also show the time periods when recombination occurs according to the two solutions. We see that the Peebles equation predicts the production of neutral Hydrogen to take much longer time than the Saha equation. Recombination therefore occurs at a much lower temperature than the binding energy of Hydrogen, as expected. Towards $x=0$ the Peebles equation give $\Xe\ll1$, but we never reach $\Xe=0$ entirely, compared to the Saha equation where $\Xe=0$ is eventually reached for sufficiently high values of $x$. 
 
 \begin{figure}[ht!]
-    % \includegraphics[width=\linewidth]{TEMPcompare_Xe_peebles_saha.png}
-    \includefig{compare_Xe_peebles_saha}
-    \caption{Free electron fraction computed from the Saha equation only (dashed green curve) and from the Peebles equation (solid blue curve), where the Saha equation was used at early times, until $X_e<0.99$.}
-    \label{fig:M2:results:compare_Xe_peebles_saha}
-\end{figure}
-
-\note{Decoupling times indicated in \figref{fig:M2:results:decoupling_compare_Xe_peebles_saha}, may be obsolete.}
-\begin{figure}[ht!]
-    % \includegraphics[width=\linewidth]{TEMPdecoupling_compare_Xe_peebles_saha.png}
     \includefig{decoupling_compare_Xe_peebles_saha}
     \caption{Free electron fraction computed from the Saha equation only (dashed green curve) and from the Peebles equation (solid blue curve), where the Saha equation was used at early times, until $\Xe<0.99$. The decoupling time, i.e. when $\tau=1$, is shown for both the Saha solution (dotted red curve), and for the Peebles solution (dotted black curve).}
     \label{fig:M2:results:decoupling_compare_Xe_peebles_saha}
 \end{figure}
 
+\subsubsection{Optical depth and visibility function} \label{sssec:M2:results:optical_depth_and_visibility_function}
 \begin{figure}[ht!]
-    % \includegraphics[width=\linewidth]{tau_plot.pdf}
     \includefig{tau_plot}
     \caption{The optical depth, $\tau(x)$ and its two first derivatives with respect to $x$.}
     \label{fig:M2:results:tau_plot}
@@ -35,8 +25,9 @@ The evolution of the electron fraction \note{(mention neutral in general)} with 
     \label{fig:M2:results:g_plot}
 \end{figure}
 
+\subsubsection{Times of recombination and decoupling} \label{sssec:M2:results:times_of_recombination_and_decoupling}
+The period of recombination and decoupling, as computed from the Peebles equation, is given in table \ref{tab:M2:results:rec_and_dec_time_table_Peebles}. For the decoupling, we also include the value of $x$ when $\g$ is at maximum.
+
 \tablesMilestoneTwo{rec_and_dec_time_table_Peebles.tex}
 
 \tablesMilestoneTwo{rec_and_dec_time_table_Saha.tex}
-
-This is given in table \ref{tab:M2:results:rec_and_dec_time_table_Peebles}. The Saha results are given in table \ref{tab:M2:results:rec_and_dec_time_table_Saha}
