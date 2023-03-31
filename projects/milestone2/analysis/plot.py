@@ -144,7 +144,7 @@ def plot_quantity_with_derivatives(x, y, dy, ddy,
     ax.plot(x, dy ,ls='dashed', color='orange', label=dy_legend)
     ax.plot(x, ddy,ls='dotted', color='green' , label=ddy_legend)
 
-
+    
     ax.set_ylim(ylim)
     ax.set_xlim(xlim)
 
@@ -162,9 +162,9 @@ def plot_quantity_with_derivatives(x, y, dy, ddy,
 
 def compare_Xe_peebles_and_saha(x_peebles, x_saha, 
                                 Xe_peebles, Xe_saha,
-                                xdec_peebles, xdec_saha,
+                                xrec_peebles, xrec_saha,
                                 fname, 
-                                decoupling_times=False,
+                                rec_times=False,
                                    xlim=None, ylim=None, 
                                    legendloc='best', yticks=None, 
                                    figsize=(8,6), log=True, 
@@ -176,12 +176,13 @@ def compare_Xe_peebles_and_saha(x_peebles, x_saha,
     ax.plot(x_peebles, Xe_peebles ,ls='solid' , color='blue'  , label="Peebles")
     ax.plot(x_saha   , Xe_saha    ,ls='dashed', color='green', label="Saha")
 
-    if decoupling_times:
-        ax.vlines(xdec_peebles, *ylim, ls='dotted', color='black'  , alpha=1, label="Decoupling, Peebles")
-        ax.vlines(xdec_saha   , *ylim, ls='dotted', color='red', alpha=1, label="Decoupling, Saha")
-        fname = "decoupling_" + fname 
+    if rec_times:
+        ax.vlines(xrec_peebles, *ylim, ls='dotted', color='black'  , alpha=1, label="Recombination, Peebles")
+        ax.vlines(xrec_saha   , *ylim, ls='dotted', color='red', alpha=1, label="Recombination, Saha")
 
+        fname = "recombination_" + fname 
 
+    
     ax.set_ylim(ylim)
     ax.set_xlim(xlim)
 
@@ -201,7 +202,7 @@ def compare_Xe_peebles_and_saha(x_peebles, x_saha,
 
 
 
-def time_table(x, z, t, saha=False, save=False, temp=False):
+def time_table(x, z, t, r, saha=False, save=False, temp=False):
    
 
     if saha:
@@ -209,13 +210,35 @@ def time_table(x, z, t, saha=False, save=False, temp=False):
     else:
         method = "Peebles"
 
-    col_labels = [method, r"$x$", r"$z$", r"$t\,\mathrm{[Myr]}$"]
+    col_labels = [method, r"$x$", r"$z$", r"$t\,\mathrm{[yr]}$"]
+    col_fmt = "l|ccc"
 
-    row_labels = [r"Decoupling ($\tau=1$)", 
-                    r"Decoupling $\max\{ \tilde{g}(x) \}$",
-                    r"Recombination"]
+    if not saha:
+        col_labels.append(r"$r_s \,\mathrm{[Mpc]}$")
+        col_fmt += "c"
 
-    data = np.array([row_labels, x, z, np.round(t,5)]).T 
+    row_labels = [r"Decoupling",
+                  r"Recombination"]
+    
+    t1_ = str(np.round(t[0]))
+    t2_ = str(np.round(t[1]))
+
+    t1 = t1_[0:3] + "\," + t1_[3:6]
+    t2 = t2_[0:3] + "\," + t2_[3:6]
+
+    t = [t1, t2]
+
+    # x = np.round(x,3)
+    z = np.round(z,1)
+
+    if saha:
+        data = np.array([row_labels, x, z, t]).T 
+    else:
+        r = [np.round(r[0],2), " "]
+        
+
+        data = np.array([row_labels, x, z, t, r]).T 
+
 
     table_caption   = "Times when decoupling and recombination occurs, computed from the " 
     table_caption   += method + " equation."
@@ -237,7 +260,7 @@ def time_table(x, z, t, saha=False, save=False, temp=False):
             index=False, 
             header=col_labels, 
             escape=False, 
-            column_format='l|ccc',
+            column_format=col_fmt,
             caption=table_caption,
             label=table_label,
             position="h",
@@ -248,6 +271,7 @@ def time_table(x, z, t, saha=False, save=False, temp=False):
     if save:
         print(f"Saving time table for {method}:")
         print(f"   {table_fname}")
+        
     else:
         print(table)
 

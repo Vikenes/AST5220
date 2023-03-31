@@ -4,7 +4,7 @@
 
 \subsubsection{Optical depth and visibility function} \label{sssec:M2:optical_depth_and_visibility_function}
 
-A source that emits light with an intensity $I_0$ is attenuated by a factor $e^{-\tau(x)}$ as it travels through a medium, where $\tau$ is the optical depth of the medium. In the early universe we have $\tau\gg1$, and the universe is said to be optically thick, as light is unable to \note{emerge}. As the universe expands and neutral atoms form, the universe becomes optically thin, $\tau\ll1$, and light is able to escape the primordial plasma and reach us. A common way to define when recombination occurs is the time when we have $\tau=1$. Considering Thompson scattering only, the optical depth is defined in terms of the scale factor, $a$, as \cite[Eq. (5)]{callin} 
+A source that emits light with an intensity $I_0$ is attenuated by a factor $e^{-\tau(x)}$ as it travels through a medium, where $\tau$ is the optical depth of the medium. In the early universe we have $\tau\gg1$, and the universe is said to be optically thick. As the universe expands and recombination takes place, the universe becomes optically thin, $\tau\ll1$, and light is able to escape the primordial plasma and reach us. Considering Thompson scattering only, the optical depth is defined in terms of the scale factor, $a$, as \cite[Eq. (5)]{callin} 
 \begin{equation} \label{eq:M2:theory:optical_depth_integral_definition}
     \tau(\eta) = \int_\eta^{\eta_0} \dd \eta' \,\ne \sigma_T a,
 \end{equation}
@@ -16,7 +16,7 @@ is the Thompson cross-section and $a$ is the scale factor. $\alpha$ is the fine-
 \begin{equation} \label{eq:M2:theory:tau_ODE}
     \dv{\tau}{x} = - \frac{\ne \sigma_T}{H},
 \end{equation}
-which we can solve numerically once we know $n_e$. The initial condition is $\tau(x=0)=0$.
+which we can solve numerically once we know $n_e$. The initial condition is $\tau(x=0)=0$, as the universe is transparent today.
 
 From the optical depth, we obtain the so-called \textit{visibility function} \cite[Eq. (8)]{callin} 
 \begin{equation} \label{eq:M2:theory:g_tilde_of_x_definition}
@@ -26,41 +26,40 @@ which is normalized as
 \begin{equation} \label{eq:M2:theory:g_tilde_normalization}
     \int_{-\infty}^0\dd x\,\gx = 1.
 \end{equation}
-The normalization means that $\gx$ is a probability distribution, and we may interpret it as the probability of an observed CMB photon today having experienced its last scattering at a time $x$. The visibility function is sharply peaked around the time when recombination takes place, and the period of recombination is thus often referred to as the surface of last scattering. We therefore have two ways of estimating when photon baryon decoupling occurred, either as the time when the universe became optically thin, i.e. when $\tau=1$, or as the time when the visibility function is at its maximum value.
+The normalization means that $\gx$ is a probability distribution, and we may interpret it as the probability of an observed CMB photon today having experienced its last scattering at a time $x$. The visibility function is sharply peaked around the time when the photons decouple from the baryons, and is often referred to as the surface of last scattering. We may therefore use the peak of $\gx$ to estimate the time when decoupling took place in the early universe. 
 
-\subsubsection{Electron density \note{(working title)}} \label{sssec:M2_electron_density}
+\subsubsection{Electron density} \label{sssec:M2_electron_density}
 The final thing we need to compute $\tau$ and $\g$ is the number density of free electrons. To compute the evolution of free electrons, we have to consider the Boltzmann equation \cite[Eq. (3.19)]{Dodelson}
 \begin{equation} \label{eq:M2:theory:Boltzmann_equation}
     \dv{f}{t} = C[f],
 \end{equation}
 where $f$ is the distribution function and $C[f]$ is a collision term. 
 
-The Boltzmann equation we will consider is \cite[Eq. (4.8)]{Dodelson} \note{(explain assumptions and simplifications.)}
+We will not consider the full Boltzmann equation, but an approximated version relevant for the recombination. Following the notation and definitions from \cite[Eq. (4.5)-(4.9)]{Dodelson}, the equation we consider is given as  
 \begin{equation} \label{eq:M2:theory:Boltzmann_equation_four_particles_scale_factor}
     a^{-3}\dv{(n_1 a^3)}{t} = \equilibriumn[1] \equilibriumn[2] \expval{\sigma v} \BBclosed{\frac{n_3 n_4}{\equilibriumn[3] \equilibriumn[4]} - \frac{n_1 n_2}{\equilibriumn[1] \equilibriumn[2]}},
 \end{equation}
-where $n_i$ denotes the number density of a particle species $i$, and $\equilibriumn[i]$ denotes the number density in equilibrium. We are interested in recombination, and thus consider the reaction 
+where $n_i$ denotes the number density of a particle species $i$, with $\equilibriumn[i]$ referring to its value in chemical equilibrium, and $\expval{\sigma v}$ is the thermally averaged cross-section. The only reaction we will consider for recombination is   
 \begin{equation} \label{eq:M2:theory:electron_proton_to_hydrogen_photon}
     e^- + p^+ \leftrightarrow H + \gamma.
 \end{equation}   
-For the photons we will assume $n_\gamma = \equilibriumn[\gamma]$. We adopt the notation of Dodelson \cite{Dodelson}, where $e$ and $p$ denotes free electrons and protons, respectively, while $H$ stands for neutral Hydrogen. 
-
+For the photons we will assume $n_\gamma = \equilibriumn[\gamma]$. From now on we use $e$ and $p$ as subscripts to denote free electrons and protons, respectively, and a subscript $H$ to denote neutral Hydrogen. 
 
 Instead of computing $\ne$ directly, we will compute the fractional electron density
 \begin{equation} \label{eq:M2:theory:X_e_definition}
-    \Xe \equiv \frac{\ne}{n_b},
+    \Xe \equiv \frac{n_e}{n_e + n_H} \approx \frac{\ne}{n_b},
 \end{equation}
-where $n_b\approx\ne+n_H$ is the total baryon density. Since we neglect Hydrogen, the baryon density can be written as    
+where $n_b$ is the total baryon density of the universe. Since the universe must be electrically neutral, we have $n_e=n_p$, and assuming no heavier elements than Hydrogen gives $n_b\approx n_p+n_H$. Neglecting the small mass difference between the proton and the Hydrogen, the baryon density can be written as    
 \begin{equation} \label{eq:M2:theory:helium_baryon_number_density}
     n_b \approx \frac{\rho_b}{m_H} = \frac{\obn \rhocn}{m_H a^3},
 \end{equation}
-where $\rhocn\equiv \frac{ H_0^2}{8\pi G}$ is the critical density of the universe today and $m_H$ is the hydrogen mass. Here, we also assume the small difference between the proton mass and Hydrogen mass to be negligible.
+where $\rhocn\equiv \frac{ H_0^2}{8\pi G}$ is the critical density of the universe today and $m_H$ is the Hydrogen mass. 
 
-At early times, we can assume that the \note{particles} are in equilibrium, and \Eqref{eq:M2:theory:Boltzmann_equation_four_particles_scale_factor} reduces to 
+Before recombination occurs, the interaction rates greatly exceed the expansion rate of the universe, and for \Eqref{eq:M2:theory:Boltzmann_equation_four_particles_scale_factor} to be valid we must have that 
 \begin{equation} \label{eq:M2:theory:Boltzmann_equation_recombination_approximation}
     \frac{n_e n_p}{n_H} = \frac{\equilibriumn[e]\equilibriumn[p]}{\equilibriumn[H]}.
 \end{equation}
-This gives us the Saha equation 
+In terms of $\Xe$, this reduces to the Saha equation 
 \begin{equation} \label{eq:M2:theory:saha_equation}
     \frac{\Xe^2}{1-\Xe} = \frac{1}{n_b} \pclosed{\frac{m_e \Tb}{2\pi}}^{3/2} e^{-\epsn / \Tb},
 \end{equation}
@@ -69,7 +68,7 @@ where $\Tb$ is the temperature of the baryons, and $\epsn$ is the Hydrogen ioniz
     \Tb = T_\gamma = \tcmb e^{-x}.
 \end{equation}
 %==
-At later times, \Eqref{eq:M2:theory:Boltzmann_equation_recombination_approximation} is no longer a valid approximation, and we have to solve \Eqref{eq:M2:theory:Boltzmann_equation_four_particles_scale_factor}. Taking atomic physics into account, the differential equation we will consider is the Peebles equation  
+At later times, \Eqref{eq:M2:theory:Boltzmann_equation_recombination_approximation} is no longer a valid approximation, and we have to solve \Eqref{eq:M2:theory:Boltzmann_equation_four_particles_scale_factor}. Additionally, we have to take processes related to atomic physics into account, so the differential equation we will consider is the Peebles equation  
 \begin{equation} \label{eq:M2:theory:Xe_peebles_ODE}
     \dv{\Xe}{x} = \frac{C_r(\Tb)}{H}\bclosed{\beta(\Tb)(1-\Xe) - n_H \alpha^{(2)}(\Tb) \Xe^2 },
 \end{equation}
@@ -86,16 +85,16 @@ where $C_r(\Tb),\: \beta(\Tb)$ and $\alpha^{(2)}(\Tb)$ are quantities related to
         \phi_2(\Tb) &= 0.448\ln(\epsn/\Tb). \label{eq:M2:theory:peebles:phi_2} 
     \end{align}
 \end{subequations}
-The main reason for these corrections is that Hydrogen production is inefficient, even at $\Tb\simeq\epsn$. A recombination process where the electron goes directly into the Hydrogen ground state is likely to produce a photon with energy higher than $\epsn$, which will ionize another nearby Hydrogen atom, resulting in no net Hydrogen production. Efficient recombination is therefore obtained by a recombination to an excited state, after which the atom can decay into the ground state, which is a slow process. \note{Added the above paragraph. Proofread later, and check physics.}
+The main reason behind these additional equations is that Hydrogen production is inefficient at $\Tb\simeq\epsn$. Direct recombination to the Hydrogen ground state is likely to produce a photon with energy greater than $\epsn$, which will ionize another nearby Hydrogen atom, resulting in no net Hydrogen production. Recombination is achieved when an electron and proton combine to an excited Hydrogen atom, followed by the atom's decay into the ground state, which is a slow process.
 
-The initial condition is chosen as the final value of $\Xe$ obtained from the Saha equation, as we further discuss in \secref{ssec:M2:implementations}   
+In \secref{sssec:M2:implementations:solving_peebles} we discuss how combine the Saha and Peebles equation to compute $\Xe$.
 
-\subsubsection{Sound Horizon \note{(working title)}} \label{sssec:M2:sound_horizon}
-Before recombination happens, baryons and photons are tightly coupled. For this reason, the baryons and photons behave as if they were a single fluid, and the sound speed of this fluid is given by \note{(citation)}
+\subsubsection{Sound Horizon at decoupling} \label{sssec:M2:sound_horizon}
+Before recombination happens, baryons and photons are tightly coupled. For this reason, the baryons and photons behave as if they were a single fluid, and the sound speed of this fluid is given by \cite[Eq. (9.21)]{Dodelson} (where we use $R\to 1/R$)
 \begin{equation} \label{eq:M2:theory:soundspeed_R_baryons_and_photons}
     c_s(x) = \frac{c}{\sqrt{3}} \sqrt{\frac{R(x)}{1+R(x)}},\quad R(x) = \frac{4\og(x)}{3\ob(x)}.
 \end{equation}
-\note{(Explicit x-dependence?)} The total co-moving distance a sound wave in this plasma could have travelled since the Big Bang is known as the sound-horizon, which is given as 
+The total co-moving distance a sound wave in this plasma could have travelled since the Big Bang is known as the sound-horizon, which is given as 
 \begin{equation} \label{eq:M2:theory:sound_horizon_integral}
     s(x)=\int_{-\infty}^x \frac{\dd x' c_s}{\H}.
 \end{equation}
@@ -105,4 +104,4 @@ From this we can compute the sound horizon at decoupling, $r_s = s(x_\mathrm{rec
 \end{equation}
 with $s(x_\mathrm{ini})=\frac{c_s(x_\mathrm{ini})}{\H(x_\mathrm{ini})}$ as the initial condition, following the same reasoning as we did for $\eta'(x)$ in \Eqref{eq:M1:theory:eta_of_xstart_analytical_approximation}.
 
-\note{Relate the sound-horizon to the Power Spectrum as well.}
+pikk

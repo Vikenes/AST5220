@@ -20,57 +20,52 @@ data_path = "/home/vetle/Documents/master_studies/subjects/V23/AST5220/projects/
 
 global SAVE 
 global TEMP
-global DECOUPLING
+global RECOMBINATION
 SAVE        = False 
 TEMP        = False 
-DECOUPLING  = False 
+RECOMBINATION  = False 
 
 
 class Recombination:
     def __init__(self, 
                  filename,
-                 rec_and_dec_times_fname, 
-                 saha=False,
+                 rec_and_dec_times_fname=None, 
                  length_unit=u.Mpc,
-                 time_unit=u.Myr):
+                 time_unit=u.yr):
         
         self.data           = self.load_data(filename)
         self.x              = self.data[0]
 
         self.rec_dec_file   = rec_and_dec_times_fname
+        self.rec_dec_saha   = rec_and_dec_times_fname.strip(".txt") + "_saha.txt"
 
         self.length_unit    = length_unit
         self.time_unit      = time_unit
 
-        self.saha = saha 
 
 
     
     def load_data(self, filename, skiprows=2):
         return np.loadtxt(data_path + filename, unpack=True, skiprows=skiprows)
     
-
-    def load_x_decoupling_tau(self):
-        self.xdec_tau = np.loadtxt(data_path + self.rec_dec_file, skiprows=1).T[0][0] 
+    def load_x_decoupling(self):
+        x = np.loadtxt(data_path + self.rec_dec_file, skiprows=1, usecols=(1,2))[0]
+        self.xLSS     = x[0]
+        self.xrec     = x[1]
 
     
-
-
     def load_Xe(self):
         self.Xe             = self.data[1]
         
-
     def load_ne(self, convert_unit=True):
         self.ne     = self.data[2] * u.m**(-3) 
         if convert_unit:
             self.ne = self.ne.to(self.length_unit**(-3))
 
-
     def load_taus(self):
         self.tau            = self.data[3]
         self.dtau_dx        = self.data[4]
         self.ddtau_ddx      = self.data[5]
-
 
     def load_g(self):
         self.g_tilde        = self.data[6]
@@ -157,30 +152,35 @@ class Recombination:
         if stop:
             exit() 
 
+    def Xe_today(self):
+        self.load_Xe()
+        Xe0 = self.Xe[-1]
+        print(self.x[-1])
+        print(f"X_e at x={self.x[-1]:.2f} is: {self.Xe[-1]:.5e}")
 
     def compare_Xe(self, x_saha, Xe_saha, 
-                   xdec_peebles=None, xdec_saha=None,
-                   ylim=[1e-4, 2], xlim=[-8,-5]):
+                   xrec_saha=None,
+                   ylim=[1e-4, 2], xlim=[-7.8,-5.3],
+                   figname="compare_Xe_peebles_saha.pdf"):
         
         if hasattr(self, 'Xe'):
             pass
         else:
             self.load_Xe()
 
-        if DECOUPLING:
-            if not hasattr(self, "xdec_tau"):
-                self.load_x_decoupling_tau()
+        if RECOMBINATION:
+            if not hasattr(self, "xrec"):
+                self.load_x_decoupling()
             
-            xdec_peebles = self.xdec_tau
+            xrec_peebles = self.xrec
 
-            
 
         plot.compare_Xe_peebles_and_saha(self.x, x_saha,
                                          self.Xe, Xe_saha,
-                                         xdec_peebles=xdec_peebles, xdec_saha=xdec_saha,
-                                         fname="compare_Xe_peebles_saha.pdf",
+                                         xrec_peebles=xrec_peebles, xrec_saha=xrec_saha,
+                                         fname=figname,
                                          xlim=xlim, ylim=ylim,
-                                         decoupling_times=DECOUPLING,
+                                         rec_times=RECOMBINATION,
                                          save=SAVE, temp=TEMP)
 
 
@@ -188,7 +188,8 @@ class Recombination:
     def plot_visibility_functions(self, dg_dx_scaling=10, 
                                         ddg_ddx_scaling=300,
                                         xlim=[-7.5, -6],
-                                        ylim=None):
+                                        ylim=None,
+                                        figname="g_plot.pdf"):
         
         """
         Plot g(x), g'(x) and g''(x)
@@ -207,8 +208,7 @@ class Recombination:
         y   = self.g_tilde
         dy  = dg_dx_scaled 
         ddy = ddg_ddx_scaled
-
-        dg_str = str(dg_dx_scaling)
+       
 
         y_legend    = r"$\tilde{g}(x)$"
         dy_legend   = r"$\tilde{g}'(x)$" + rf"$/{str(dg_dx_scaling)}$"
@@ -217,12 +217,13 @@ class Recombination:
 
         plot.plot_quantity_with_derivatives(x, y, dy, ddy, 
                                             y_legend, dy_legend, ddy_legend,
-                                            fname="g_plot.pdf",
+                                            fname=figname,
                                             xlim=xlim, log=False,
                                             save=SAVE, temp=TEMP)
 
 
-    def plot_tau_with_derivatives(self, xlim=[-10,0], ylim=[1e-8, 1e6]):
+    def plot_tau_with_derivatives(self, xlim=[-10,0], ylim=[1e-8, 1e6],
+                                  figname="tau_plot.pdf"):
 
         if hasattr(self, 'tau'):
             pass
@@ -245,23 +246,21 @@ class Recombination:
                                             save=SAVE, temp=TEMP)
 
 
-    def make_table(self):
+    def make_table(self, saha=False):
+        if saha:
+            fname = self.rec_dec_saha
+        else:
+            fname = self.rec_dec_file
 
-        rec_dec_times = np.loadtxt(data_path + self.rec_dec_file, skiprows=1).T 
+        x, z, t, r = np.loadtxt(data_path + fname, skiprows=1, usecols=(1,2)) 
 
-        self.x_times_data  = rec_dec_times[0]
-        self.z_times_data  = rec_dec_times[1]
-        self.t_times_data  = rec_dec_times[2] * u.s 
-        self.rs_times_data = rec_dec_times[3] * u.m 
-
-        self.t_times_data  = self.t_times_data.to(self.time_unit)
-        self.rs_times_data = self.rs_times_data.to(self.length_unit)
+        
+        t       = (t * u.s).to(self.time_unit).value 
+        r       = (r * u.m).to(self.length_unit).value
 
 
-        plot.time_table(self.x_times_data,
-                        self.z_times_data,
-                        self.t_times_data,
-                        saha=self.saha,
+        plot.time_table(x, z, t, r,
+                        saha=saha,
                         save=SAVE,
                         temp=TEMP)
 
@@ -271,18 +270,18 @@ class Recombination:
 
 
 rec = Recombination(filename="recombination.txt", 
-                    rec_and_dec_times_fname="rec_times.txt",
-                    saha=False)
+                    rec_and_dec_times_fname="rec_times.txt"
+                    )
 
 rec_saha_only = Recombination(filename="recombination_saha.txt", 
-                              rec_and_dec_times_fname="rec_times_saha.txt",
-                              saha=True)
+                              rec_and_dec_times_fname="rec_times_saha.txt"
+                              )
 rec_saha_only.load_Xe()
 x_saha, Xe_saha = rec_saha_only.x, rec_saha_only.Xe
 
-rec_saha_only.load_x_decoupling_tau()
-x_dec_saha = rec_saha_only.xdec_tau
+rec_saha_only.load_x_decoupling()
 
+x_rec_saha = rec_saha_only.xrec
 
 rec.assert_valid_recombination_value()
 rec.assert_normalized_g_tilde()
@@ -291,15 +290,24 @@ rec.assert_normalized_g_tilde()
 
 # SAVE        = True
 # TEMP        = True
-# DECOUPLING  = True 
+# RECOMBINATION  = True 
+
+# rec.Xe_today()
 
 # rec.plot_tau_with_derivatives()
 # rec.plot_visibility_functions()
-# rec.compare_Xe(x_saha=x_saha, Xe_saha=Xe_saha, xdec_saha=x_dec_saha)
-
+# rec.compare_Xe(x_saha=x_saha, Xe_saha=Xe_saha, xrec_saha=x_rec_saha)
+# rec.make_table(True)
 # rec.make_table()
-# rec_saha_only.make_table()
 
+exit()
+
+# rec.plot_tau_with_derivatives(figname="tau_plot_split.pdf")
+# rec.plot_visibility_functions(figname="g_plot_split.pdf")
+rec.compare_Xe(x_saha=x_saha, 
+               Xe_saha=Xe_saha, 
+               xdec_saha=x_dec_saha, 
+               figname="compare_Xe_peebles_saha_split.pdf")
 
 
 

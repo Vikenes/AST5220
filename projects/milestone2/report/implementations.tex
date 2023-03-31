@@ -1,6 +1,6 @@
 
 \subsection{Implementation details}\label{ssec:M2:implementations} 
-To compute $\Xe$, we use the Saha equation initially, as it is a good approximation at early times when $\Xe \approx 1$. This is also the regime where the Peebles equation is unstable, and we therefore consider the Saha equation for $\Xe>\Xe^\mathrm{tol}$. Once we reach $\Xe<\Xe^\mathrm{tol}$ we use the final value from the Saha equation as our initial condition to solve the Peebles equation. The Peebles equation is then used all the way to today, at $x=0$. \note{MENTION THE TOLERANCE VALUE CHOSEN.}
+To compute $\Xe$, we use the Saha equation initially, as it is a good approximation at early times when $\Xe \approx 1$. This is also the regime where the Peebles equation is unstable, and we therefore consider the Saha equation for $\Xe>\Xe^\mathrm{tol}$. Once we reach $\Xe<\Xe^\mathrm{tol}$ we use the final value from the Saha equation as our initial condition to solve the Peebles equation. The Peebles equation is then used all the way to today, at $x=0$. For this report, we choose $\Xe^\mathrm{tol}=0.99$. For comparison with the Saha equation alone, we set $\Xe^\mathrm{tol}=10^{-6}$. Once $\Xe$ is computed we get $\nex$ from \Eqref{eq:M2:theory:X_e_definition}. 
 
 \subsubsection{Solving the Saha Equation}\label{sssec:M2:implementations:solving_saha}
 Solving the Saha equation is done by solving a quadratic formula for $\Xe$. At early times, however, the RHS of \Eqref{eq:M2:theory:saha_equation} will be enormous, and may cause numerical errors when solving the quadratic formula. To avoid this, we use the first order approximation $\sqrt{1+x}\approx 1 + \frac{x}{2}$ for $\abs{x}\ll1$ at early times. The Saha equation is thus implemented as   
@@ -22,14 +22,22 @@ At late times, when the baryon temperature gets low, the exponent term in \Eqref
         \beta(\Tb) e^{3\epsn/4\Tb},\quad &\epsn/\Tb \leq 200.
     \end{cases}
 \end{equation} 
-
-\note{(Mention splining of log's and so forth?)}
+ 
 
 \subsubsection{Optical depth and visibility function} \label{sssec:M2:implementations:optical_depth}
-Once $\Xe$ is obtained we get $\nex$ from \Eqref{eq:M2:theory:X_e_definition}, and can then solve \Eqref{eq:M2:theory:tau_ODE} for $\tau(x)$ with the aforementioned initial condition of $\tau(x=0)=0$. We therefore integrate backwards, starting from $x=0$. The visibility function is now easily obtained, as $\tau'(x)$ is given analytically by \Eqref{eq:M2:theory:tau_ODE}. From this, we get immediately $\gx$. 
+With $\ne$ we can then solve \Eqref{eq:M2:theory:tau_ODE} for $\tau(x)$ with the aforementioned initial condition of $\tau(x=0)=0$. We therefore integrate backwards, starting from $x=0$. The visibility function is now easily obtained, as $\tau'(x)$ is given analytically by \Eqref{eq:M2:theory:tau_ODE}. From this, we get immediately $\gx$. 
 
 We also need the second derivative of $\tau$, as well as the first two derivatives of $\g$. For $\tau''(x)$, we compute it from numerically differentiating the $\tau'(x)$ data. \footnote{Couldn't we just compute it analytically? I get a tiny "bump" in $\tau''$ near $X_e^\mathrm{tol}$, and I don't know if this will cause problems later on, and therefore didn't want to spend too much time on it if wasn't needed.} We use this to compute 
 \begin{equation} \label{eq:M2:implementations:dg_dx}
     \g'(x) = \vclosed{\tau'(x)^2 - \tau''(x)} e^{-\tau(x)}, 
 \end{equation}
 and obtain $\g''(x)$ by numerically differentiating $\g'(x)$. This is done to avoid potential errors that may occur when numerically computing the second derivative of $\g(x)$, if $\g(x)$ is somewhat ill-behaved at certain times. \footnote{I don't know if this is useful, or helps, at all. I don't know if we care about the derivatives at $x$-values where this might be an issue.} 
+
+\subsubsection{Determining the time of recombination and decoupling} \label{sssec:M2:implementations:determining_the_time_of_recombination_and_decoupling}
+To estimate the times when recombination takes place, we define this as 
+\begin{equation}
+    \Xe(x=x_\mathrm{recombination}) = 0.1,  
+\end{equation}
+where the value $\Xe=0.1$ is chosen arbitrarily. 
+
+For decoupling, we find $x_\mathrm{decoupling}$ as the point where $\g'(x_\mathrm{decoupling})=0$. However, we limit the time values to $x\in[x_0\pm0.1]$, where $x_0$ is defined by $\tau(x_0)=1$. This is done to avoid $x$ values where $\g(x)=0$. 
