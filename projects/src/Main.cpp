@@ -77,10 +77,12 @@ int main(int argc, char **argv){
   // Output recombination quantities
   // rec.output("milestone2/data/recombination.txt");
   // rec.output("milestone2/data/recombination_saha.txt");
+  // rec.output("milestone2/data/recombination_split.txt");
 
   //===== Find decoupling times ======
   // rec.output_important_times("milestone2/data/rec_times.txt");
   // rec.output_important_times("milestone2/data/rec_times_saha.txt");
+  rec.output_important_times("milestone2/data/rec_times.txt");
 
   
   // Remove when module is completed

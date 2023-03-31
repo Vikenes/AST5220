@@ -6,6 +6,8 @@
 #include <fstream>
 #include "Utils.h"
 #include "BackgroundCosmology.h"
+#include <iomanip>
+#include <string>
 
 using Vector = std::vector<double>;
 
@@ -26,8 +28,8 @@ class RecombinationHistory{
     const int npts_rec_arrays = 1e5;
   
     // Xe for when to switch between Saha and Peebles
-    const double Xe_saha_limit = 1e-6;
-    // const double Xe_saha_limit = 0.99;
+    // const double Xe_saha_limit = 1e-6;
+    const double Xe_saha_limit = 0.99;
 
 
 
@@ -49,7 +51,7 @@ class RecombinationHistory{
     //===============================================================
 
     // Number of points of tau, g_tilde arrays, and their derivatives
-    const int npts_tau = 5e4;
+    const int npts_tau = 1e5;
 
     // The two things we need to solve: Xe/ne and tau
     void solve_for_optical_depth_tau();
@@ -62,7 +64,7 @@ class RecombinationHistory{
     
     
     // Splines contained in this class
-    Spline log_Xe_of_x_spline{"Xe"};
+    Spline Xe_of_x_spline{"Xe"};
     Spline log_ne_of_x_spline{"ne"};
     Spline tau_of_x_spline{"tau"}; 
     Spline dtau_dx_spline{"dtau_dx"};
@@ -73,7 +75,7 @@ class RecombinationHistory{
     Spline s_of_x_spline{"s(x)"};
 
     // Number of points written to file
-    const int nx_write = 1e5;
+    const int nx_write = 5e4;
 
   public:
 

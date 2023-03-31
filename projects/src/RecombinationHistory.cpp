@@ -72,6 +72,8 @@ void RecombinationHistory::solve_number_density_electrons(){
       // the Peebles equation
       //==============================================================
 
+      std::cout << "End of Saha regime reached at x=" << x_array[i-1] << std::endl; 
+
       // The Peebles ODE equation
       ODEFunction dXedx = [&](double x, const double *Xe, double *dXedx){
         return rhs_peebles_ode(x, Xe, dXedx);
@@ -106,10 +108,9 @@ void RecombinationHistory::solve_number_density_electrons(){
   //=============================================================================
   // Splining the result.  
   //=============================================================================
-  Vector log_Xe_arr = log(Xe_arr);
   Vector log_ne_arr = log(ne_arr);
 
-  log_Xe_of_x_spline.create(x_array, log_Xe_arr, "log_Xe");
+  Xe_of_x_spline.create(x_array, Xe_arr, "log_Xe");
   log_ne_of_x_spline.create(x_array, log_ne_arr, "log_ne");
 
   Utils::EndTiming("Xe");
@@ -317,7 +318,6 @@ double RecombinationHistory::dtaudx_of_x(double x) const{
 
 double RecombinationHistory::ddtauddx_of_x(double x) const{
   return dtau_dx_spline.deriv_x(x);
-  // return tau_of_x_spline.deriv_xx(x);
 }
 
 double RecombinationHistory::g_tilde_of_x(double x) const{
@@ -325,15 +325,11 @@ double RecombinationHistory::g_tilde_of_x(double x) const{
 }
 
 double RecombinationHistory::dgdx_tilde_of_x(double x) const{
-  // return dg_dx_spline(x);
   return dg_dx_spline(x);
-  // return g_tilde_of_x_spline.deriv_x(x);
 }
 
 double RecombinationHistory::ddgddx_tilde_of_x(double x) const{
   return dg_dx_spline.deriv_x(x);
-  // return g_tilde_of_x_spline.deriv_xx(x);
-  // return ddg_ddx_spline(x);
 }
 
 double RecombinationHistory::s_of_x(double x) const{
@@ -353,14 +349,11 @@ double RecombinationHistory::nb_of_x(double x) const{
 
 
 double RecombinationHistory::Xe_of_x(double x) const{
-  return exp(log_Xe_of_x_spline(x));
-  // return Xe_of_x_spline(x);
+  return Xe_of_x_spline(x);
 }
 
 double RecombinationHistory::ne_of_x(double x) const{
   return exp(log_ne_of_x_spline(x));
-  // return nb_of_x(x) * Xe_of_x(x);
-  // return ne_of_x_spline(x);
 }
 
 double RecombinationHistory::cs_of_x(double x) const{
@@ -395,9 +388,16 @@ void RecombinationHistory::info() const{
 // Output the data computed to file
 //====================================================
 void RecombinationHistory::output(const std::string filename) const{
-  std::ofstream fp(filename.c_str());
+  
+  std::string fname = filename;
+  if(Xe_saha_limit < 0.99){
+    int idx = filename.find(".");
+    fname = fname.insert(idx, "_saha");
+  }
 
-  std::cout << "Writing result to " << filename << std::endl; 
+  std::ofstream fp(fname.c_str());
+
+  std::cout << "Writing result to " << fname << std::endl; 
 
   const int npts       = nx_write;
   const double x_min   = x_start;
@@ -423,58 +423,80 @@ void RecombinationHistory::output(const std::string filename) const{
 }
 
 void RecombinationHistory::output_important_times(const std::string filename) const{
-  std::ofstream fp(filename.c_str());
+  std::string fname = filename;
+
+  if(Xe_saha_limit < 0.99){
+    int idx = filename.find(".");
+    fname = fname.insert(idx, "_saha");
+  }
+
+  std::cout << fname << std::endl;
+  
+  std::ofstream fp(fname.c_str());
 
   std::cout << "Computing decoupling and recombination time. " << std::endl
-  << "Writing to: " << filename << std::endl;
+  << "Writing to: " << fname << std::endl;
 
+  // Locate tau=1. 
   double tau_at_dec = 1.0; 
   auto x_range_tau = std::pair<double,double>(x_start, x_end);
   double x_dec_tau = Utils::binary_search_for_value(tau_of_x_spline, 
                                                   tau_at_dec,
                                                   x_range_tau);
-  
+
+  // Find peak of visibility function 
   double dg_dx_at_dec = 0.0;
   auto x_range_g_peak = std::pair<double,double>(x_dec_tau - 0.1, x_dec_tau + 0.1);
   double x_dec_g_peak = Utils::binary_search_for_value(dg_dx_spline, 
                                                       dg_dx_at_dec,
                                                       x_range_g_peak);
   
-
-  double log_Xe_at_recomb = log(0.1);
+  // Find recombination time 
+  double log_Xe_at_recomb = 0.1;
   auto x_range_recomb = std::pair<double,double>(x_start, x_end);
-  double x_recomb = Utils::binary_search_for_value(log_Xe_of_x_spline,
+  double x_recomb = Utils::binary_search_for_value(Xe_of_x_spline,
                                                       log_Xe_at_recomb,
                                                       x_range_recomb);
 
   
   cosmo->solve_t();
-  auto z_of_x = [&](double x){ return exp(-x) - 1.0; };
-  auto t_of_x = [&](double x){ return cosmo->get_t_of_x(x); }; 
+  auto z = [&](double x){ return exp(-x) - 1.0; };
+  auto t = [&](double x){ return cosmo->get_t_of_x(x); }; 
 
-  Vector decoupl_tau;
-  Vector decoupl_gpeak;
-  Vector recomb;
-
-  Vector x_times = Vector({x_dec_tau, x_dec_g_peak, x_recomb});
-  std::vector x_names ({"dec_tau", "dec_g_peak", "recomb"});
-
-  auto print_data = [&] (const double x) {
-    fp << x         << " ";
-    fp << z_of_x(x) << " ";
-    fp << t_of_x(x) << " ";
-    fp << s_of_x(x) << " ";
-    fp << "\n";
-  }; 
-
-  fp << "x z t r_s (r1=dec_tau=1, r2=dec_gmax, r3=rec)\n";
-  // fp << x_dec_tau << " " << x_dec_g_peak << " " << x_recomb << " \n";
-  // fp << z_of_x(x_dec_tau) << " " << z_of_x(x_dec_g_peak) << " " << z_of_x(x_recomb) << " \n";
-  // fp << t_of_x(x_dec_tau) << " " << t_of_x(x_dec_g_peak) << " " << t_of_x(x_recomb) << " \n";
-  // fp << s_of_x(x_dec_tau) << " " << s_of_x(x_dec_g_peak) << " " << s_of_x(x_recomb) << " \n";
+  fp << "LS Recombination \n";
+  fp << "x: " << x_dec_g_peak << " " << x_recomb << " \n";
+  fp << "z: " << z(x_dec_g_peak) << " " << z(x_recomb) << " \n"; 
+  fp << "t: " << t(x_dec_g_peak) << " " << t(x_recomb) << " \n"; 
+  fp << "r: " << s_of_x(x_dec_g_peak) << " " << s_of_x(x_recomb) << " \n"; 
 
 
-  std::for_each(x_times.begin(), x_times.end(), print_data);
+
+  // Spline GH_saha{"gh"};
+  // Spline GH_peeb{"gh"};
+  // Vector x = Utils::linspace(-10, -5, npts_rec_arrays);
+  // Vector GGH_saha(npts_rec_arrays);
+  // Vector GGH_peeb(npts_rec_arrays);
+  // double sigmaT = Constants.sigma_T;
+  // double c = Constants.c;
+  // for(int i=0; i<npts_rec_arrays; i++){
+  //   auto Xe_ne_saha = electron_fraction_from_saha_equation(x[i]);
+  //   double ne_saha = Xe_ne_saha.second;
+  //   double ne_peeb = ne_of_x(x[i]);
+  //   double H = cosmo->H_of_x(x[i]);
+  //   GGH_saha[i] = sigmaT*c * ne_saha - H;
+  //   GGH_peeb[i] = sigmaT*c * ne_peeb - H;
+  // }
+  // GH_saha.create(x, GGH_saha, "gghh_saha");
+  // GH_peeb.create(x, GGH_peeb, "gghh_peeb");
+
+
+  // double xdec_saha = Utils::binary_search_for_value(GH_saha, 0.0, std::pair<double,double>(-10, -5));
+  // double xdec_peeb = Utils::binary_search_for_value(GH_peeb, 0.0, std::pair<double,double>(-10, -5));
+
+  // std::cout << "gamma=H at" << std::endl;
+  // std::cout << "Saha: x=" << std::setprecision(10) << xdec_saha << ", z=" << std::setprecision(10) << z_of_x(xdec_saha) << std::endl;
+  // std::cout << "Peeb: x=" << std::setprecision(10) << xdec_peeb << ", z=" << std::setprecision(10) << z_of_x(xdec_peeb) << std::endl;
+
 
   /*
   double z_dec_tau       = z_of_x(x_dec_tau);
