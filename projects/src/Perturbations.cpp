@@ -147,12 +147,11 @@ Vector Perturbations::set_ic(const double x, const double k) const{
   // Feel free to organize the component any way you like
   //=============================================================================
   
+  // I THINK THESE ARE OBSOLETE  
   // For integration of perturbations in tight coupling regime (Only 2 photon multipoles + neutrinos needed)
   const int n_ell_theta_tc      = Constants.n_ell_theta_tc;
   const int n_ell_neutrinos_tc  = Constants.n_ell_neutrinos_tc;
   const int n_ell_tot_tc        = Constants.n_ell_tot_tc;
-  const bool polarization       = Constants.polarization;
-  const bool neutrinos          = Constants.neutrinos;
 
   // References to the tight coupling quantities
   double &delta_cdm    =  y_tc[Constants.ind_deltacdm_tc];
@@ -169,19 +168,19 @@ Vector Perturbations::set_ic(const double x, const double k) const{
   // ...
   // ...
 
-  // SET: Scalar quantities (Gravitational potential, baryons and CDM)
-  // ...
-  // ...
+  
+  // Scalar quantities (Gravitational potential, baryons and CDM)
+  double Psi  = -2.0 / 3.0;
+  Phi         = - Psi;
+  delta_cdm   = -1.5 * Psi;
+  delta_b     = -1.5 * Psi; 
+  v_cdm       = - Constants.c * k / (2.0 * cosmo->Hp_of_x(x)) * Psi;
+  v_b         = v_cdm;    
 
-  // SET: Photon temperature perturbations (Theta_ell)
-  // ...
-  // ...
+  // Photon temperature perturbations (Theta_ell)
+  Theta[0]    = -0.5 * Psi;
+  Theta[1]    = v_cdm / 3.0;
 
-  // SET: Neutrino perturbations (N_ell)
-  if(neutrinos){
-    // ...
-    // ...
-  }
 
   return y_tc;
 }
@@ -279,8 +278,16 @@ double Perturbations::get_tight_coupling_time(const double k) const{
   // TODO: compute and return x for when tight coupling ends
   // Remember all the three conditions in Callin
   //=============================================================================
-  // ...
-  // ...
+  for (int i=0; i<n_x; i++){
+    double x_ = x_array_integration[i];
+    double tau_prime = rec->dtaudx_of_x(x_);
+    tau_prime *= -1; // Make dtau/dx<0 a positive quantity 
+    if (tau_prime < 10 || tau_prime < 10 * Constants.c * k / cosmo->Hp_of_x(x_) || x_ > -8.3) {
+      // Tight-coupling regime not valid 
+      x_tight_coupling_end = x_; 
+      break; 
+    }
+  }
 
   return x_tight_coupling_end;
 }
@@ -379,25 +386,60 @@ int Perturbations::rhs_tight_coupling_ode(double x, double k, const double *y, d
   double *dThetadx        = &dydx[Constants.ind_start_theta_tc];
   double *dNudx           = &dydx[Constants.ind_start_nu_tc];
 
+
+  const double a          = exp(x);
+  const double ck         = Constants.c * k;
+  const double H0         = cosmo->get_H0();
+  const double Hp         = cosmo->Hp_of_x(x);
+
+  const double a_squared  = a*a;
+  const double ck_squared = ck * ck; 
+  const double H0_squared = H0 * H0;
+  const double Hp_squared = Hp * Hp;
+
+  const double dHp_dx     = cosmo->dHpdx_of_x(x);
+  const double ck_over_Hp = ck / Hp;
+  const double dtau_dx    = rec->dtaudx_of_x(x);
+  const double ddtau_ddx  = rec->ddtauddx_of_x(x);
+
+  const double OmegaCDM0  = cosmo->get_OmegaCDM();
+  const double OmegaB0    = cosmo->get_OmegaB();
+  const double OmegaB0    = cosmo->get_OmegaB();
+  const double OmegaR0    = cosmo->get_OmegaR();
+  const double R          = 4.0 * OmegaR0 / (3.0 * OmegaB0 * a);
+
+
+
+
   //=============================================================================
   // TODO: fill in the expressions for all the derivatives
   //=============================================================================
 
+  const double Theta2 = - 20.0 * ck_over_Hp / (45.0 * dtau_dx) * Theta[1];
+  const double Psi    = - Phi - 12.0 * H0_squared * OmegaR0 * Theta2 / (ck_squared * a_squared);
   // SET: Scalar quantities (Phi, delta, v, ...)
-  // ...
-  // ...
-  // ...
+  dPhidx = Psi - ck_over_Hp*ck_over_Hp * Phi / 3.0 
+              + H0_squared / (2.0 * Hp_squared)
+              * ((OmegaCDM0 * delta_cdm + OmegaB0 * delta_b) / a + 4.0 * OmegaR0 * Theta[0] / a_squared);
+
+  ddelta_cdmdx = ck_over_Hp * v_cdm - 3.0 * dPhidx;
+  ddelta_bdx   = ck_over_Hp * v_b   - 3.0 * dPhidx;
+  dv_cdmdx     = -v_cdm - ck_over_Hp * Psi;
 
   // SET: Photon multipoles (Theta_ell)
-  // ...
-  // ...
+  dThetadx[0] = -ck_over_Hp * Theta[1] - dPhidx;
 
-  // SET: Neutrino mutlipoles (Nu_ell)
-  if(neutrinos){
-    // ...
-    // ...
-    // ...
-  }
+  const double q_nominator = - ((1.0 - R)*dtau_dx + (1.0 + R)*ddtau_ddx)*(3.0*Theta[1] + v_b)
+                             - ck_over_Hp*Psi 
+                             + (1 - dHp_dx/Hp) * ck_over_Hp * (-Theta[0] + 2.0*Theta2) 
+                             - ck_over_Hp * dThetadx[0];
+  const double q_denominator = (1.0 + R)*dtau_dx + dHp_dx/Hp - 1;
+  
+
+  const double q  = q_nominator / q_denominator;
+  dv_bdx          = (-v_b - ck_over_Hp * Psi + R*(q + ck_over_Hp*(-Theta[0] + 2.0*Theta2) - ck_over_Hp*Psi )) / (1.0 + R);
+  dThetadx[1]     = (q - dv_bdx) / 3.0;
+
 
   return GSL_SUCCESS;
 }

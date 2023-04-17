@@ -29,6 +29,8 @@ class Perturbations{
     const double x_start = Constants.x_start;
     const double x_end   = Constants.x_end;
 
+    Vector x_array_integration = Utils::linspace(x_start, x_end, n_x);
+
     // Below is a full list of splines you probably need, 
     // but you only need to make the splines you will need
 
