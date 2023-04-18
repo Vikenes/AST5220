@@ -82,11 +82,9 @@ int main(int argc, char **argv){
   //===== Find decoupling times ======
   // rec.output_important_times("milestone2/data/rec_times.txt");
   // rec.output_important_times("milestone2/data/rec_times_saha.txt");
-  rec.output_important_times("milestone2/data/rec_times.txt");
+  // rec.output_important_times("milestone2/data/rec_times.txt");
 
   
-  // Remove when module is completed
-  return 0;
 
   //=========================================================================
   // Module III

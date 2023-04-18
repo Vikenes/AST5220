@@ -29,7 +29,7 @@ class Perturbations{
     const double x_start = Constants.x_start;
     const double x_end   = Constants.x_end;
 
-    Vector x_array_integration = Utils::linspace(x_start, x_end, n_x);
+    Vector x_array_full = Utils::linspace(x_start, x_end, n_x);
 
     // Below is a full list of splines you probably need, 
     // but you only need to make the splines you will need
@@ -67,7 +67,7 @@ class Perturbations{
     int rhs_tight_coupling_ode(double x, double k, const double *y, double *dydx);
     
     // Compute the time when tight coupling ends
-    double get_tight_coupling_time(const double k) const;
+    std::pair<double,int> get_tight_coupling_time(const double k) const;
     
     //==========================================================
     // [2] The full ODE system 
