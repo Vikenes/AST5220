@@ -9,7 +9,30 @@ Perturbations::Perturbations(
     RecombinationHistory *rec) : 
   cosmo(cosmo), 
   rec(rec)
-{}
+{
+  /* TBD 
+   - Ask Nanna how to store global variables here. 
+  integrate_perturbations():
+   - Implement PI spline??
+   - Store derivative of quantities 
+     - Store other Theta values??
+   - Create vector of Splines
+   - Check if storing integration values can be done in one go. 
+   - Make functions for Computing some of the quantities. 
+  
+  set_ic and set_ic_after_tc():
+   - Remove redundant stuff 
+   - Simplify/rewrite stuff 
+
+  Implement source function! 
+   - Check if Derivatives should be computed analytically,
+     or if I should get them from the ODESolver directly. 
+
+  rhs_tight_coupling_ode and rhs_full_ode:
+   - Remove redundant stuff
+   - Simplify/clean expressions 
+  */
+}
 
 //====================================================
 // Do all the solving
@@ -20,7 +43,7 @@ void Perturbations::solve(){
   integrate_perturbations();
 
   // Compute source functions and spline the result
-  compute_source_functions();
+  // compute_source_functions();
 }
 
 //====================================================
@@ -33,7 +56,15 @@ void Perturbations::integrate_perturbations(){
   //=============================================================
   // Quantities to store 
   //=============================================================
+  
+  /* TBD
+   - Create arrays for derivatives
+   - Simplify looping for storing quantities.
+     Store flat values in one go in the end? 
+  */
+
   Vector nk_vector(n_k);
+
   Vector2D delta_cdm_array(n_x, nk_vector);
   Vector2D delta_b_array(n_x, nk_vector);
   Vector2D v_cdm_array(n_x, nk_vector);
@@ -106,6 +137,9 @@ void Perturbations::integrate_perturbations(){
     Vector2D dydx_tc_sol  = ode_tc.get_derivative_data();
     Vector y_tc_end       = ode_tc.get_final_data();
 
+
+
+
     double ck = Constants.c * k;
     double ck_squared = ck * ck;
     const double H0 = cosmo->get_H0();
@@ -160,28 +194,42 @@ void Perturbations::integrate_perturbations(){
     Vector2D y_after_tc_sol = ode_after_tc.get_data();
     Vector2D dydx_after_tc_sol = ode_after_tc.get_derivative_data();
 
-    //===================================================================
-    // TODO: remember to store the data found from integrating so we can
-    // spline it below
-    //
-    // To compute a 2D spline of a function f(x,k) the data must be given 
-    // to the spline routine as a 1D array f_array with the points f(ix, ik) 
-    // stored as f_array[ix + n_x * ik]
-    // Example:
-    // Vector x_array(n_x);
-    // Vector k_array(n_k);
-    // Vector f(n_x * n_k);
-    // Spline2D y_spline;
-    // f_spline.create(x_array, k_array, f_array);
-    // We can now use the spline as f_spline(x, k)
-    //
-    // NB: If you use Theta_spline then you have to allocate it first,
-    // before using it e.g.
-    // Theta_spline = std::vector<Spline2D>(n_ell_theta);
-    //
-    //===================================================================
-    //...
-    //...
+
+    for (int ix=idx_end_tc; ix<n_x; ix++){
+      double x = x_array_full[ix];
+      double a_squared = exp(2*x);
+      double Hp       = cosmo->Hp_of_x(x);
+      double dtau_dx  = rec->dtaudx_of_x(x);
+
+      int sol_idx = ix - idx_end_tc;
+
+      delta_cdm_array[ix][ik] = y_after_tc_sol[sol_idx][Constants.ind_deltacdm];
+      delta_b_array[ix][ik]   = y_after_tc_sol[sol_idx][Constants.ind_deltab];
+      v_cdm_array[ix][ik]     = y_after_tc_sol[sol_idx][Constants.ind_vcdm];
+      v_b_array[ix][ik]       = y_after_tc_sol[sol_idx][Constants.ind_vb];
+      Theta0_array[ix][ik]    = y_after_tc_sol[sol_idx][Constants.ind_start_theta];
+
+      Phi_array[ix][ik]       = y_after_tc_sol[sol_idx][Constants.ind_Phi];
+      Theta1_array[ix][ik]    = y_after_tc_sol[sol_idx][Constants.ind_start_theta + 1];
+      Theta2_array[ix][ik]    = y_after_tc_sol[sol_idx][Constants.ind_start_theta + 2];
+      Psi_array[ix][ik]       = - Phi_array[ix][ik] - 12.0*H0_squared/(ck_squared*a_squared)
+                                                  *OmegaR0 * Theta2_array[ix][ik];
+    }
+
+    for (int ix=0; ix<n_x; ix++){
+      delta_cdm_array_flat[ix + n_x * ik] = delta_cdm_array[ix][ik];
+      delta_b_array_flat[ix + n_x * ik]   = delta_b_array[ix][ik];
+      v_cdm_array_flat[ix + n_x * ik]     = v_cdm_array[ix][ik];
+      v_b_array_flat[ix + n_x * ik]       = v_b_array[ix][ik];
+      Phi_array_flat[ix + n_x * ik]       = Phi_array[ix][ik];
+      Psi_array_flat[ix + n_x * ik]       = Psi_array[ix][ik];
+
+      Theta0_array_flat[ix + n_x * ik]    = Theta0_array[ix][ik];
+      Theta1_array_flat[ix + n_x * ik]    = Theta1_array[ix][ik];
+      Theta2_array_flat[ix + n_x * ik]    = Theta2_array[ix][ik];
+
+
+    }
 
   }
   Utils::EndTiming("integrateperturbation");
@@ -189,9 +237,17 @@ void Perturbations::integrate_perturbations(){
   //=============================================================================
   // TODO: Make all splines needed: Theta0,Theta1,Theta2,Phi,Psi,...
   //=============================================================================
-  // ...
-  // ...
-  // ...
+  delta_cdm_spline.create(x_array_full, k_array, delta_cdm_array_flat);
+  delta_b_spline.create(x_array_full, k_array, delta_b_array_flat);
+  v_cdm_spline.create(x_array_full, k_array, v_cdm_array_flat);
+  v_b_spline.create(x_array_full, k_array, v_b_array_flat);
+  Phi_spline.create(x_array_full, k_array, Phi_array_flat);
+  Psi_spline.create(x_array_full, k_array, Psi_array_flat);
+
+  Theta0_spline.create(x_array_full, k_array, Theta0_array_flat);
+  Theta1_spline.create(x_array_full, k_array, Theta1_array_flat);
+  Theta2_spline.create(x_array_full, k_array, Theta2_array_flat);
+
 }
 
 //====================================================
@@ -203,12 +259,6 @@ Vector Perturbations::set_ic(const double x, const double k) const{
   // The vector we are going to fill
   Vector y_tc(Constants.n_ell_tot_tc);
 
-  //=============================================================================
-  // Compute where in the y_tc array each component belongs
-  // This is just an example of how to do it to make it easier
-  // Feel free to organize the component any way you like
-  //=============================================================================
-  
   // I THINK THESE ARE OBSOLETE  
   // For integration of perturbations in tight coupling regime (Only 2 photon multipoles + neutrinos needed)
   const int n_ell_theta_tc      = Constants.n_ell_theta_tc;
@@ -222,7 +272,6 @@ Vector Perturbations::set_ic(const double x, const double k) const{
   double &v_b          =  y_tc[Constants.ind_vb_tc];
   double &Phi          =  y_tc[Constants.ind_Phi_tc];
   double *Theta        = &y_tc[Constants.ind_start_theta_tc];
-  double *Nu           = &y_tc[Constants.ind_start_nu_tc];
 
   //=============================================================================
   // TODO: Set the initial conditions in the tight coupling regime
@@ -259,13 +308,6 @@ Vector Perturbations::set_ic_after_tight_coupling(
   // Make the vector we are going to fill
   Vector y(Constants.n_ell_tot_full);
   
-  //=============================================================================
-  // Compute where in the y array each component belongs and where corresponding
-  // components are located in the y_tc array
-  // This is just an example of how to do it to make it easier
-  // Feel free to organize the component any way you like
-  //=============================================================================
-
   // Number of multipoles we have in the full regime
   const int n_ell_theta         = Constants.n_ell_theta;
   const int n_ell_thetap        = Constants.n_ell_thetap;
@@ -284,7 +326,6 @@ Vector Perturbations::set_ic_after_tight_coupling(
   const double &v_b_tc          =  y_tc[Constants.ind_vb_tc];
   const double &Phi_tc          =  y_tc[Constants.ind_Phi_tc];
   const double *Theta_tc        = &y_tc[Constants.ind_start_theta_tc];
-  const double *Nu_tc           = &y_tc[Constants.ind_start_nu_tc];
 
   // References to the quantities we are going to set
   double &delta_cdm       =  y[Constants.ind_deltacdm_tc];
@@ -293,8 +334,6 @@ Vector Perturbations::set_ic_after_tight_coupling(
   double &v_b             =  y[Constants.ind_vb_tc];
   double &Phi             =  y[Constants.ind_Phi_tc];
   double *Theta           = &y[Constants.ind_start_theta_tc];
-  double *Theta_p         = &y[Constants.ind_start_thetap_tc];
-  double *Nu              = &y[Constants.ind_start_nu_tc];
 
   //=============================================================================
   // TODO: fill in the initial conditions for the full equation system below
@@ -459,7 +498,6 @@ int Perturbations::rhs_tight_coupling_ode(double x, double k, const double *y, d
   const double ddtau_ddx  = rec->ddtauddx_of_x(x);
 
   const double OmegaCDM0  = cosmo->get_OmegaCDM();
-  const double OmegaB0    = cosmo->get_OmegaB();
   const double OmegaB0    = cosmo->get_OmegaB();
   const double OmegaR0    = cosmo->get_OmegaR();
   const double R          = 4.0 * OmegaR0 / (3.0 * OmegaB0 * a);
@@ -628,7 +666,8 @@ double Perturbations::get_Psi(const double x, const double k) const{
   return Psi_spline(x,k);
 }
 double Perturbations::get_Pi(const double x, const double k) const{
-  return Pi_spline(x,k);
+  // return Pi_spline(x,k);
+  return Theta2_spline(x,k);
 }
 double Perturbations::get_Source_T(const double x, const double k) const{
   return ST_spline(x,k);
@@ -637,13 +676,16 @@ double Perturbations::get_Source_E(const double x, const double k) const{
   return SE_spline(x,k);
 }
 double Perturbations::get_Theta(const double x, const double k, const int ell) const{
-  return Theta_spline[ell](x,k);
+  return 0;//Theta_spline[ell](x,k);
 }
-double Perturbations::get_Theta_p(const double x, const double k, const int ell) const{
-  return Theta_p_spline[ell](x,k);
+double Perturbations::get_Theta0(const double x, const double k) const{
+  return Theta0_spline(x,k);
 }
-double Perturbations::get_Nu(const double x, const double k, const int ell) const{
-  return Nu_spline[ell](x,k);
+double Perturbations::get_Theta1(const double x, const double k) const{
+  return Theta1_spline(x,k);
+}
+double Perturbations::get_Theta2(const double x, const double k) const{
+  return Theta2_spline(x,k);
 }
 
 //====================================================
@@ -711,18 +753,23 @@ void Perturbations::output(const double k, const std::string filename) const{
   auto print_data = [&] (const double x) {
     double arg = k * (cosmo->eta_of_x(0.0) - cosmo->eta_of_x(x));
     fp << x                  << " ";
-    fp << get_Theta(x,k,0)   << " ";
-    fp << get_Theta(x,k,1)   << " ";
-    fp << get_Theta(x,k,2)   << " ";
+    fp << get_delta_cdm(x,k) << " ";
+    fp << get_delta_b(x,k)   << " ";
+    fp << get_v_cdm(x,k)     << " ";
+    fp << get_v_b(x,k)       << " ";
+    fp << get_Theta0(x,k)    << " ";
+    fp << get_Theta1(x,k)    << " ";
+    fp << get_Theta2(x,k)    << " ";
     fp << get_Phi(x,k)       << " ";
     fp << get_Psi(x,k)       << " ";
     fp << get_Pi(x,k)        << " ";
-    fp << get_Source_T(x,k)  << " ";
-    fp << get_Source_T(x,k) * Utils::j_ell(5,   arg)           << " ";
-    fp << get_Source_T(x,k) * Utils::j_ell(50,  arg)           << " ";
-    fp << get_Source_T(x,k) * Utils::j_ell(500, arg)           << " ";
+    // fp << get_Source_T(x,k)  << " ";
+    // fp << get_Source_T(x,k) * Utils::j_ell(5,   arg)           << " ";
+    // fp << get_Source_T(x,k) * Utils::j_ell(50,  arg)           << " ";
+    // fp << get_Source_T(x,k) * Utils::j_ell(500, arg)           << " ";
     fp << "\n";
   };
+  fp << "x dcdm db vcdm vb Th0 Th1 Th2 Phi Psi Pi \n";
   std::for_each(x_array.begin(), x_array.end(), print_data);
 }
 

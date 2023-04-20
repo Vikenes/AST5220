@@ -48,11 +48,9 @@ class Perturbations{
     Spline2D SE_spline{"SE_spline"};
     
     // Splines of mulipole quantities
-    // NB: If you use there you have to allocate the container first
-    // e.g. Theta_spline = std::vector<Spline2D>(n_ell_theta); before using it
-    std::vector<Spline2D> Theta_spline;
-    std::vector<Spline2D> Theta_p_spline;
-    std::vector<Spline2D> Nu_spline;
+    Spline2D Theta0_spline{"Theta0_spline"};
+    Spline2D Theta1_spline{"Theta1_spline"};
+    Spline2D Theta2_spline{"Theta2_spline"};
     
     //==========================================================
     // [1] Tight coupling ODE system
@@ -122,6 +120,10 @@ class Perturbations{
     double get_Psi(const double x, const double k) const;
     double get_Pi(const double x, const double k) const;
     double get_Theta(const double x, const double k, const int ell) const;
+    double get_Theta0(const double x, const double k) const;
+    double get_Theta1(const double x, const double k) const;
+    double get_Theta2(const double x, const double k) const;
+
     double get_Theta_p(const double x, const double k, const int ell) const;
     double get_Nu(const double x, const double k, const int ell) const;
     double get_Source_T(const double x, const double k) const;
