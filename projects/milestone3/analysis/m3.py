@@ -24,18 +24,15 @@ TEMP        = False
 RECOMBINATION  = False 
 
 
-class Recombination:
+class Perturbations:
     def __init__(self, 
                  filename,
-                 rec_and_dec_times_fname=None, 
                  length_unit=u.Mpc,
                  time_unit=u.yr):
         
         self.data           = self.load_data(filename)
         self.x              = self.data[0]
 
-        self.rec_dec_file   = rec_and_dec_times_fname
-        self.rec_dec_saha   = rec_and_dec_times_fname.strip(".txt") + "_saha.txt"
 
         self.length_unit    = length_unit
         self.time_unit      = time_unit
@@ -43,37 +40,31 @@ class Recombination:
 
 
     
-    def load_data(self, filename, skiprows=2):
+    def load_data(self, filename, skiprows=1):
         return np.loadtxt(data_path + filename, unpack=True, skiprows=skiprows)
     
-    def load_x_decoupling(self):
-        x = np.loadtxt(data_path + self.rec_dec_file, skiprows=1, usecols=(1,2))[0]
-        self.xLSS     = x[0]
-        self.xrec     = x[1]
-
+    def load_delta(self):
+        self.delta     = True 
+        self.delta_cdm = self.data[1] 
+        self.delta_b   = self.data[2]
     
-    def load_Xe(self):
-        self.Xe             = self.data[1]
+    def load_v(self):
+        self.v     = True 
+        self.v_cdm = self.data[3]
+        self.v_b   = self.data[4]
+
+    def load_Thetas(self):
+        self.Thetas = True 
+        self.Theta0 = self.data[5]
+        self.Theta1 = self.data[6]
+        self.Theta2 = self.data[7]
         
-    def load_ne(self, convert_unit=True):
-        self.ne     = self.data[2] * u.m**(-3) 
-        if convert_unit:
-            self.ne = self.ne.to(self.length_unit**(-3))
+    def load_fields(self):
+        self.fields = True 
+        self.Phi    = self.data[8]
+        self.Psi    = self.data[9]
+        self.Pi     = self.data[10]
 
-    def load_taus(self):
-        self.tau            = self.data[3]
-        self.dtau_dx        = self.data[4]
-        self.ddtau_ddx      = self.data[5]
-
-    def load_g(self):
-        self.g_tilde        = self.data[6]
-        self.dg_tilde_dx    = self.data[7]
-        self.ddg_tilde_ddx  = self.data[8]
-
-    def load_sound_horizon(self, convert_unit=True):
-        self.sound_horizon = self.data[9] * u.m 
-        if convert_unit:
-            self.sound_horizon = self.sound_horizon.to(self.length_unit)
 
     def x_to_redshift(self, x):
         # Convert from x to redshift 
@@ -150,98 +141,41 @@ class Recombination:
         if stop:
             exit() 
 
-    def Xe_today(self):
-        self.load_Xe()
-        Xe0 = self.Xe[-1]
-        print(self.x[-1])
-        print(f"X_e at x={self.x[-1]:.2f} is: {self.Xe[-1]:.5e}")
+    
+    def plot_delta(self, xlim=[-12,0], ylim=[1e-8, 1e6],
+                                  figname="tbd.pdf"):
 
-    def compare_Xe(self, x_saha, Xe_saha, 
-                   xrec_saha=None,
-                   ylim=[1e-4, 2], xlim=[-7.8,-5.3],
-                   figname="compare_Xe_peebles_saha.pdf"):
-        
-        if hasattr(self, 'Xe'):
+        if hasattr(self, 'delta'):
             pass
         else:
-            self.load_Xe()
+            self.load_delta()
 
-        if RECOMBINATION:
-            if not hasattr(self, "xrec"):
-                self.load_x_decoupling()
-            
-            xrec_peebles = self.xrec
+        x    = self.x 
+        dcdm = self.delta_cdm
+        db   = self.delta_b 
 
-
-        plot.compare_Xe_peebles_and_saha(self.x, x_saha,
-                                         self.Xe, Xe_saha,
-                                         xrec_peebles=xrec_peebles, xrec_saha=xrec_saha,
-                                         fname=figname,
-                                         xlim=xlim, ylim=ylim,
-                                         rec_times=RECOMBINATION,
-                                         save=SAVE, temp=TEMP)
+        plt.plot(x, dcdm, label='cdm')
+        plt.plot(x, db, '--', label='b')
+        plt.yscale('log')
+        plt.show()
 
 
+    def plot_v(self, xlim=[-12,0], ylim=[1e-8, 1e6],
+                                  figname="tbd.pdf"):
 
-    def plot_visibility_functions(self, dg_dx_scaling=10, 
-                                        ddg_ddx_scaling=300,
-                                        xlim=[-7.5, -6],
-                                        ylim=None,
-                                        figname="g_plot.pdf"):
-        
-        """
-        Plot g(x), g'(x) and g''(x)
-        scale g'(x) and g''(x) to fit in the same plot as g(x)
-        """
-
-        if hasattr(self, 'g_tilde'):
+        if hasattr(self, 'v'):
             pass
         else:
-            self.load_g()
+            self.load_v()
 
-        dg_dx_scaled = self.dg_tilde_dx / dg_dx_scaling
-        ddg_ddx_scaled = self.ddg_tilde_ddx / ddg_ddx_scaling
+        x    = self.x 
+        vcdm = self.v_cdm
+        vb   = self.v_b 
 
-        x   = self.x 
-        y   = self.g_tilde
-        dy  = dg_dx_scaled 
-        ddy = ddg_ddx_scaled
-       
-
-        y_legend    = r"$\tilde{g}(x)$"
-        dy_legend   = r"$\tilde{g}'(x)$" + rf"$/{str(dg_dx_scaling)}$"
-        ddy_legend  = r"$\tilde{g}''(x)$" + rf"$/{str(ddg_ddx_scaling)}$"
-
-
-        plot.plot_quantity_with_derivatives(x, y, dy, ddy, 
-                                            y_legend, dy_legend, ddy_legend,
-                                            fname=figname,
-                                            xlim=xlim, log=False,
-                                            save=SAVE, temp=TEMP)
-
-
-    def plot_tau_with_derivatives(self, xlim=[-10,0], ylim=[1e-8, 1e6],
-                                  figname="tau_plot.pdf"):
-
-        if hasattr(self, 'tau'):
-            pass
-        else:
-            self.load_taus()
-
-        x   = self.x 
-        y   = self.tau 
-        dy  = - self.dtau_dx
-        ddy = self.ddtau_ddx
-
-        y_legend   = r"$\tau(x)$"
-        dy_legend  = r"$- \tau'(x)$"
-        ddy_legend = r"$\tau''(x)$"
-
-        plot.plot_quantity_with_derivatives(x, y, dy, ddy, 
-                                            y_legend, dy_legend, ddy_legend,
-                                            fname="tau_plot.pdf",
-                                            xlim=xlim, ylim=ylim,
-                                            save=SAVE, temp=TEMP)
+        plt.plot(x, vcdm, label='cdm')
+        plt.plot(x, vb, '--', label='b')
+        plt.yscale('log')
+        plt.show()
 
 
     def make_table(self, saha=False):
@@ -267,20 +201,5 @@ class Recombination:
 
 
 
-rec = Recombination(filename="recombination.txt", 
-                    rec_and_dec_times_fname="rec_times.txt"
-                    )
-
-rec_saha_only = Recombination(filename="recombination_saha.txt", 
-                              rec_and_dec_times_fname="rec_times_saha.txt"
-                              )
-rec_saha_only.load_Xe()
-x_saha, Xe_saha = rec_saha_only.x, rec_saha_only.Xe
-
-rec_saha_only.load_x_decoupling()
-
-x_rec_saha = rec_saha_only.xrec
-
-rec.assert_valid_recombination_value()
-rec.assert_normalized_g_tilde()
-
+p = Perturbations(filename="perturbations_k0.001.txt")
+p.plot_v()
