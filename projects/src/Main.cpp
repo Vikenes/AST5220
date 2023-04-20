@@ -14,8 +14,10 @@ int main(int argc, char **argv){
 
   // Background parameters
   double h           = 0.67;
+  // double h           = 0.7;
   double OmegaB      = 0.05;
   double OmegaCDM    = 0.267;
+  // double OmegaCDM    = 0.45;
   double OmegaK      = 0.0;
   double Neff        = 3.046;
   double TCMB        = 2.7255;
@@ -93,7 +95,7 @@ int main(int argc, char **argv){
   // Solve the perturbations
   Perturbations pert(&cosmo, &rec);
   pert.solve();
-  pert.info();
+  // pert.info();
   
   // Output perturbation quantities
   double kvalue = 0.001 / Constants.Mpc;

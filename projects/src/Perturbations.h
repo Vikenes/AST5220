@@ -25,7 +25,7 @@ class Perturbations{
     const double k_max   = Constants.k_max;
     
     // Start and end of the time-integration
-    const int n_x        = 1000;
+    const int n_x        = 10000;
     const double x_start = Constants.x_start;
     const double x_end   = Constants.x_end;
 
@@ -51,7 +51,7 @@ class Perturbations{
     Spline2D Theta0_spline{"Theta0_spline"};
     Spline2D Theta1_spline{"Theta1_spline"};
     Spline2D Theta2_spline{"Theta2_spline"};
-    
+
     //==========================================================
     // [1] Tight coupling ODE system
     //==========================================================

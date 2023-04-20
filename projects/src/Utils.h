@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <chrono>
 #include <map>
+#include <cstdlib>
 #include <gsl/gsl_sf_bessel.h>
 #ifdef _COMPLEX_BESSEL
 #include <complex_bessel.h>
@@ -57,7 +58,7 @@ extern struct ConstantsAndUnits {
   // const double x_end   = 0.0;
 
   // Initial recombination testing
-  const double x_start = -12.0;
+  const double x_start = -18.0;
   const double x_end   = 0.0;
 
   // Include polarization and/or neutrinos?

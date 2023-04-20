@@ -100,7 +100,7 @@ void Perturbations::integrate_perturbations(){
   for(int i=0; i<n_k; i++){
     k_array[i] = exp(log_k_array[i]);
   }
-
+  // Vector k_array = Utils::linspace(k_min, k_max, n_k);
 
   // Loop over all wavenumbers
   for(int ik = 0; ik < n_k; ik++){
@@ -131,6 +131,7 @@ void Perturbations::integrate_perturbations(){
 
     // Integrate from x_start -> x_end_tight
     ODESolver ode_tc;
+    ode_tc.set_accuracy(1e-5, 1e-8, 1e-8);
     ode_tc.solve(dydx_tight_coupling, x_array_tc, y_tight_coupling_ini);
 
     Vector2D y_tc_sol     = ode_tc.get_data();
@@ -142,6 +143,10 @@ void Perturbations::integrate_perturbations(){
 
     double ck = Constants.c * k;
     double ck_squared = ck * ck;
+    if(ck_squared==0){
+      std::cout << "ck_squared=0 in integrate_perturbations" << std::endl; 
+      exit(0);
+    }
     const double H0 = cosmo->get_H0();
     const double H0_squared = H0 * H0;
     const double OmegaR0 = cosmo->get_OmegaR();
@@ -189,6 +194,7 @@ void Perturbations::integrate_perturbations(){
     Vector x_array_after_tc = Utils::linspace(x_end_tc, x_end, n_x_after_tc); 
 
     ODESolver ode_after_tc;
+    ode_after_tc.set_accuracy(1e-5, 1e-8, 1e-8);
     ode_after_tc.solve(dydx_full, x_array_after_tc, y_full_ini);
 
     Vector2D y_after_tc_sol = ode_after_tc.get_data();
@@ -290,7 +296,7 @@ Vector Perturbations::set_ic(const double x, const double k) const{
 
   // Photon temperature perturbations (Theta_ell)
   Theta[0]    = -0.5 * Psi;
-  Theta[1]    = v_cdm / 3.0;
+  Theta[1]    = - v_cdm / 3.0;
 
 
   return y_tc;
@@ -364,8 +370,8 @@ Vector Perturbations::set_ic_after_tight_coupling(
 // The time when tight coupling end
 //====================================================
 std::pair<double,int> Perturbations::get_tight_coupling_time(const double k) const{
-  double x_tight_coupling_end = 0.0;
-  int  idx_tight_coupling_end = 0;
+  double x_tight_coupling_end = 1000.0;
+  int  idx_tight_coupling_end = n_x*10;
 
   //=============================================================================
   // TODO: compute and return x for when tight coupling ends
@@ -374,10 +380,10 @@ std::pair<double,int> Perturbations::get_tight_coupling_time(const double k) con
   for (int i=0; i<n_x; i++){
     double x = x_array_full[i];
     double tau_prime = rec->dtaudx_of_x(x);
+    double Hp = cosmo->Hp_of_x(x);
     tau_prime *= -1; // Make dtau/dx<0 a positive quantity 
-    if (tau_prime < 10 || tau_prime < 10 * Constants.c * k / cosmo->Hp_of_x(x) || x > -8.3) {
+    if (tau_prime < 10.0 || tau_prime < 10.0 * Constants.c * k / Hp || x > -8.3) {
       // Tight-coupling regime not valid 
-
       // DOUBLE CHECK THAT IT'S NOT X-DX AND I-1
       x_tight_coupling_end = x; 
       idx_tight_coupling_end = i;
@@ -502,6 +508,11 @@ int Perturbations::rhs_tight_coupling_ode(double x, double k, const double *y, d
   const double OmegaR0    = cosmo->get_OmegaR();
   const double R          = 4.0 * OmegaR0 / (3.0 * OmegaB0 * a);
 
+  if(ck_over_Hp==0 || ck_squared==0){
+      std::cout << "ck_over_Hp=0 in rhs_tight_coupling_ode" << std::endl; 
+      exit(0);
+    }
+
 
 
 
@@ -524,13 +535,13 @@ int Perturbations::rhs_tight_coupling_ode(double x, double k, const double *y, d
 
   const double q_nominator = - ((1.0 - R)*dtau_dx + (1.0 + R)*ddtau_ddx)*(3.0*Theta[1] + v_b)
                              - ck_over_Hp*Psi 
-                             + (1 - dHp_dx/Hp) * ck_over_Hp * (-Theta[0] + 2.0*Theta2) 
+                             + (1.0 - dHp_dx/Hp) * ck_over_Hp * (-Theta[0] + 2.0*Theta2) 
                              - ck_over_Hp * dThetadx[0];
-  const double q_denominator = (1.0 + R)*dtau_dx + dHp_dx/Hp - 1;
+  const double q_denominator = (1.0 + R)*dtau_dx + dHp_dx/Hp - 1.0;
   
 
   const double q  = q_nominator / q_denominator;
-  dv_bdx          = (-v_b - ck_over_Hp * Psi + R*(q + ck_over_Hp*(-Theta[0] + 2.0*Theta2) - ck_over_Hp*Psi )) / (1.0 + R);
+  dv_bdx          = (-v_b-ck_over_Hp*Psi + R*(q + ck_over_Hp*(-Theta[0] + 2.0*Theta2) - ck_over_Hp*Psi )) / (1.0 + R);
   dThetadx[1]     = (q - dv_bdx) / 3.0;
 
 
@@ -562,8 +573,6 @@ int Perturbations::rhs_full_ode(double x, double k, const double *y, double *dyd
   const double &v_b             =  y[Constants.ind_vb];
   const double &Phi             =  y[Constants.ind_Phi];
   const double *Theta           = &y[Constants.ind_start_theta];
-  const double *Theta_p         = &y[Constants.ind_start_thetap];
-  const double *Nu              = &y[Constants.ind_start_nu];
 
   // References to the quantities we are going to set in the dydx array
   double &ddelta_cdmdx    =  dydx[Constants.ind_deltacdm];
@@ -572,30 +581,32 @@ int Perturbations::rhs_full_ode(double x, double k, const double *y, double *dyd
   double &dv_bdx          =  dydx[Constants.ind_vb];
   double &dPhidx          =  dydx[Constants.ind_Phi];
   double *dThetadx        = &dydx[Constants.ind_start_theta];
-  double *dTheta_pdx      = &dydx[Constants.ind_start_thetap];
-  double *dNudx           = &dydx[Constants.ind_start_nu];
 
   // Cosmological parameters and variables
-  const double H0 = cosmo->get_H0();
-  const double H0_squared = H0 * H0;
-  const double Hp = cosmo->Hp_of_x(x);
-  const double a_inv = exp(-x);
-  const double a_inv_squared = a_inv * a_inv;
-  const double OmegaR0 = cosmo->get_OmegaR();
-  const double OmegaCDM0 = cosmo->get_OmegaCDM();
-  const double OmegaB0   = cosmo->get_OmegaB();
-  const double eta = cosmo->eta_of_x(x);
-  
+  const double H0             = cosmo->get_H0();
+  const double H0_squared     = H0 * H0;
+  const double Hp             = cosmo->Hp_of_x(x);
+  const double a              = exp(x);
+  const double a_inv          = 1.0 / a; 
+  const double a_inv_squared  = a_inv * a_inv;
+  const double OmegaR0        = cosmo->get_OmegaR();
+  const double OmegaCDM0      = cosmo->get_OmegaCDM();
+  const double OmegaB0        = cosmo->get_OmegaB();
+  const double eta            = cosmo->eta_of_x(x);
 
   // Recombination variables
   const double dtau_dx = rec->dtaudx_of_x(x);
 
   // Parameters 
-  const double c = Constants.c;
-  const double ck = c * k;
-  const double ck_over_Hp = ck / Hp;
-  const double ck_over_3Hp = ck_over_Hp / 3.0; 
-  const double R = 4.0 * OmegaR0 * a_inv / (3.0 * OmegaB0);
+  const double c            = Constants.c;
+  const double ck           = c * k;
+  const double ck_over_Hp   = ck / Hp;
+  const double ck_over_3Hp  = ck_over_Hp / 3.0; 
+  const double R            = 4.0 * OmegaR0 * a_inv / (3.0 * OmegaB0);
+  if(ck==0 || ck_over_Hp==0){
+      std::cout << "ck=0 in rhs_full_ode" << std::endl; 
+      exit(0);
+    }
 
   //=============================================================================
   // TODO: fill in the expressions for all the derivatives
@@ -610,10 +621,10 @@ int Perturbations::rhs_full_ode(double x, double k, const double *y, double *dyd
                  + OmegaB0 * delta_b * a_inv
                  + 4.0 * OmegaR0 * Theta[0] * a_inv_squared);
 
-  ddelta_cdmdx = ck_over_Hp * v_cdm - 3.0 * dPhidx;
-  ddelta_bdx = ck_over_Hp * v_b - 3.0 * dPhidx;
-  dv_cdmdx = -v_cdm - ck_over_Hp * Psi;
-  dv_bdx = -v_b - ck_over_Hp * Psi + dtau_dx * R * (3.0 * Theta[1] + v_b);
+  ddelta_cdmdx  = ck_over_Hp * v_cdm - 3.0 * dPhidx;
+  ddelta_bdx    = ck_over_Hp * v_b - 3.0 * dPhidx;
+  dv_cdmdx      = -v_cdm - ck_over_Hp * Psi;
+  dv_bdx        = -v_b - ck_over_Hp * Psi + dtau_dx * R * (3.0 * Theta[1] + v_b);
 
   // SET: Photon multipoles (Theta_ell)
   dThetadx[0] = -ck_over_Hp * Theta[1] - dPhidx;
@@ -749,6 +760,7 @@ void Perturbations::info() const{
 void Perturbations::output(const double k, const std::string filename) const{
   std::ofstream fp(filename.c_str());
   const int npts = 5000;
+  
   auto x_array = Utils::linspace(x_start, x_end, npts);
   auto print_data = [&] (const double x) {
     double arg = k * (cosmo->eta_of_x(0.0) - cosmo->eta_of_x(x));
@@ -769,6 +781,9 @@ void Perturbations::output(const double k, const std::string filename) const{
     // fp << get_Source_T(x,k) * Utils::j_ell(500, arg)           << " ";
     fp << "\n";
   };
+
+  std::cout << "Saving n=" << npts << " to '" << filename << "'" << std::endl;
+
   fp << "x dcdm db vcdm vb Th0 Th1 Th2 Phi Psi Pi \n";
   std::for_each(x_array.begin(), x_array.end(), print_data);
 }
