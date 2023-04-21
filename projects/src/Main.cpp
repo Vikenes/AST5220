@@ -19,7 +19,8 @@ int main(int argc, char **argv){
   double OmegaCDM    = 0.267;
   // double OmegaCDM    = 0.45;
   double OmegaK      = 0.0;
-  double Neff        = 3.046;
+  // double Neff        = 3.046;
+  double Neff        = 0.0;
   double TCMB        = 2.7255;
 
   // Recombination parameters

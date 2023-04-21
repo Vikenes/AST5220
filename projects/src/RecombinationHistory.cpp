@@ -238,22 +238,34 @@ void RecombinationHistory::solve_for_optical_depth_tau(){
 
   // Solve ODE 
   ODESolver tau_ode_backwards;
+  tau_ode_backwards.set_accuracy(1e-5, 1e-8, 1e-8);
+
   tau_ode_backwards.solve(dtaudx, x_backwards_array, tau_ic_back);
 
   // 
-  auto tau_array_backwards = tau_ode_backwards.get_data_by_component(0);
+  auto tau_array_backwards      = tau_ode_backwards.get_data_by_component(0);
+  auto dtau_dx_array_backwards  = tau_ode_backwards.get_derivative_data_by_component(0);
   
   // Store tau for increasing x 
   // Compute analytical expressions for t'(x) and g_tilde(x) 
   Vector tau_array(npts_tau);
   Vector dtau_dx_array(npts_tau);
+
+  std::reverse(tau_array_backwards.begin(), tau_array_backwards.end());
+  std::reverse(dtau_dx_array_backwards.begin(), dtau_dx_array_backwards.end());
+
+  std::copy(tau_array_backwards.begin(), tau_array_backwards.end(), tau_array.begin());
+  std::copy(dtau_dx_array_backwards.begin(), dtau_dx_array_backwards.end(), dtau_dx_array.begin());
+
+  // Vector dtau_dx_array(npts_tau);
   Vector g_tilde_array(npts_tau);
 
   for(int i=0; i<npts_tau; i++){
     double x_ = x_array[i];
 
-    tau_array[i] = tau_array_backwards[npts_tau-i-1];
-    dtau_dx_array[i] = - ne_of_x(x_) * Constants.c * Constants.sigma_T / cosmo->H_of_x(x_);
+    // tau_array[i] = tau_array_backwards[npts_tau-i-1];
+    // dtau_dx_array[i] = dtau_dx_array_backwards[npts_tau-i-1];
+    // dtau_dx_array[i] = - ne_of_x(x_) * Constants.c * Constants.sigma_T / cosmo->H_of_x(x_);
     g_tilde_array[i] = - dtau_dx_array[i] * exp(-tau_array[i]);
   }
 
@@ -261,6 +273,13 @@ void RecombinationHistory::solve_for_optical_depth_tau(){
   tau_of_x_spline.create(x_array, tau_array, "tau_of_x");
   dtau_dx_spline.create(x_array, dtau_dx_array, "dtau_dx");
   g_tilde_of_x_spline.create(x_array, g_tilde_array, "g_tilde_of_x");
+
+  Vector ddtau_ddx_array(npts_tau);
+  for (int i=0; i<npts_tau; i++){
+    ddtau_ddx_array[i] = dtau_dx_spline.deriv_x(x_array[i]);
+  }  
+
+  ddtau_ddx_spline.create(x_array, ddtau_ddx_array, "ddtau");
 
   // Create spline for g'(x). 
   // Avoid numerical errors when differentiating g twice.   
@@ -317,7 +336,8 @@ double RecombinationHistory::dtaudx_of_x(double x) const{
 }
 
 double RecombinationHistory::ddtauddx_of_x(double x) const{
-  return dtau_dx_spline.deriv_x(x);
+  // return dtau_dx_spline.deriv_x(x);
+  return ddtau_ddx_spline(x);
 }
 
 double RecombinationHistory::g_tilde_of_x(double x) const{

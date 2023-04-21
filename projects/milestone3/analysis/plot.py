@@ -135,29 +135,32 @@ def load(file, folder=data_path, skiprows=0):
 
 
 
-def plot_quantity_for_n_k_values(x, y, k,
-                                   k_legends, 
-                                   fname, 
-                                   xlabel=r"$x$", 
-                                   ylabel=None, 
-                                   xlim=None, 
-                                   ylim=None, 
-                                   legendloc='best', 
-                                   yticks=None, 
-                                   figsize=(8,6), 
-                                   log=True, 
-                                   save=True, 
-                                   temp=False):
+def plot_quantity_for_n_k_values(x, y,
+                                 k_legends, 
+                                 fname, 
+                                 xend=None,
+                                 xlabel=r"$x$", 
+                                 ylabel=None, 
+                                 xlim=None, 
+                                 ylim=None, 
+                                 legendloc='best', 
+                                 yticks=None, 
+                                 figsize=(8,6), 
+                                 log=True, 
+                                 save=True, 
+                                 temp=False):
 
 
     fig, ax = plt.subplots(figsize=figsize)
     y1, y2, y3 = y 
-    k1, k2, k3 = k 
     k1_leg, k2_leg, k3_leg = k_legends
     ax.plot(x, y1, color='blue'  , label=k1_leg)
     ax.plot(x, y2, color='orange', label=k2_leg)
     ax.plot(x, y3, color='green' , label=k3_leg)
-    
+
+    if xend is not None:
+        ax.vlines(xend, *ylim, colors='k', ls='--', lw=1)
+
     ax.set_ylim(ylim)
     ax.set_xlim(xlim)
 
@@ -174,6 +177,7 @@ def plot_quantity_for_n_k_values(x, y, k,
 def plot_cdm_baryon_for_n_k_values(x, y_cdm, y_baryon,
                                    k_legends, ylegends,
                                    fname, 
+                                   xend=None,
                                    xlabel=r"$x$", 
                                    ylabel=None, 
                                    xlim=None, 
@@ -188,8 +192,8 @@ def plot_cdm_baryon_for_n_k_values(x, y_cdm, y_baryon,
 
 
     fig, ax = plt.subplots(figsize=figsize)
-    y_cdm1   , y_cdm2   , y_cdm3    = y_cdm
-    y_baryon1, y_baryon2, y_baryon3 = y_baryon
+    y_cdm1   , y_cdm2   , y_cdm3    = np.abs(y_cdm)
+    y_baryon1, y_baryon2, y_baryon3 = np.abs(y_baryon)
     y_cdm_legend, y_baryon_legend = ylegends 
 
     # k1, k2, k3 = k 
@@ -200,6 +204,13 @@ def plot_cdm_baryon_for_n_k_values(x, y_cdm, y_baryon,
     ax.plot(x, y_baryon2, ls='dashed', color='orange')
     ax.plot(x, y_cdm3   , ls='solid' , color='green' , label=k3_leg)
     ax.plot(x, y_baryon3, ls='dashed', color='green' )
+
+
+    end_set = set(xend)
+    for end in end_set:
+        ax.vlines(end, *ylim, color='k', ls='--', lw=1)
+    # ax.vlines(xend2, *ylim)
+    # ax.vlines(xend3, *ylim)
 
 
     # ax.plot([], ls='solid' , c='k', label=y_cdm_legend)
