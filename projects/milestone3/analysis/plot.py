@@ -88,7 +88,8 @@ def save_push(fig, pdf_name, save=True, push=False, show=False, tight=True, temp
     plt.close()
 
 
-def set_ax_info(ax, xlabel, ylabel=False, title=None, legend=True, legendloc='best', legend_size=False):
+def set_ax_info(ax, xlabel, ylabel=False, title=None, legend=True, 
+                double_legends=[], legendloc='best', legend_size=False):
     """Write title and labels on an axis with the correct fontsizes.
     Args:
         ax (matplotlib.axis): the axis on which to display information
@@ -108,10 +109,13 @@ def set_ax_info(ax, xlabel, ylabel=False, title=None, legend=True, legendloc='be
     # except AttributeError:
         # pass
     if legend:
+        # if len(legends)==2:
+            # l1 = legends[0]
+            # l2 = legends[1]
+
         if legend_size:
             ax.legend(loc=legendloc, fontsize=legend_size)
         else:
-
             ax.legend(loc=legendloc)
 
 
@@ -131,19 +135,28 @@ def load(file, folder=data_path, skiprows=0):
 
 
 
-def plot_quantity_with_derivatives(x, y, dy, ddy,
-                                   y_legend, dy_legend, ddy_legend, 
-                                   fname, xlabel=r"$x$", ylabel=None, 
-                                   xlim=None, ylim=None, 
-                                   legendloc='best', yticks=None, 
-                                   figsize=(8,6), log=True, 
-                                   save=True, temp=False):
+def plot_quantity_for_n_k_values(x, y, k,
+                                   k_legends, 
+                                   fname, 
+                                   xlabel=r"$x$", 
+                                   ylabel=None, 
+                                   xlim=None, 
+                                   ylim=None, 
+                                   legendloc='best', 
+                                   yticks=None, 
+                                   figsize=(8,6), 
+                                   log=True, 
+                                   save=True, 
+                                   temp=False):
+
 
     fig, ax = plt.subplots(figsize=figsize)
-    ax.plot(x, y  ,ls='solid' , color='blue'  , label=y_legend)
-    ax.plot(x, dy ,ls='dashed', color='orange', label=dy_legend)
-    ax.plot(x, ddy,ls='dotted', color='green' , label=ddy_legend)
-
+    y1, y2, y3 = y 
+    k1, k2, k3 = k 
+    k1_leg, k2_leg, k3_leg = k_legends
+    ax.plot(x, y1, color='blue'  , label=k1_leg)
+    ax.plot(x, y2, color='orange', label=k2_leg)
+    ax.plot(x, y3, color='green' , label=k3_leg)
     
     ax.set_ylim(ylim)
     ax.set_xlim(xlim)
@@ -158,29 +171,40 @@ def plot_quantity_with_derivatives(x, y, dy, ddy,
 
     save_push(fig, fname, save, temp=temp)
     
-
-
-def compare_Xe_peebles_and_saha(x_peebles, x_saha, 
-                                Xe_peebles, Xe_saha,
-                                xrec_peebles, xrec_saha,
-                                fname, 
-                                rec_times=False,
-                                   xlim=None, ylim=None, 
-                                   legendloc='best', yticks=None, 
-                                   figsize=(8,6), log=True, 
-                                   save=True, temp=False):
+def plot_cdm_baryon_for_n_k_values(x, y_cdm, y_baryon,
+                                   k_legends, ylegends,
+                                   fname, 
+                                   xlabel=r"$x$", 
+                                   ylabel=None, 
+                                   xlim=None, 
+                                   ylim=None, 
+                                   legendloc1='best',
+                                   legendloc2='best', 
+                                   yticks=None, 
+                                   figsize=(8,6), 
+                                   log=True, 
+                                   save=True, 
+                                   temp=False):
 
 
     fig, ax = plt.subplots(figsize=figsize)
+    y_cdm1   , y_cdm2   , y_cdm3    = y_cdm
+    y_baryon1, y_baryon2, y_baryon3 = y_baryon
+    y_cdm_legend, y_baryon_legend = ylegends 
 
-    ax.plot(x_peebles, Xe_peebles ,ls='solid' , color='blue'  , label="Peebles")
-    ax.plot(x_saha   , Xe_saha    ,ls='dashed', color='green', label="Saha")
+    # k1, k2, k3 = k 
+    k1_leg, k2_leg, k3_leg = k_legends
+    ax.plot(x, y_cdm1   , ls='solid' , color='blue'  , label=k1_leg)
+    ax.plot(x, y_baryon1, ls='dashed', color='blue'  )
+    ax.plot(x, y_cdm2   , ls='solid' , color='orange', label=k2_leg)
+    ax.plot(x, y_baryon2, ls='dashed', color='orange')
+    ax.plot(x, y_cdm3   , ls='solid' , color='green' , label=k3_leg)
+    ax.plot(x, y_baryon3, ls='dashed', color='green' )
 
-    if rec_times:
-        ax.vlines(xrec_peebles, *ylim, ls='dotted', color='black'  , alpha=1, label="Recombination, Peebles")
-        ax.vlines(xrec_saha   , *ylim, ls='dotted', color='red', alpha=1, label="Recombination, Saha")
 
-        fname = "recombination_" + fname 
+    # ax.plot([], ls='solid' , c='k', label=y_cdm_legend)
+    # ax.plot([], ls='dashed', c='k', label=y_baryon_legend)
+
 
     
     ax.set_ylim(ylim)
@@ -188,17 +212,20 @@ def compare_Xe_peebles_and_saha(x_peebles, x_saha,
 
     if log:
         ax.set_yscale('log')
-
-    
-    xlabel = r"$x$"
-    ylabel = r"$X_e$"
-
-    set_ax_info(ax, xlabel, ylabel, legendloc=legendloc)
+    set_ax_info(ax, xlabel, ylabel, legendloc=legendloc1)
+    # leg1 = ax.legend(loc=legendloc1)
+    plt.gca().add_artist(ax.legend(loc=legendloc1))
+    solid_line,  = ax.plot([], label=y_cdm_legend   , c='k', linestyle="-")
+    dashed_line, = ax.plot([], label=y_baryon_legend, c='k', linestyle="--")
+    leg2 = ax.legend([solid_line, dashed_line], ylegends, loc=legendloc2)
+    plt.gca().add_artist(leg2)
 
     if yticks is not None:
         ax.set_yticks(yticks)
 
     save_push(fig, fname, save, temp=temp)
+    
+
 
 
 
