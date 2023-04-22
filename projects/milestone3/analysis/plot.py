@@ -145,7 +145,7 @@ def plot_quantity_for_n_k_values(x, y,
                                  ylim=None, 
                                  legendloc='best', 
                                  yticks=None, 
-                                 figsize=(8,6), 
+                                 figsize=(10,6), 
                                  log=True, 
                                  save=True, 
                                  temp=False):
@@ -159,7 +159,11 @@ def plot_quantity_for_n_k_values(x, y,
     ax.plot(x, y3, color='green' , label=k3_leg)
 
     if xend is not None:
-        ax.vlines(xend, *ylim, colors='k', ls='--', lw=1)
+        if ylim is None:
+            ylim_vline = [np.min(y), np.max(y)]
+        else:
+            ylim_vline = ylim  
+        ax.vlines(xend, *ylim_vline, colors='k', ls='--', lw=1)
 
     ax.set_ylim(ylim)
     ax.set_xlim(xlim)
@@ -184,8 +188,9 @@ def plot_cdm_baryon_for_n_k_values(x, y_cdm, y_baryon,
                                    ylim=None, 
                                    legendloc1='best',
                                    legendloc2='best', 
+                                   legendloc3='best', 
                                    yticks=None, 
-                                   figsize=(8,6), 
+                                   figsize=(10,6), 
                                    log=True, 
                                    save=True, 
                                    temp=False):
@@ -206,9 +211,7 @@ def plot_cdm_baryon_for_n_k_values(x, y_cdm, y_baryon,
     ax.plot(x, y_baryon3, ls='dashed', color='green' )
 
 
-    end_set = set(xend)
-    for end in end_set:
-        ax.vlines(end, *ylim, color='k', ls='--', lw=1)
+    
     # ax.vlines(xend2, *ylim)
     # ax.vlines(xend3, *ylim)
 
@@ -226,10 +229,20 @@ def plot_cdm_baryon_for_n_k_values(x, y_cdm, y_baryon,
     set_ax_info(ax, xlabel, ylabel, legendloc=legendloc1)
     # leg1 = ax.legend(loc=legendloc1)
     plt.gca().add_artist(ax.legend(loc=legendloc1))
+ 
     solid_line,  = ax.plot([], label=y_cdm_legend   , c='k', linestyle="-")
     dashed_line, = ax.plot([], label=y_baryon_legend, c='k', linestyle="--")
     leg2 = ax.legend([solid_line, dashed_line], ylegends, loc=legendloc2)
     plt.gca().add_artist(leg2)
+ 
+    end_set = set(xend)
+    lines = []
+    end_leg = ["Tight coupling"]
+    for end in end_set:
+        line = ax.vlines(end, *ylim, color='red', ls='--', lw=1, label=end_leg)
+        lines.append(line)
+    leg3 = ax.legend(lines, end_leg, loc=legendloc3)
+    plt.gca().add_artist(leg3)
 
     if yticks is not None:
         ax.set_yticks(yticks)
