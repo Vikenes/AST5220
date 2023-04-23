@@ -239,7 +239,12 @@ def plot_cdm_baryon_for_n_k_values(x, y_cdm, y_baryon,
     lines = []
     end_leg = ["Tight coupling"]
     for end in end_set:
-        line = ax.vlines(end, *ylim, color='red', ls='--', lw=1, label=end_leg)
+        if ylim is None:
+            ylim_end = [np.min(np.abs(y_cdm, y_baryon)), np.max(np.abs(y_cdm, y_baryon))]
+        else:
+            ylim_end = ylim
+        
+        line = ax.vlines(end, *ylim_end, color='red', ls='--', lw=1, label=end_leg)
         lines.append(line)
     leg3 = ax.legend(lines, end_leg, loc=legendloc3)
     plt.gca().add_artist(leg3)

@@ -313,16 +313,16 @@ p = Perturbations(f1="perturbations_k0.001.txt",
                   f2="perturbations_k0.01.txt",
                   f3="perturbations_k0.1.txt")
 
-SAVE=True
+# SAVE=True
 # TEMP=True
-p.plot_delta(xlim=[-15, 0])
-p.plot_delta_gamma(xlim=[-15,0], ylim=[1e-2,1e1])
+# p.plot_delta(xlim=[-15, 0])
+# p.plot_delta_gamma(xlim=[-15,0], ylim=[1e-2,1e1])
 p.plot_v(xlim=[-15,0])
-p.plot_v_gamma(ylim=None)
-p.plot_Theta(0, xlim=[-15,0], ylim=[-0.8,1], legendloc='lower left')
-p.plot_Theta(1, xlim=[-15,0], ylim=[-0.5, 0.6], legendloc='upper left')
-p.plot_Phi([-15,0])
-p.plot_Phi_plus_Psi(xlim=[-15,0])
+# p.plot_v_gamma(ylim=None)
+# p.plot_Theta(0, xlim=[-15,0], ylim=[-0.8,1], legendloc='lower left')
+# p.plot_Theta(1, xlim=[-15,0], ylim=[-0.5, 0.6], legendloc='upper left')
+# p.plot_Phi([-15,0])
+# p.plot_Phi_plus_Psi(xlim=[-15,0])
 
 # p.plot_source_function(xlim=[-5,0], no=0)
 # p.plot_source_function(xlim=[-5,0], no=1)
