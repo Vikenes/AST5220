@@ -1,0 +1,41 @@
+\usepackage{graphicx}
+\usepackage{txfonts}
+\usepackage{hyperref}
+\usepackage{physics}
+\usepackage{xcolor}
+\usepackage{amsmath}
+
+\usepackage{natbib}
+% \usepackage[square,numbers]{natbib}
+\bibpunct{(}{)}{;}{a}{}{,}      
+\setcitestyle{square,comma,numbers,compress}
+
+\usepackage{booktabs}
+\usepackage{array}
+
+%=================================
+%    Avoid compiler warning  
+%==================================
+\makeatletter
+\renewcommand*\aa@pageof{, page \thepage{} of \pageref*{LastPage}}
+\makeatother
+
+
+
+
+
+\newcommand{\tablesMilestoneTwo}[1]{\input{../milestone2/report/tables/#1}}
+\newcommand{\tablesMilestoneThree}[1]{\input{../milestone3/report/tables/#1}}
+
+
+% \newcommand{\figext}{pdf}
+% \graphicspath{{../milestone1/analysis/figures/}{../milestone2/analysis/figures/}{../milestone3/analysis/figures/}}
+
+
+\newcommand{\figext}{png}
+\graphicspath{{../milestone1/analysis/figures/temp/}{../milestone2/analysis/figures/temp/}{../milestone3/analysis/figures/temp/}}
+
+
+
+\newcommand{\includefig}[2][width=\linewidth]{\includegraphics[#1]{#2.\figext}}
+

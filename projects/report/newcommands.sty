@@ -1,25 +1,3 @@
-\usepackage{graphicx}
-\usepackage{txfonts}
-\usepackage{hyperref}
-\usepackage{physics}
-\usepackage{xcolor}
-\usepackage{amsmath}
-
-\usepackage{natbib}
-% \usepackage[square,numbers]{natbib}
-\bibpunct{(}{)}{;}{a}{}{,}      
-\setcitestyle{square,comma,numbers,compress}
-
-\usepackage{booktabs}
-\usepackage{array}
-
-%=================================
-%    Avoid compiler warning  
-%==================================
-\makeatletter
-\renewcommand*\aa@pageof{, page \thepage{} of \pageref*{LastPage}}
-\makeatother
-
 
 %=================================
 %    Label commands  
@@ -34,6 +12,7 @@
 %    Text commands  
 %==================================
 \renewcommand{\note}[1]{\textcolor{red}{#1}}
+\newcommand{\pnote}[1]{\note{(#1)}}
 
 
 %=================================
@@ -100,20 +79,4 @@
 \newcommand{\nex}{n_e(x)}
 
 \newcommand{\equilibriumn}[1][1]{n_{#1}^{(0)}}
-
-
-
-
-\newcommand{\tablesMilestoneTwo}[1]{\input{../milestone2/report/tables/#1}}
-
-\newcommand{\figext}{pdf}
-\graphicspath{{../milestone1/analysis/figures/}{../milestone2/analysis/figures/}}
-
-
-% \newcommand{\figext}{png}
-% \graphicspath{{../milestone1/analysis/figures/temp/}{../milestone2/analysis/figures/temp/}}
-
-
-
-\newcommand{\includefig}[2][width=\linewidth]{\includegraphics[#1]{#2.\figext}}
 
