@@ -1,6 +1,8 @@
 \subsection{Theory}\label{ssec:M3:theory}
-\subsubsection{Metric perturbations}\label{sssec:M3:theory:metric_perturbations}
-For the perturbed metric we use Newtonian gauge \pnote{Explain/cite}, and write it as  
+In this section we present the equations governing the evolution of the perturbed quantities. We will only present the relevant equations here, which are all obtained from \cite{Dodelson} and \cite{callin}, unless otherwise stated. We refer to \citeauthor{Dodelson} for a detailed derivation of the equations. For the notation, we adapt that of \citeauthor{callin}. 
+
+\subsubsection{Metric Perturbations}\label{sssec:M3:theory:perturbations}
+For the perturbed metric we consider the Newtonian gauge \pnote{Explain/cite}, and write it as  
 \begin{equation}
     g_{\mu\nu} = 
     \begin{pmatrix}
@@ -8,31 +10,34 @@ For the perturbed metric we use Newtonian gauge \pnote{Explain/cite}, and write 
         0 & a^2 \delta_{ij}(1+2\Phi)
     \end{pmatrix},
 \end{equation}
-where we have introduced the perturbations $\Psi$ and $\Phi$, which are functions of both position and time. For $\Psi=\Phi=0$ we derive the FLRW metric. 
-
-
-\subsubsection{Temperature fluctuations}\label{sssec:M3:theory:temperature_fluctuations}
-
-
+where we have introduced the scalar perturbations $\Psi$ and $\Phi$, which are functions of both position and time. For $\Psi=\Phi=0$ we obtain the FLRW metric. Photon perturbations are defined in terms of the relative temperature variations, $\Theta$, via 
+\begin{equation} \label{eq:M3:theory:temperature_fluctuations}
+    T(\vec{k},\mu,\eta) = \zerothorder{T}(\eta)\bclosed{1 + \Theta(\vec{k},\mu,\eta)},
+\end{equation}  
+where $\vec{k}$ is the Fourier transformed variable corresponding to position $\vec{x}$, and $\mu\equiv \frac{\vec{k}\cdot\vec{p}}{kp}$. $\Theta$ only depends on the photon momentum in terms of their directions, and are expanded in terms of multipoles as 
+\begin{equation} \label{eq:M3:theory:theta_ell_multipolse_expansion}
+    \Theta_\ell = \frac{i^\ell}{2}\int_{-1}^1 \pl(\mu)\Theta(\mu)\,\dd\mu,\,\quad \Theta(\mu) = \sum_{\ell=0}^{\infty}\frac{2\ell+1}{i^\ell}\Theta_\ell \pl(\mu),
+\end{equation}
+where $\pl(\mu)$ are Legendre polynomials. \note{Explain Fourier space, and its relation to the CMB.} For CDM we denote the density and velocity perturbations as $\dcdm$ and $\vcdm$, respectively, and similarly denote the baryon perturbations as $\db$ and $\vb$.  
 
 \subsubsection{Perturbation equations}
-The system of ODEs we have to solve are  
+In Fourier space, the system of ODEs we have to solve are  
 \begin{subequations}
     \begin{align}
-        \Theta_0' =& - \frac{ck}{\H}\Theta_1 - \Phi', \\
-        \Theta_1' =& \frac{ck}{3\H}\Theta_0 - \frac{2ck}{3\H}\Theta_2 + \frac{ck}{3\H}\Psi \bclosed{\Theta_1 + \frac{1}{3}v_b} \\ 
-        \Theta_\ell' =& \frac{\ell ck}{(2\ell+1)\H}\Theta_{\ell-1} - \frac{(\ell+1)ck}{(2\ell+1)\H}\Theta_{\ell+1} \nonumber \\
+        \Theta_0' =& - \koverhp\Theta_1 - \Phi', \\
+        \Theta_1' =& \frac{k}{3\H}\Theta_0 - \frac{2k}{3\H}\Theta_2 + \frac{k}{3\H}\Psi \bclosed{\Theta_1 + \frac{1}{3}v_b} \\ 
+        \Theta_\ell' =& \frac{\ell k}{(2\ell+1)\H}\Theta_{\ell-1} - \frac{(\ell+1)k}{(2\ell+1)\H}\Theta_{\ell+1} \nonumber \\
         & + \tau'\bclosed{\Theta_\ell - \frac{1}{10}\Pi \delta_{\ell,2}},\quad 2\leq\ell<\ell_\mathrm{max}, \\
-        \Theta_\ell' =& \frac{ck}{\H}\Theta_{\ell-1} - c \frac{(\ell+1)}{\H\eta(x)}\Theta_{\ell} + \tau' \Theta_\ell,\quad \ell=\ell_\mathrm{max}, \\
-        \dcdm' =& \frac{ck}{\H} \vcdm - 3\Phi', \\
-        \vcdm' =& - \vcdm . \frac{ck}{\H} \Psi, \\
-        \db' =& \ckoverhp \vb - 3\Phi', \\
-        \vb' =& -\vb - \ckoverhp \Psi + \tau' R(3\Theta_1 + \vb), \\
-        \Phi' =& -\Psi - \frac{c^2 k^2}{3\H^2}\Phi + \frac{H_0^2}{2\H^2} \begin{aligned}[t]
+        \Theta_\ell' =& \frac{k}{\H}\Theta_{\ell-1} - c \frac{(\ell+1)}{\H\eta(x)}\Theta_{\ell} + \tau' \Theta_\ell,\quad \ell=\ell_\mathrm{max}, \\
+        \dcdm' =& \frac{k}{\H} \vcdm - 3\Phi', \\
+        \vcdm' =& - \vcdm \frac{k}{\H} \Psi, \\
+        \db' =& \koverhp \vb - 3\Phi', \\
+        \vb' =& -\vb - \koverhp \Psi + \tau' R(3\Theta_1 + \vb), \\
+        \Phi' =& -\Psi - \frac{k^2}{3\H^2}\Phi + \frac{H_0^2}{2\H^2} \begin{aligned}[t]
             [&\ocdmn a^{-1}\dcdm + \obn a^{-1} \db \\
             &+4\ogn a^{-2} \Theta_0] 
             \end{aligned}, \\
-        \Psi &= -\Phi - \frac{12H_0^2}{c^2 k^2 a^2} \ogn \Theta_2
+        \Psi &= -\Phi - \frac{12H_0^2}{k^2 a^2} \ogn \Theta_2
     \end{align}
 \end{subequations}
 
@@ -44,11 +49,11 @@ The initial conditions are
         \Psi &= -\frac{2}{3}, \\
         \Phi &= - \Psi, \\
         \dcdm &= \db = -\frac{3}{2}\Psi, \\
-        \vcdm &= \vb = -\frac{ck}{2\H} \Psi, \\
+        \vcdm &= \vb = -\frac{k}{2\H} \Psi, \\
         \Theta_0 &= -\frac{1}{2}\Psi, \\
-        \Theta_1 &= \frac{ck}{6\H}\Psi, \\
-        \Theta_2 &= - \frac{20ck}{45\H\tau'}\Theta_1, \\
-        \Theta_\ell &= - \frac{\ell}{2\ell+1} \frac{ck}{\H\tau'}\Theta_{\ell-1} \pnote{Needed?}.
+        \Theta_1 &= \frac{k}{6\H}\Psi, \\
+        \Theta_2 &= - \frac{20k}{45\H\tau'}\Theta_1, \\
+        \Theta_\ell &= - \frac{\ell}{2\ell+1} \frac{k}{\H\tau'}\Theta_{\ell-1} \pnote{Needed?}.
     \end{align}
 \end{subequations}
 
@@ -58,8 +63,8 @@ The tight coupling regime is computed with
 \begin{subequations}
     \begin{align}
         \varrho q =& -[(1-R)\tau' + (1+R)\tau''](3\Theta_1 + \vb) \nonumber \\
-            & -\ckoverhp\Psi + (1-\frac{\H'}{\H})\ckoverhp(-\Theta_0 + 2\Theta_2) - \ckoverhp\Theta_0', \\
-        \vb' =& \frac{1}{1+R}\bclosed{-\vb-\ckoverhp\Psi + R(q+\ckoverhp[-\Theta_0+2\Theta_2-\Psi])}, \\
+            & -\koverhp\Psi + (1-\frac{\H'}{\H})\koverhp(-\Theta_0 + 2\Theta_2) - \koverhp\Theta_0', \\
+        \vb' =& \frac{1}{1+R}\bclosed{-\vb-\koverhp\Psi + R(q+\koverhp[-\Theta_0+2\Theta_2-\Psi])}, \\
         \Theta_1' =& \frac{1}{3}(q-\vb'),
     \end{align}
 \end{subequations}
@@ -72,12 +77,12 @@ where we introduced the parameter
 \subsubsection{Line-of-sight integration}\label{sssec:M3:theory:line_of_sight_integration}
 
 \begin{equation}
-    \Theta_\ll(k,x=0) = \int_{-\infty}^0 \tilde{S}(k,x) j_\ell [k(\eta_0 - \eta(x))]\,\dd x, 
+    \Theta_\ell(k,x=0) = \int_{-\infty}^0 \tilde{S}(k,x) j_\ell [k(\eta_0 - \eta(x))]\,\dd x, 
 \end{equation}
 where $\tilde{S}(k,x)$ is the source function 
 \begin{equation}
     \begin{split}
         \tilde{S}(k,x) =& \g \bclosed{\Theta_0 + \Psi + \frac{1}{4} \Pi} + e^{-\tau}\bclosed{\Psi' - \Phi'} \\
-        & - \frac{1}{ck}\dv{x}(\H \g \vb) + \frac{3}{4c^2 k^2}\dv{x}\bclosed{\H \dv{x}(\H\g\Pi)}.
+        & - \frac{1}{k}\dv{x}(\H \g \vb) + \frac{3}{4k^2}\dv{x}\bclosed{\H \dv{x}(\H\g\Pi)}.
     \end{split}
 \end{equation}
