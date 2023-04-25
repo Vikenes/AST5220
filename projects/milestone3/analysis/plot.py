@@ -255,7 +255,41 @@ def plot_cdm_baryon_for_n_k_values(x, y_cdm, y_baryon,
     save_push(fig, fname, save, temp=temp)
     
 
+def plot_source_function(x, y,
+                         k_legends,
+                        fname, 
+                        xlabel=r"$x$", 
+                        ylabel=None, 
+                        xlim=None, 
+                        ylim=None, 
+                        legendloc='best', 
+                        yticks=None, 
+                        figsize=(10,6), 
+                        log=False, 
+                        save=True, 
+                        temp=False):
 
+
+    fig, ax = plt.subplots(figsize=figsize)
+    y1, y2, y3 = y 
+    k1_leg, k2_leg, k3_leg = k_legends
+    ax.plot(x, y1, color='blue'  , label=k1_leg)
+    ax.plot(x, y2, color='orange', label=k2_leg)
+    ax.plot(x, y3, color='green' , label=k3_leg)
+
+    ax.set_ylim(ylim)
+    ax.set_xlim(xlim)
+
+    if log:
+        ax.set_yscale('log')
+    
+    set_ax_info(ax, xlabel, ylabel, legendloc=legendloc)
+
+    if yticks is not None:
+        ax.set_yticks(yticks)
+
+    print(f'Showing: {fname}')
+    save_push(fig, fname, save, temp=temp)
 
 
 def time_table(x, z, t, r, saha=False, save=False, temp=False):

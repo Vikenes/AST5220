@@ -107,8 +107,8 @@ class Perturbations:
         self.source         = True 
         self.S_tilde        = self.data[11]
         self.S_tilde_j5     = self.data[12]
-        self.S_tilde_j50    = self.data[12] 
-        self.S_tilde_j500   = self.data[12] 
+        self.S_tilde_j50    = self.data[13] 
+        self.S_tilde_j500   = self.data[14] 
 
 
     def plot_delta(self, xlim=[-18,0], ylim=[1e-2, 1e4],
@@ -254,33 +254,60 @@ class Perturbations:
                                           legendloc='upper left',
                                           save=SAVE, temp=TEMP)
 
-    def plot_source_function(self, xlim=None, ylim=None, no=0):
+    def plot_source_function(self, xlim=None, ylim=None, no=0, fname=None):
         if hasattr(self, 'source'):
             pass
         else:
             self.load_source_func()
 
         if no == 0:
-            plt.title(r"$\tilde{S}(k,x)$")
-            plt.plot(self.x, self.S_tilde[2])
-            plt.xlim(xlim)
-            plt.show()
+            if fname is None:
+                fname = "S_alone.pdf"
+            plot.plot_source_function(self.x, self.S_tilde,
+                                      k_legends=self.k_labels,
+                                      ylabel=r"$\tilde{S}$",
+                                      fname=fname,
+                                      xlim=xlim,ylim=ylim,
+                                      save=SAVE, temp=TEMP)
 
-        elif no == 1:
-            plt.title(r"$\tilde{S}(k,x) j_5 $")
-            plt.plot(self.x, self.S_tilde_j5[2])
-            plt.xlim(xlim)
-            plt.show()
+        if no == 1:
+            if fname is None:
+                fname = "S_j5.pdf"
+            plot.plot_source_function(self.x, self.S_tilde_j5, 
+                                      k_legends=self.k_labels,
+                                      ylabel=r"$\tilde{S} j_5 $",
+                                      fname=fname,
+                                      xlim=xlim,ylim=ylim,
+                                      save=SAVE, temp=TEMP)
+
         elif no == 2:
-            plt.title(r"$\tilde{S}(k,x) j_{50}$")
-            plt.plot(self.x, self.S_tilde_j50[2])
-            plt.xlim(xlim)
-            plt.show()
+            if fname is None:
+                fname = "S_j50.pdf"
+            plot.plot_source_function(self.x, self.S_tilde_j50, 
+                                      k_legends=self.k_labels,
+                                      ylabel=r"$\tilde{S} j_{50} $",
+                                      fname=fname,
+                                      xlim=xlim,ylim=ylim,
+                                      save=SAVE, temp=TEMP)
+            # plt.title(r"$\tilde{S}(k,x) j_{50}$")
+            # plt.plot(self.x, self.S_tilde_j50[2])
+            # plt.xlim(xlim)
+            # plt.ylim(ylim)
+            # plt.show()
         elif no == 3:
-            plt.title(r"$\tilde{S}(k,x) j_{500}$")
-            plt.plot(self.x, self.S_tilde_j500[2])
-            plt.xlim(xlim)
-            plt.show()
+            if fname is None:
+                fname = "S_j500.pdf"
+            plot.plot_source_function(self.x, self.S_tilde_j500, 
+                                      k_legends=self.k_labels,
+                                      ylabel=r"$\tilde{S} j_{500} $",
+                                      fname=fname,
+                                      xlim=xlim,ylim=ylim,
+                                      save=SAVE, temp=TEMP)
+            # plt.title(r"$\tilde{S}(k,x) j_{500}$")
+            # plt.plot(self.x, self.S_tilde_j500[2])
+            # plt.xlim(xlim)
+            # plt.ylim(ylim)
+            # plt.show()
         else:
             pass     
 
@@ -317,17 +344,25 @@ p = Perturbations(f1="perturbations_k0.001.txt",
 # TEMP=True
 # p.plot_delta(xlim=[-15, 0])
 # p.plot_delta_gamma(xlim=[-15,0], ylim=[1e-2,1e1])
-p.plot_v(xlim=[-15,0])
+# p.plot_v(xlim=[-15,0])
 # p.plot_v_gamma(ylim=None)
 # p.plot_Theta(0, xlim=[-15,0], ylim=[-0.8,1], legendloc='lower left')
 # p.plot_Theta(1, xlim=[-15,0], ylim=[-0.5, 0.6], legendloc='upper left')
+# p.plot_Theta(2, xlim=[-15,0], ylim=[-0.5, 0.6], legendloc='upper left')
+
 # p.plot_Phi([-15,0])
 # p.plot_Phi_plus_Psi(xlim=[-15,0])
 
-# p.plot_source_function(xlim=[-5,0], no=0)
-# p.plot_source_function(xlim=[-5,0], no=1)
-# p.plot_source_function(xlim=[-5,0], no=2)
-# p.plot_source_function(xlim=[-5,0], no=3)
 
+p.plot_source_function(xlim=[-7.5,-6], no=1, fname='S_j5_center.pdf')
+p.plot_source_function(xlim=[-1,0], ylim=[-0.026,0.055], no=1, fname='S_j5_end.pdf')
 
+p.plot_source_function(xlim=[-7.5,-6], no=2, fname='S_j50_center.pdf')
+p.plot_source_function(xlim=[-3,0], ylim=[-0.001,0.0015], no=2, fname='S_j50_mid_end.pdf')
+p.plot_source_function(xlim=[-1,0], ylim=[-0.001,0.0015], no=2, fname='S_j50_end.pdf')
 
+p.plot_source_function(xlim=[-7.5,-6], no=3, fname='S_j500_center.pdf')
+p.plot_source_function(xlim=[-5,0], ylim=[-3e-5,6e-5], no=3, fname='S_j500_end.pdf')
+
+p.plot_source_function(xlim=[-7.5,-6], no=0, fname='S_no_l_center.pdf')
+p.plot_source_function(xlim=[-1,0], ylim=[-0.01,0.5], no=0, fname='S_no_l_end.pdf')
