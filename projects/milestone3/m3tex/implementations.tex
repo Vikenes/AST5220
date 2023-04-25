@@ -16,18 +16,3 @@ where we introduced the parameter
 \end{equation}
 
 
-\subsubsection{Initial conditions} \label{sssec:M3:implementations:initial_conditions}
-The initial conditions are 
-\begin{subequations} \label{eq:M3:implementations:pert_ODE_IC}
-    \begin{align}
-        \Psi &= -\frac{2}{3}, \label{eq:M3:implementations:pert_ODE_IC_Psi} \\
-        \Phi &= - \Psi, \label{eq:M3:implementations:pert_ODE_IC_Phi} \\
-        \dcdm &= \db = -\frac{3}{2}\Psi, \label{eq:M3:implementations:pert_ODE_IC_delta_cdm} \\
-        \vcdm &= \vb = -\frac{k}{2\H} \Psi, \label{eq:M3:implementations:pert_ODE_IC_v_cdm} \\
-        \Theta_0 &= -\frac{1}{2}\Psi, \label{eq:M3:implementations:pert_ODE_IC_Theta0} \\
-        \Theta_1 &= \frac{k}{6\H}\Psi, \label{eq:M3:implementations:pert_ODE_IC_Theta1} \\
-        \Theta_2 &= - \frac{20k}{45\H\tau'}\Theta_1, \label{eq:M3:implementations:pert_ODE_IC_Theta2} \\
-        \Theta_\ell &= - \frac{\ell}{2\ell+1} \frac{k}{\H\tau'}\Theta_{\ell-1} \pnote{Needed?}. \label{eq:M3:implementations:pert_ODE_IC_Theta_ell} 
-    \end{align}
-\end{subequations}
-
