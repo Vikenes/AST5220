@@ -1,0 +1,63 @@
+\subsection{Theory}\label{ssec:M3:theory}
+In this section we present the equations governing the evolution of the perturbed quantities. We will only present the relevant equations here, which are all obtained from \cite{Dodelson} and \cite{callin}, unless otherwise stated. We refer to \citeauthor{Dodelson} for a detailed derivation of the equations. For the notation, we adapt that of \citeauthor{callin}. 
+
+\subsubsection{Metric Perturbations}\label{sssec:M3:theory:perturbations}
+For the perturbed metric we consider the Newtonian gauge \pnote{Explain/cite}, and write it as  
+\begin{equation} \label{eq:M3:theory:metric_perturbation}
+    g_{\mu\nu} = 
+    \begin{pmatrix}
+        -(1+2\Psi) & 0 \\
+        0 & a^2 \delta_{ij}(1+2\Phi)
+    \end{pmatrix},
+\end{equation}
+where we have introduced the scalar perturbations $\Psi$ and $\Phi$, which are functions of both position and time. For $\Psi=\Phi=0$ we obtain the FLRW metric. Photon perturbations are defined in terms of the relative temperature variations, $\Theta$, via 
+\begin{equation} \label{eq:M3:theory:temperature_fluctuations}
+    T(\vec{k},\mu,\eta) = \zerothorder{T}(\eta)\bclosed{1 + \Theta(\vec{k},\mu,\eta)},
+\end{equation}  
+where $\vec{k}$ is the Fourier transformed variable corresponding to position $\vec{x}$, and $\mu\equiv \frac{\vec{k}\cdot\vec{p}}{kp}$. $\Theta$ only depends on the photon momentum in terms of their directions, and are expanded in terms of multipoles as 
+\begin{equation} \label{eq:M3:theory:theta_ell_multipolse_expansion}
+    \Theta_\ell = \frac{i^\ell}{2}\int_{-1}^1 \pl(\mu)\Theta(\mu)\,\dd\mu \Leftrightarrow \Theta(\mu) = \sum_{\ell=0}^{\infty}\frac{2\ell+1}{i^\ell}\Theta_\ell \pl(\mu),
+\end{equation}
+where $\pl(\mu)$ are Legendre polynomials. \note{Explain Fourier space, and its relation to the CMB.} For CDM we denote the density and velocity perturbations as $\dcdm$ and $\vcdm$, respectively, and similarly denote the baryon perturbations as $\db$ and $\vb$.  
+
+\subsubsection{Perturbation equations}
+Having introduced the perturbed quantities of interest, the system of ODEs, given in Fourier space, that we will solve are given by \cite[Eq. (22)]{callin} 
+\begin{subequations} \label{eq:M3:theory:perturbation_ODEs}
+    \begin{align}
+        \Theta_0' =& - \koverhp\Theta_1 - \Phi', \label{eq:M3:theory:perturbation_ODEs_Theta0}\\
+        \Theta_1' =& \frac{k}{3\H}\Theta_0 - \frac{2k}{3\H}\Theta_2 + \frac{k}{3\H}\Psi \bclosed{\Theta_1 + \frac{1}{3}v_b}, \label{eq:M3:theory:perturbation_ODEs_Theta1} \\ 
+        \Theta_\ell' =& \frac{\ell k}{(2\ell+1)\H}\Theta_{\ell-1} - \frac{(\ell+1)k}{(2\ell+1)\H}\Theta_{\ell+1} \nonumber \\
+        & + \tau'\bclosed{\Theta_\ell - \frac{1}{10}\Pi \delta_{\ell,2}},\quad 2\leq\ell<\ell_\mathrm{max}, \label{eq:M3:theory:perturbation_ODEs_Theta_ell} \\
+        \Theta_\ell' =& \frac{k}{\H}\Theta_{\ell-1} - c \frac{(\ell+1)}{\H\eta(x)}\Theta_{\ell} + \tau' \Theta_\ell,\quad \ell=\ell_\mathrm{max}, \label{eq:M3:theory:perturbation_ODEs_Theta_ell_max} \\
+        \dcdm' =& \frac{k}{\H} \vcdm - 3\Phi', \label{eq:M3:theory:perturbation_ODEs_delta_cdm} \\
+        \vcdm' =& - \vcdm \frac{k}{\H} \Psi, \label{eq:M3:theory:perturbation_ODEs_v_cdm} \\
+        \db' =& \koverhp \vb - 3\Phi', \label{eq:M3:theory:perturbation_ODEs_delta_b} \\
+        \vb' =& -\vb - \koverhp \Psi + \tau' R(3\Theta_1 + \vb), \label{eq:M3:theory:perturbation_ODEs_v_b} \\
+        \Phi' =& -\Psi - \frac{k^2}{3\H^2}\Phi + \frac{H_0^2}{2\H^2} \begin{aligned}[t]
+            [&\ocdmn a^{-1}\dcdm + \obn a^{-1} \db \\
+            &+4\ogn a^{-2} \Theta_0], 
+            \end{aligned} \label{eq:M3:theory:perturbation_ODEs_Phi} \\
+        \Psi &= -\Phi - \frac{12H_0^2}{k^2 a^2} \ogn \Theta_2. \label{eq:M3:theory:perturbation_ODEs_Psi}
+    \end{align}
+\end{subequations}
+Compared to \cite[Eq. (22)]{callin}, we have set all terms involving $\Theta_{P\ell}$ and $\mathcal{N}$ to zero, as we neglect polarization and neutrinos. Thus, we have $\Pi=\Theta_2$ \pnote{Mention quadropole}. \Eqref{eq:M3:theory:perturbation_ODEs_Theta_ell_max} comes from \cite[Eq. (49)]{callin}.   
+
+The equation for $\Psi$ is an algebraic equation, and its value is inserted in the other equations. Noting that $\Phi'$ is the only derivative of a perturbed quantity found on the RHS of Eqs. \eqref{eq:M3:theory:perturbation_ODEs}, we solve for it first, and insert this value into the other equations. At early times, $\tau'$ is very large, as seen from \figref{fig:M2:results:tau_plot}. Since we're considering small perturbations, this implies that terms multiplied with $\tau'$ should be set to zero in \Eqref{eq:M3:theory:perturbation_ODEs}. This is referred to as the \textit{Tight coupling regime}, where the equations we have to solve are slightly modified. There are also changes that have to be made due to numerical stability at early times. We therefore proceed with the discussion of initial conditions in \secref{ssec:M3:implementations}.
+
+\note{The initial conditions should be given here, and the tight-coupling equations in implementations.}
+
+\pnote{Mention truncation?}
+
+\subsubsection{Line-of-sight integration}\label{sssec:M3:theory:line_of_sight_integration}
+From \Eqref{eq:M3:theory:perturbation_ODEs_Theta_ell} we see that we have to solve a huge system of ODEs if we want to probe the CMB to scales around $\ell\sim1000$. However, by exploiting the LOS-integration technique \pnote{Cite}, $\Theta_\ell$ can be obtained from computing the integral 
+\begin{equation} \label{eq:M3:theory:Theta_ell_LOS_integration}
+    \Theta_\ell(k,x=0) = \int_{-\infty}^0 \tilde{S}(k,x) j_\ell [k(\eta_0 - \eta(x))]\,\dd x, 
+\end{equation}
+where $\tilde{S}(k,x)$ is the source function, and is given by 
+\begin{equation} \label{eq:M3:theory:source_function_LOS}
+    \begin{split}
+        \tilde{S}(k,x) =& \g \bclosed{\Theta_0 + \Psi + \frac{1}{4} \Pi} + e^{-\tau}\bclosed{\Psi' - \Phi'} \\
+        & - \frac{1}{k}\dv{x}(\H \g \vb) + \frac{3}{4k^2}\dv{x}\bclosed{\H \dv{x}(\H\g\Pi)}.
+    \end{split}
+\end{equation}
+Since we have $\Pi=\Theta_2$, the highest photon multipole required to compute any multipole $\Theta_\ell$ from \Eqref{eq:M3:theory:Theta_ell_LOS_integration} is $\Theta_2$. Thus, the number of multipole we have to compute from the coupled ODEs in \Eqref{eq:M3:theory:perturbation_ODEs} is governed by the value of $\ell_\mathrm{max}$ which ensures sufficient accuracy in $\Theta_2$. This is explained more thoroughly in \note{Section}  
