@@ -45,14 +45,18 @@ class Perturbations{
    
     // Splines of source functions (ST for temperature; SE for polarization)
     Spline2D ST_spline{"ST_spline"};
-    Spline2D SE_spline{"SE_spline"};
     
     // Splines of mulipole quantities
     Spline2D Theta0_spline{"Theta0_spline"};
     Spline2D Theta1_spline{"Theta1_spline"};
     Spline2D Theta2_spline{"Theta2_spline"};
+    Spline2D Theta3_spline{"Theta2_spline"};
+
+
+
 
     std::vector<Spline2D> Theta_splines;
+
 
     //==========================================================
     // [1] Tight coupling ODE system
@@ -122,14 +126,11 @@ class Perturbations{
     double get_Psi(const double x, const double k) const;
     double get_Pi(const double x, const double k) const;
     double get_Theta(const double x, const double k, const int ell) const;
-    double get_Theta0(const double x, const double k) const;
-    double get_Theta1(const double x, const double k) const;
-    double get_Theta2(const double x, const double k) const;
 
-    double get_Theta_p(const double x, const double k, const int ell) const;
-    double get_Nu(const double x, const double k, const int ell) const;
+    double compute_Theta2_tc(const double x, const double k, const double Theta1) const;
+    double compute_Theta3_tc(const double x, const double k, const double Theta2) const;
+    double compute_Psi(const double x, const double k, const double Theta2, const double Phi) const;
     double get_Source_T(const double x, const double k) const;
-    double get_Source_E(const double x, const double k) const;
 };
 
 #endif
