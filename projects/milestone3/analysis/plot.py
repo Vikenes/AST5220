@@ -162,7 +162,7 @@ def plot_quantity_for_n_k_values(x, y,
     y1, y2, y3 = y 
     k1_leg, k2_leg, k3_leg = k_legends
     ax.plot(x, y1, color='blue'  , label=k1_leg)
-    ax.plot(x, y2, color='orange', label=k2_leg)
+    ax.plot(x, y2, color='red', label=k2_leg)
     ax.plot(x, y3, color='green' , label=k3_leg)
 
     if xend is not None:
@@ -170,7 +170,7 @@ def plot_quantity_for_n_k_values(x, y,
             ylim_vline = [np.min(y), np.max(y)]
         else:
             ylim_vline = ylim  
-        ax.vlines(xend, *ylim_vline, colors='red', ls='--', lw=1)
+        ax.vlines(xend, *ylim_vline, colors='black', ls='dotted', lw=2)
 
     ax.set_ylim(ylim)
     ax.set_xlim(xlim)
@@ -213,8 +213,8 @@ def plot_cdm_baryon_for_n_k_values(x, y_cdm, y_baryon,
     k1_leg, k2_leg, k3_leg = k_legends
     ax.plot(x, y_cdm1   , ls='solid' , color='blue'  , label=k1_leg)
     ax.plot(x, y_baryon1, ls='dashed', color='blue'  )
-    ax.plot(x, y_cdm2   , ls='solid' , color='orange', label=k2_leg)
-    ax.plot(x, y_baryon2, ls='dashed', color='orange')
+    ax.plot(x, y_cdm2   , ls='solid' , color='red', label=k2_leg)
+    ax.plot(x, y_baryon2, ls='dashed', color='red')
     ax.plot(x, y_cdm3   , ls='solid' , color='green' , label=k3_leg)
     ax.plot(x, y_baryon3, ls='dashed', color='green' )
 
@@ -252,10 +252,8 @@ def plot_cdm_baryon_for_n_k_values(x, y_cdm, y_baryon,
         else:
             ylim_end = ylim
         
-        line = ax.vlines(end, *ylim_end, color='red', ls='--', lw=1, label=end_leg)
+        line = ax.vlines(end, *ylim_end, color='black', ls='dotted', lw=2, label=end_leg)
         lines.append(line)
-    leg3 = ax.legend(lines, end_leg, loc=legendloc3)
-    plt.gca().add_artist(leg3)
 
     if yticks is not None:
         ax.set_yticks(yticks)

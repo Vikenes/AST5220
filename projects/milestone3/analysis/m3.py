@@ -324,20 +324,21 @@ p = Perturbations(f1="perturbations_k0.001.txt",
                   f3="perturbations_k0.1.txt")
 
 SAVE=True
-TEMP=True
+# TEMP=True
 # p.plot_delta()
-# p.plot_delta_gamma(ylim=[1e-2,1e1], yabs=True, log=True)
-p.plot_delta_gamma(ylim=[-3, 5])
+# p.plot_delta_gamma(ylim=[-3, 5])
 # p.plot_v()
-p.plot_v_gamma(ylim=[-1.5,1.5])
+# p.plot_v_gamma(ylim=[-1.5,1.5])
 
 # p.plot_Theta(0, ylim=[-0.8,1], legendloc='lower left')
 # p.plot_Theta(1, ylim=[-0.5, 0.6], legendloc='upper left')
-# p.plot_Theta(2, xlim=[-10,0], ylim=[-0.1, 0.2], legendloc='upper right')
+p.plot_Theta(2, xlim=[-10,0], ylim=[-0.1, 0.2], legendloc='upper right')
 
 # p.plot_Phi()
 # p.plot_Phi_plus_Psi(ylim=[-0.006,0.026])
 
+#### NOT USING ###### 
+# p.plot_delta_gamma(ylim=[1e-2,1e1], yabs=True, log=True) ## Not using 
 
 # p.plot_source_function(xlim=[-7.5,-6], no=1, fname='S_j5_center.pdf')
 # p.plot_source_function(xlim=[-1,0], ylim=[-0.026,0.055], no=1, fname='S_j5_end.pdf')
