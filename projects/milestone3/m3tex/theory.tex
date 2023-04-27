@@ -14,11 +14,15 @@ where we have introduced the scalar perturbations $\Psi$ and $\Phi$, which are f
 \begin{equation} \label{eq:M3:theory:temperature_fluctuations}
     T(\vec{k},\mu,\eta) = \zerothorder{T}(\eta)\bclosed{1 + \Theta(\vec{k},\mu,\eta)},
 \end{equation}  
-where $\vec{k}$ is the Fourier transformed variable corresponding to position $\vec{x}$, and $\mu\equiv \frac{\vec{k}\cdot\vec{p}}{kp}$. $\Theta$ only depends on the photon momentum in terms of their directions, and are expanded in terms of multipoles as 
+where $\vec{k}$ is the Fourier transformed variable corresponding to position $\vec{x}$, and $\mu\equiv \frac{\vec{k}\cdot\vec{p}}{kp}$. The temperature perturbations only depend on the photon momentum in terms of their directions, and we therefore expand $\Theta$ in terms of multipoles as 
 \begin{equation} \label{eq:M3:theory:theta_ell_multipolse_expansion}
     \Theta_\ell = \frac{i^\ell}{2}\int_{-1}^1 \pl(\mu)\Theta(\mu)\,\dd\mu \Leftrightarrow \Theta(\mu) = \sum_{\ell=0}^{\infty}\frac{2\ell+1}{i^\ell}\Theta_\ell \pl(\mu),
 \end{equation}
-where $\pl(\mu)$ are Legendre polynomials. \note{Explain Fourier space, and its relation to the CMB.} For CDM we denote the density and velocity perturbations as $\dcdm$ and $\vcdm$, respectively, and similarly denote the baryon perturbations as $\db$ and $\vb$.  
+where $\pl(\mu)$ are Legendre polynomials. The most important terms are the monopole, $\Theta_0$, the dipole, $\Theta_1$, and the quadrupole, $\Theta_2$. The monopole is related to the density perturbation of photons, $\dg=4\Theta_0$, and the dipole to the photon velocity, $\vg=-3\Theta_1$. These terms represent the average background temperature, and the temperature fluctuation due to Doppler effects, respectively \note{Check last sentence}.  
+
+For CDM we denote the density and velocity perturbations as $\dcdm$ and $\vcdm$, respectively, and similarly denote the baryon perturbations as $\db$ and $\vb$.  
+
+\note{Fix structure afterwards.}
 
 \subsubsection{Perturbation equations}
 Having introduced the perturbed quantities of interest, the system of ODEs, given in Fourier space, that we will solve are given by \cite[Eq. (22)]{callin} 
@@ -40,7 +44,7 @@ Having introduced the perturbed quantities of interest, the system of ODEs, give
         \Psi &= -\Phi - \frac{12H_0^2}{k^2 a^2} \ogn \Theta_2. \label{eq:M3:theory:perturbation_ODEs_Psi}
     \end{align}
 \end{subequations}
-Compared to \cite[Eq. (22)]{callin}, we have set all terms involving $\Theta_{P\ell}$ and $\mathcal{N}$ to zero, as we neglect polarization and neutrinos. Thus, we have $\Pi=\Theta_2$ \pnote{Mention quadropole}. 
+Compared to \cite[Eq. (22)]{callin}, we have set all terms involving $\Theta_{P\ell}$ and $\mathcal{N}$ to zero, as we neglect polarization and neutrinos. Thus, we have $\Pi=\Theta_2$. 
 
 \Eqref{eq:M3:theory:perturbation_ODEs_Theta_ell_max} comes from \cite[Eq. (49)]{callin}. In \secref{sssec:M3:theory:line_of_sight_integration} we discuss how we can compute any $\Theta_\ell$ from $\Theta_0$ and $\Theta_2$. Due to the recursive expression for $\Theta_\ell'$ we need higher moments to compute $\Theta_2$ accurately. Truncating the series by setting $\Theta_{\ell_\mathrm{max}}=0$ would lead to numerical errors propagating down to $\Theta_2$. The expression for $\Theta_{\ell_\mathrm{max}}$ comes from assuming $\Theta_\ell(k,\eta)\sim j_\ell(k\eta)$ at high $\ell$, together with the recursive relation of $j_\ell(k\eta)$.
 

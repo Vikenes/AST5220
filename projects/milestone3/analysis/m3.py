@@ -118,6 +118,9 @@ class Perturbations:
             pass
         else:
             self.load_delta()
+
+        self.load_Thetas()
+        self.delta_cdm = np.abs(4*self.Theta0)
         ylabel = r"$\delta_\mathrm{CDM},\,\delta_b$"
         ylegends = ["CDM", "baryons"]
         plot.plot_cdm_baryon_for_n_k_values(self.x, self.delta_cdm, self.delta_b, 
@@ -129,7 +132,6 @@ class Perturbations:
                                             ylabel=ylabel, ylim=ylim,
                                             legendloc1='upper left', 
                                             legendloc2='lower right',
-                                            legendloc3='lower left',
                                             figsize=(10,6),
                                             save=SAVE, temp=TEMP)
 
@@ -154,6 +156,63 @@ class Perturbations:
                                           xlim=xlim,
                                           save=SAVE, temp=TEMP)
 
+    def compare_delta_baryon_photon(self, xlim=XLIM, ylim=[1e-2, 1e4]):
+
+        if hasattr(self, 'deltas'):
+            pass
+        else:
+            self.load_delta()
+        
+        if hasattr(self, 'fields'):
+            pass
+        else:
+            self.load_Thetas()
+
+
+        delta_gamma = 4*self.Theta0
+        ylabel = r"$\delta_\gamma,\,\delta_b$"
+        ylegends = ["Photons", "baryons"]
+        k_labels = [self.k_labels[0], self.k_labels[-1]]
+        plot.plot_photon_baryon_for_2_k_values(self.x, delta_gamma, self.delta_b, 
+                                            k_legends=k_labels,
+                                            ylegends=ylegends, 
+                                            fname="deltas",
+                                            xend=self.tc_end,
+                                            xlim=xlim,
+                                            ylabel=ylabel, ylim=ylim,
+                                            legendloc1='upper left', 
+                                            legendloc2='lower right',
+                                            figsize=(10,6),
+                                            save=SAVE, temp=TEMP)
+
+    def compare_vel_baryon_photon(self, xlim=XLIM, ylim=[1e-2, 1e4]):
+
+        if hasattr(self, 'vels'):
+            pass
+        else:
+            self.load_v()
+        
+        if hasattr(self, 'fields'):
+            pass
+        else:
+            self.load_Thetas()
+
+
+        v_gamma = -3 * self.Theta1 
+        ylabel = r"$v_\gamma,\,v_b$"
+        ylegends = ["photons", "baryons"]
+        k_labels = [self.k_labels[0], self.k_labels[-1]]
+        plot.plot_photon_baryon_for_2_k_values(self.x, v_gamma, self.v_b, 
+                                            k_labels,
+                                            ylegends, 
+                                            fname="vel_baryon_photon",
+                                            xend=self.tc_end,
+                                            xlim=xlim,
+                                            ylabel=ylabel, ylim=ylim,
+                                            legendloc1='upper left', 
+                                            legendloc2='lower right',
+                                            figsize=(10,6),
+                                            save=SAVE, temp=TEMP)
 
     def plot_v(self, xlim=XLIM, ylim=[1e-5, 1e3]):
 
@@ -237,6 +296,25 @@ class Perturbations:
                                           log=False,
                                           save=SAVE, temp=TEMP)
     
+    def plot_Psi(self, xlim=XLIM, ylim=[0, 0.7]):
+        """
+        For stupid testing only, not actually using 
+        """
+        if hasattr(self, 'fields'):
+            pass
+        else:
+            self.load_fields()
+
+
+        plot.plot_cdm_baryon_for_n_k_values(x=self.x, y_cdm=self.Psi, y_baryon=self.Phi, 
+                                          k_legends = self.k_labels, ylegends=["psi", "Phi"],
+                                          fname="PsiandPhi",
+                                          xend = self.tc_end,
+                                          xlabel=r"$x$", ylabel=r"$\Phi$",
+                                          ylim=ylim, xlim=xlim, 
+                                          log=False,
+                                          save=SAVE, temp=TEMP)
+
     def plot_Phi_plus_Psi(self, xlim=XLIM, ylim=None):
 
         if hasattr(self, 'fields'):
@@ -323,7 +401,7 @@ p = Perturbations(f1="perturbations_k0.001.txt",
                   f2="perturbations_k0.01.txt",
                   f3="perturbations_k0.1.txt")
 
-SAVE=True
+# SAVE=True
 # TEMP=True
 # p.plot_delta()
 # p.plot_delta_gamma(ylim=[-3, 5])
@@ -332,13 +410,20 @@ SAVE=True
 
 # p.plot_Theta(0, ylim=[-0.8,1], legendloc='lower left')
 # p.plot_Theta(1, ylim=[-0.5, 0.6], legendloc='upper left')
-p.plot_Theta(2, xlim=[-10,0], ylim=[-0.1, 0.2], legendloc='upper right')
+# p.plot_Theta(2, xlim=[-10,0], ylim=[-0.1, 0.2], legendloc='upper right')
 
 # p.plot_Phi()
 # p.plot_Phi_plus_Psi(ylim=[-0.006,0.026])
 
+
+#### MAYBE ########
+p.compare_delta_baryon_photon()
+p.compare_vel_baryon_photon()
+
+
 #### NOT USING ###### 
 # p.plot_delta_gamma(ylim=[1e-2,1e1], yabs=True, log=True) ## Not using 
+# p.plot_Psi(ylim=None)
 
 # p.plot_source_function(xlim=[-7.5,-6], no=1, fname='S_j5_center.pdf')
 # p.plot_source_function(xlim=[-1,0], ylim=[-0.026,0.055], no=1, fname='S_j5_end.pdf')

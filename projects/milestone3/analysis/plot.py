@@ -196,7 +196,6 @@ def plot_cdm_baryon_for_n_k_values(x, y_cdm, y_baryon,
                                    ylim=None, 
                                    legendloc1='best',
                                    legendloc2='best', 
-                                   legendloc3='best', 
                                    yticks=None, 
                                    figsize=(10,6), 
                                    log=True, 
@@ -260,6 +259,68 @@ def plot_cdm_baryon_for_n_k_values(x, y_cdm, y_baryon,
 
     save_push(fig, fname, save, temp=temp)
     
+
+def plot_photon_baryon_for_2_k_values(x, y_photon, y_baryon,
+                                   k_legends, ylegends,
+                                   fname, 
+                                   xend=None,
+                                   xlabel=r"$x$", 
+                                   ylabel=None, 
+                                   xlim=None, 
+                                   ylim=None, 
+                                   legendloc1='best',
+                                   legendloc2='best', 
+                                   yticks=None, 
+                                   figsize=(10,6), 
+                                   log=True, 
+                                   save=True, 
+                                   temp=False):
+
+
+    fig, ax = plt.subplots(figsize=figsize)
+    y_photon1, y_photon2, y_photon3 = np.abs(y_photon)
+    y_baryon1, y_baryon2, y_baryon3 = np.abs(y_baryon)
+    y_photon_legend, y_baryon_legend = ylegends 
+
+    k1_leg, k2_leg = k_legends
+    ax.plot(x, y_photon3, ls='solid' , color='blue', label=k2_leg)
+    ax.plot(x, y_baryon3, ls='dashed', color='blue')
+    ax.plot(x, y_photon1, ls='solid' , color='red', label=k1_leg)
+    ax.plot(x, y_baryon1, ls='dashed', color='red')
+    
+    ax.set_ylim(ylim)
+    ax.set_xlim(xlim)
+
+    if log:
+        ax.set_yscale('log')
+    set_ax_info(ax, xlabel, ylabel, legendloc=legendloc1)
+    # leg1 = ax.legend(loc=legendloc1)
+    plt.gca().add_artist(ax.legend(loc=legendloc1))
+ 
+    solid_line,  = ax.plot([], label=y_photon_legend, c='k', linestyle="-")
+    dashed_line, = ax.plot([], label=y_baryon_legend, c='k', linestyle="--")
+    leg2 = ax.legend([solid_line, dashed_line], ylegends, loc=legendloc2)
+    plt.gca().add_artist(leg2)
+ 
+    end_set = set(xend)
+    lines = []
+    for end in end_set:
+        if ylim is None:
+            ymin_end = np.min(np.abs(y_photon, y_baryon))
+            ymax_end = np.max(np.abs(y_photon, y_baryon))
+            ylim_end = [ymin_end, ymax_end]
+        else:
+            ylim_end = ylim
+        
+        line = ax.vlines(end, *ylim_end, color='black', ls='dotted', lw=2)
+        lines.append(line)
+
+    if yticks is not None:
+        ax.set_yticks(yticks)
+
+    save_push(fig, fname, save, temp=temp)
+    
+
 
 def plot_source_function(x, y,
                          k_legends,
