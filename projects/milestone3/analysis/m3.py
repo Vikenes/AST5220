@@ -18,9 +18,10 @@ data_path = "/home/vetle/Documents/master_studies/subjects/V23/AST5220/projects/
 
 global SAVE 
 global TEMP
+global XLIM
 SAVE        = False 
 TEMP        = False 
-
+XLIM        = [-15, 0]
 
 class Perturbations:
     def __init__(self, 
@@ -111,8 +112,7 @@ class Perturbations:
         self.S_tilde_j500   = self.data[14] 
 
 
-    def plot_delta(self, xlim=[-18,0], ylim=[1e-2, 1e4],
-                                  figname="tbd.pdf"):
+    def plot_delta(self, xlim=XLIM, ylim=[1e-2, 1e4]):
 
         if hasattr(self, 'deltas'):
             pass
@@ -123,7 +123,7 @@ class Perturbations:
         plot.plot_cdm_baryon_for_n_k_values(self.x, self.delta_cdm, self.delta_b, 
                                             self.k_labels,
                                             ylegends, 
-                                            fname="deltas.pdf",
+                                            fname="deltas",
                                             xend=self.tc_end,
                                             xlim=xlim,
                                             ylabel=ylabel, ylim=ylim,
@@ -133,7 +133,8 @@ class Perturbations:
                                             figsize=(10,6),
                                             save=SAVE, temp=TEMP)
 
-    def plot_delta_gamma(self, xlim=[-15,0], ylim=[-2, 4]):
+    def plot_delta_gamma(self, xlim=XLIM, ylim=[-2, 4],
+                         log=False, yabs=False):
 
         if hasattr(self, 'Thetas'):
             pass
@@ -143,18 +144,18 @@ class Perturbations:
         delta_gamma = 4 * self.Theta0
         ylabel = r"$\delta_\gamma$"
 
-        plot.plot_quantity_for_n_k_values(x=self.x, y=np.abs(delta_gamma), 
+        plot.plot_quantity_for_n_k_values(x=self.x, y=delta_gamma, 
                                           k_legends = self.k_labels, 
-                                          fname="delta_gamma.pdf",
+                                          fname="delta_gamma",
                                           xend=self.tc_end,
+                                          absval_of_y=yabs,
                                           xlabel=r"$x$", ylabel=ylabel,
-                                          ylim=ylim, log=True,
+                                          ylim=ylim, log=log,
                                           xlim=xlim,
                                           save=SAVE, temp=TEMP)
 
 
-    def plot_v(self, xlim=[-12,0], ylim=[1e-5, 1e3],
-                                  figname="tbd.pdf"):
+    def plot_v(self, xlim=XLIM, ylim=[1e-5, 1e3]):
 
         if hasattr(self, 'vels'):
             pass
@@ -166,7 +167,7 @@ class Perturbations:
         plot.plot_cdm_baryon_for_n_k_values(self.x, self.v_cdm, self.v_b, 
                                             self.k_labels,
                                             ylegends, 
-                                            fname="vels.pdf",
+                                            fname="vels",
                                             xend=self.tc_end,
                                             ylabel=ylabel, ylim=ylim,
                                             xlim=xlim,
@@ -176,7 +177,7 @@ class Perturbations:
                                             figsize=(10,6),
                                             save=SAVE, temp=TEMP)
         
-    def plot_v_gamma(self, ylim=[-2, 4]):
+    def plot_v_gamma(self, xlim=XLIM, ylim=[-2, 4], log=False, yabs=False):
 
         if hasattr(self, 'Thetas'):
             pass
@@ -188,14 +189,16 @@ class Perturbations:
 
         plot.plot_quantity_for_n_k_values(x=self.x, y=v_gamma, 
                                           k_legends = self.k_labels, 
-                                          fname="v_gamma.pdf",
+                                          fname="v_gamma",
                                           xend=self.tc_end,
+                                          absval_of_y=yabs,
                                           xlabel=r"$x$", ylabel=ylabel,
-                                          ylim=ylim, log=False,
+                                          ylim=ylim, log=log,
+                                          xlim=xlim,
                                           legendloc='upper left',
                                           save=SAVE, temp=TEMP)
     
-    def plot_Theta(self, Theta_number=0, xlim=[-15,0], ylim=[-0.5, 1], legendloc='best'):
+    def plot_Theta(self, Theta_number=0, xlim=XLIM, ylim=[-0.5, 1], legendloc='best'):
 
         if hasattr(self, 'Thetas'):
             pass
@@ -205,7 +208,7 @@ class Perturbations:
         thetas = [self.Theta0, self.Theta1, self.Theta2]
         theta = thetas[Theta_number]
         theta_label = fr"$\Theta_{Theta_number}$"
-        theta_fname = f"Theta{Theta_number}.pdf"
+        theta_fname = f"Theta{Theta_number}"
 
         plot.plot_quantity_for_n_k_values(x=self.x, y=theta, 
                                           k_legends = self.k_labels, 
@@ -217,7 +220,7 @@ class Perturbations:
                                           legendloc=legendloc,
                                           save=SAVE, temp=TEMP)
 
-    def plot_Phi(self, xlim=None, ylim=[0, 0.7]):
+    def plot_Phi(self, xlim=XLIM, ylim=[0, 0.7]):
 
         if hasattr(self, 'fields'):
             pass
@@ -227,14 +230,14 @@ class Perturbations:
 
         plot.plot_quantity_for_n_k_values(x=self.x, y=self.Phi, 
                                           k_legends = self.k_labels, 
-                                          fname="Phi.pdf",
+                                          fname="Phi",
                                           xend = self.tc_end,
                                           xlabel=r"$x$", ylabel=r"$\Phi$",
                                           ylim=ylim, xlim=xlim, 
                                           log=False,
                                           save=SAVE, temp=TEMP)
     
-    def plot_Phi_plus_Psi(self, xlim=None, ylim=None):
+    def plot_Phi_plus_Psi(self, xlim=XLIM, ylim=None):
 
         if hasattr(self, 'fields'):
             pass
@@ -243,10 +246,9 @@ class Perturbations:
 
         y = self.Phi + self.Psi
         ylabel = r"$\Phi + \Psi$"
-        fname = "Phi_plus_Psi.pdf"
         plot.plot_quantity_for_n_k_values(x=self.x, y=y, 
                                           k_legends = self.k_labels, 
-                                          fname=fname,
+                                          fname="Phi_plus_Psi",
                                           xend=self.tc_end,
                                           xlabel=r"$x$", ylabel=ylabel,
                                           ylim=ylim, xlim=xlim, 
@@ -254,7 +256,7 @@ class Perturbations:
                                           legendloc='upper left',
                                           save=SAVE, temp=TEMP)
 
-    def plot_source_function(self, xlim=None, ylim=None, no=0, fname=None):
+    def plot_source_function(self, xlim=XLIM, ylim=None, no=0, fname=None):
         if hasattr(self, 'source'):
             pass
         else:
@@ -262,7 +264,7 @@ class Perturbations:
 
         if no == 0:
             if fname is None:
-                fname = "S_alone.pdf"
+                fname = "S_alone"
             plot.plot_source_function(self.x, self.S_tilde,
                                       k_legends=self.k_labels,
                                       ylabel=r"$\tilde{S}$",
@@ -272,7 +274,7 @@ class Perturbations:
 
         if no == 1:
             if fname is None:
-                fname = "S_j5.pdf"
+                fname = "S_j5"
             plot.plot_source_function(self.x, self.S_tilde_j5, 
                                       k_legends=self.k_labels,
                                       ylabel=r"$\tilde{S} j_5 $",
@@ -282,7 +284,7 @@ class Perturbations:
 
         elif no == 2:
             if fname is None:
-                fname = "S_j50.pdf"
+                fname = "S_j50"
             plot.plot_source_function(self.x, self.S_tilde_j50, 
                                       k_legends=self.k_labels,
                                       ylabel=r"$\tilde{S} j_{50} $",
@@ -296,7 +298,7 @@ class Perturbations:
             # plt.show()
         elif no == 3:
             if fname is None:
-                fname = "S_j500.pdf"
+                fname = "S_j500"
             plot.plot_source_function(self.x, self.S_tilde_j500, 
                                       k_legends=self.k_labels,
                                       ylabel=r"$\tilde{S} j_{500} $",
@@ -311,26 +313,7 @@ class Perturbations:
         else:
             pass     
 
-    def make_table(self, saha=False):
-        if saha:
-            fname = self.rec_dec_saha
-        else:
-            fname = self.rec_dec_file
-
-        x, z, t, r = np.loadtxt(data_path + fname, skiprows=1, usecols=(1,2)) 
-
-        
-        t       = (t * u.s).to(self.time_unit).value 
-        r       = (r * u.m).to(self.length_unit).value
-
-
-        plot.time_table(x, z, t, r,
-                        saha=saha,
-                        save=SAVE,
-                        temp=TEMP)
-
-
-
+   
 
 
 
@@ -340,29 +323,31 @@ p = Perturbations(f1="perturbations_k0.001.txt",
                   f2="perturbations_k0.01.txt",
                   f3="perturbations_k0.1.txt")
 
-# SAVE=True
-# TEMP=True
-# p.plot_delta(xlim=[-15, 0])
-# p.plot_delta_gamma(xlim=[-15,0], ylim=[1e-2,1e1])
-# p.plot_v(xlim=[-15,0])
-# p.plot_v_gamma(ylim=None)
-# p.plot_Theta(0, xlim=[-15,0], ylim=[-0.8,1], legendloc='lower left')
-# p.plot_Theta(1, xlim=[-15,0], ylim=[-0.5, 0.6], legendloc='upper left')
-# p.plot_Theta(2, xlim=[-15,0], ylim=[-0.5, 0.6], legendloc='upper left')
+SAVE=True
+TEMP=True
+# p.plot_delta()
+# p.plot_delta_gamma(ylim=[1e-2,1e1], yabs=True, log=True)
+p.plot_delta_gamma(ylim=[-3, 5])
+# p.plot_v()
+p.plot_v_gamma(ylim=[-1.5,1.5])
 
-# p.plot_Phi([-15,0])
-# p.plot_Phi_plus_Psi(xlim=[-15,0])
+# p.plot_Theta(0, ylim=[-0.8,1], legendloc='lower left')
+# p.plot_Theta(1, ylim=[-0.5, 0.6], legendloc='upper left')
+# p.plot_Theta(2, xlim=[-10,0], ylim=[-0.1, 0.2], legendloc='upper right')
+
+# p.plot_Phi()
+# p.plot_Phi_plus_Psi(ylim=[-0.006,0.026])
 
 
-p.plot_source_function(xlim=[-7.5,-6], no=1, fname='S_j5_center.pdf')
-p.plot_source_function(xlim=[-1,0], ylim=[-0.026,0.055], no=1, fname='S_j5_end.pdf')
+# p.plot_source_function(xlim=[-7.5,-6], no=1, fname='S_j5_center.pdf')
+# p.plot_source_function(xlim=[-1,0], ylim=[-0.026,0.055], no=1, fname='S_j5_end.pdf')
 
-p.plot_source_function(xlim=[-7.5,-6], no=2, fname='S_j50_center.pdf')
-p.plot_source_function(xlim=[-3,0], ylim=[-0.001,0.0015], no=2, fname='S_j50_mid_end.pdf')
-p.plot_source_function(xlim=[-1,0], ylim=[-0.001,0.0015], no=2, fname='S_j50_end.pdf')
+# p.plot_source_function(xlim=[-7.5,-6], no=2, fname='S_j50_center.pdf')
+# p.plot_source_function(xlim=[-3,0], ylim=[-0.001,0.0015], no=2, fname='S_j50_mid_end.pdf')
+# p.plot_source_function(xlim=[-1,0], ylim=[-0.001,0.0015], no=2, fname='S_j50_end.pdf')
 
-p.plot_source_function(xlim=[-7.5,-6], no=3, fname='S_j500_center.pdf')
-p.plot_source_function(xlim=[-5,0], ylim=[-3e-5,6e-5], no=3, fname='S_j500_end.pdf')
+# p.plot_source_function(xlim=[-7.5,-6], no=3, fname='S_j500_center.pdf')
+# p.plot_source_function(xlim=[-5,0], ylim=[-3e-5,6e-5], no=3, fname='S_j500_end.pdf')
 
-p.plot_source_function(xlim=[-7.5,-6], no=0, fname='S_no_l_center.pdf')
-p.plot_source_function(xlim=[-1,0], ylim=[-0.01,0.5], no=0, fname='S_no_l_end.pdf')
+# p.plot_source_function(xlim=[-7.5,-6], no=0, fname='S_no_l_center.pdf')
+# p.plot_source_function(xlim=[-1,0], ylim=[-0.01,0.5], no=0, fname='S_no_l_end.pdf')

@@ -60,13 +60,15 @@ def save_push(fig, pdf_name, save=True, push=False, show=False, tight=True, temp
     if tight:
         fig.tight_layout()
 
+    pdf_name += ".pdf"
+
     if temp:
         fig_name = pdf_name.replace(".pdf", ".png")
         fig_path = png_path
     else: 
         fig_name = pdf_name
         fig_path = pdf_path 
-    
+
     file = fig_path + fig_name
 
 
@@ -139,6 +141,8 @@ def plot_quantity_for_n_k_values(x, y,
                                  k_legends, 
                                  fname, 
                                  xend=None,
+                                 log=True, 
+                                 absval_of_y=False,
                                  xlabel=r"$x$", 
                                  ylabel=None, 
                                  xlim=None, 
@@ -146,12 +150,15 @@ def plot_quantity_for_n_k_values(x, y,
                                  legendloc='best', 
                                  yticks=None, 
                                  figsize=(10,6), 
-                                 log=True, 
                                  save=True, 
                                  temp=False):
 
 
     fig, ax = plt.subplots(figsize=figsize)
+    if absval_of_y:
+        y = np.abs(y)
+        fname += "_abs"
+
     y1, y2, y3 = y 
     k1_leg, k2_leg, k3_leg = k_legends
     ax.plot(x, y1, color='blue'  , label=k1_leg)
@@ -163,13 +170,14 @@ def plot_quantity_for_n_k_values(x, y,
             ylim_vline = [np.min(y), np.max(y)]
         else:
             ylim_vline = ylim  
-        ax.vlines(xend, *ylim_vline, colors='k', ls='--', lw=1)
+        ax.vlines(xend, *ylim_vline, colors='red', ls='--', lw=1)
 
     ax.set_ylim(ylim)
     ax.set_xlim(xlim)
 
     if log:
         ax.set_yscale('log')
+        fname += "_log"
     
     set_ax_info(ax, xlabel, ylabel, legendloc=legendloc)
 
@@ -291,79 +299,6 @@ def plot_source_function(x, y,
     print(f'Showing: {fname}')
     save_push(fig, fname, save, temp=temp)
 
-
-def time_table(x, z, t, r, saha=False, save=False, temp=False):
-   
-
-    if saha:
-        method = "Saha"
-    else:
-        method = "Peebles"
-
-    col_labels = [method, r"$x$", r"$z$", r"$t\,\mathrm{[yr]}$"]
-    col_fmt = "l|ccc"
-
-    if not saha:
-        col_labels.append(r"$r_s \,\mathrm{[Mpc]}$")
-        col_fmt += "c"
-
-    row_labels = [r"Decoupling",
-                  r"Recombination"]
-    
-    t1_ = str(np.round(t[0]))
-    t2_ = str(np.round(t[1]))
-
-    t1 = t1_[0:3] + "\," + t1_[3:6]
-    t2 = t2_[0:3] + "\," + t2_[3:6]
-
-    t = [t1, t2]
-
-    # x = np.round(x,3)
-    z = np.round(z,1)
-
-    if saha:
-        data = np.array([row_labels, x, z, t]).T 
-    else:
-        r = [np.round(r[0],2), " "]
-        
-
-        data = np.array([row_labels, x, z, t, r]).T 
-
-
-    table_caption   = "Times when decoupling and recombination occurs, computed from the " 
-    table_caption   += method + " equation."
-
-    table_name      = "rec_and_dec_time_table_" + method
-    table_label     = "tab:M2:results:" + table_name
-    table_fname     = table_name + ".tex"
-
-    if save:
-        if temp:
-            table_fname = "TEMP" + table_fname
-
-        buffer = latex_path + table_fname 
-    else:
-        buffer = None 
-
-
-    table = pd.DataFrame(data).to_latex(
-            index=False, 
-            header=col_labels, 
-            escape=False, 
-            column_format=col_fmt,
-            caption=table_caption,
-            label=table_label,
-            position="h",
-            buf=buffer
-        )
-
-
-    if save:
-        print(f"Saving time table for {method}:")
-        print(f"   {table_fname}")
-        
-    else:
-        print(table)
 
 
 if __name__=='__main__':
