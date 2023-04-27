@@ -424,17 +424,17 @@ void Perturbations::compute_source_functions(){
       const double ddPi_ddx     = Theta2_spline.deriv_xx(x,k);
 
       // Compute terms in Source function. 
-      const double first_term = g_tilde * (Theta0 + Psi + Pi/4.0);
-      const double second_term = exp(-tau) * (dPsi_dx - dPhi_dx);
-      const double d_Hp_gtilde_vb_dx = dHp_dx * g_tilde * v_b 
+      const double first_term         = g_tilde * (Theta0 + Psi + Pi/4.0);
+      const double second_term        = exp(-tau) * (dPsi_dx - dPhi_dx);
+      const double d_Hp_gtilde_vb_dx  = dHp_dx * g_tilde * v_b 
                                         + Hp * dgdx_tilde * v_b 
                                         + Hp * g_tilde * dvb_dx;
-      const double third_term = - d_Hp_gtilde_vb_dx / ck;
+      const double third_term         = - d_Hp_gtilde_vb_dx / ck;
 
-      const double fourth_term_1 = g_tilde * Pi * (dHp_dx*dHp_dx + Hp * ddHp_ddx);
-      const double fourth_term_2 = 3.0 * Hp * dHp_dx * (dgdx_tilde*Pi + g_tilde * dPi_dx);
-      const double fourth_term_3 = Hp*Hp * (ddgddx_tilde*Pi + 2.0 * dgdx_tilde * dPi_dx + g_tilde*ddPi_ddx);
-      const double fourth_term = 3.0 / (4.0 * ck*ck) * (fourth_term_1+fourth_term_2+fourth_term_3);  
+      const double fourth_term_1      = g_tilde * Pi * (dHp_dx*dHp_dx + Hp * ddHp_ddx);
+      const double fourth_term_2      = 3.0 * Hp * dHp_dx * (dgdx_tilde*Pi + g_tilde * dPi_dx);
+      const double fourth_term_3      = Hp*Hp * (ddgddx_tilde*Pi + 2.0 * dgdx_tilde * dPi_dx + g_tilde*ddPi_ddx);
+      const double fourth_term        = 3.0 / (4.0 * ck*ck) * (fourth_term_1+fourth_term_2+fourth_term_3);  
 
 
       // Temperatur source
