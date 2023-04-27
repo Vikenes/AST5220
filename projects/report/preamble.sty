@@ -1,3 +1,4 @@
+\usepackage{silence}
 \usepackage{graphicx}
 \usepackage{txfonts}
 \usepackage{hyperref}
@@ -8,7 +9,7 @@
 \usepackage{natbib}
 % \usepackage[square,numbers]{natbib}
 \bibpunct{(}{)}{;}{a}{}{,}      
-% \setcitestyle{square,comma,numbers,compress}
+% \setcitestyle{compress}
 
 \usepackage{booktabs}
 \usepackage{array}
@@ -20,6 +21,12 @@
 \renewcommand*\aa@pageof{, page \thepage{} of \pageref*{LastPage}}
 \makeatother
 
+\WarningFilter{natbib}{Citation `Dodelson' multiply defined}
+\WarningFilter{natbib}{Citation `Supernova2014Betoule' multiply defined}
+\WarningFilter{natbib}{Citation `callin' multiply defined}
+\WarningFilter{natbib}{Citation `Planck2020' multiply defined}
+\WarningFilter{natbib}{Citation `gough2009gnu' multiply defined}
+\WarningFilter{natbib}{Citation `winther' multiply defined}
 
 
 

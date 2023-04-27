@@ -1,7 +1,6 @@
 \subsection{Implementation details}\label{ssec:M3:implementations} 
-
 \subsubsection{Tight coupling regime} \label{sssec:M3:implementations:tight_coupling_regime}
-The tight coupling regime is computed with 
+During tight coupling, \Eqref{eq:M3:implementations:TC_ODEs_Theta_1} becomes numerically unstable, since the last term consists of multiplying $\tau'$ with $\Theta_1+v_b/3$, where $\tau'$ is huge, and the latter term is approximately $0$. We therefore have to resort to a numerically stable equation for $\Theta_1 + v_b$. Following \citeauthor{callin}, the tight coupling regime is computed with 
 \begin{subequations} \label{eq:M3:implementations:TC_ODEs}
     \begin{align}
         \varrho q =& -[(1-R)\tau' + (1+R)\tau''](3\Theta_1 + \vb) \nonumber \\
@@ -14,5 +13,19 @@ where we introduced the parameter
 \begin{equation} \label{eq:M3:implementations:q_prefactor}
     \varrho = (1+R)\tau' + \frac{\H'}{\H} - 1.
 \end{equation}
+In the tight coupling regime we use the initial conditions given in \Eqref{eq:M3:theory:pert_ODE_IC}. We then solve the ODEs given in \Eqref{eq:M3:theory:perturbation_ODEs}, but compute $\Theta_1'$ and $v_b'$ in the end by using \Eqref{eq:M3:implementations:TC_ODEs}. In this regime we use Eqs. \Eqref{eq:M3:theory:pert_ODE_IC_Theta2} and \eqref{eq:M3:theory:pert_ODE_IC_Theta_ell} for $\Theta_2$ and $\Theta_\ell$, respectively, as we assume $\Theta_\ell'=0$ for $\ell>2$ \note{Check this}. 
+
+Next, we need to determine when the tight coupling approximation is valid. We use the same conditions as \citeauthor{callin}, namely that the approximation holds as long as $\abs{\tau'}>10$ and $\abs{k/\H\tau'}<1/10$, and that it should not be used after the start of recombination. For the last condition, we choose $x<-8.3$ as the time when recombination starts. If any of these three conditions fails, we switch to the full ODEs. We then use the final results from the tight coupling regime as initial conditions for the ODEs in \Eqref{eq:M3:theory:perturbation_ODEs}, and integrate up to $x=0$. 
+
+\subsubsection{Integration details \pnote{working title}} \label{sssec:M3:implementations:integration_details}
+\note{Write about details regarding integration}
+
+When solving the perturbation ODEs we integrate across $x$ for each mode $k$, where we choose a logarithmic spacing for the $k$ values.   
 
 
+\subsubsection{Source function} \label{sssec:M3:implementations:source_function}
+For the source function, we use values of $k$ distributed quadratically \pnote{explain why} as 
+\begin{equation} \label{eq:M3:implementations:k_distribution_for_source_function}
+    k_i = k_\mathrm{min} + (k_\mathrm{max} - k_\mathrm{min})(i/N_k)^2,
+\end{equation}
+where we use $N_k=100$ value of $k$ \pnote{Check this}.

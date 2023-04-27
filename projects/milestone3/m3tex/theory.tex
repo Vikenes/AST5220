@@ -47,17 +47,17 @@ Compared to \cite[Eq. (22)]{callin}, we have set all terms involving $\Theta_{P\
 The equation for $\Psi$ is an algebraic equation, and its value is inserted in the other equations. Noting that $\Phi'$ is the only derivative of a perturbed quantity found on the RHS of Eqs. \eqref{eq:M3:theory:perturbation_ODEs}, we solve for it first, and insert this value into the other equations. At early times, $\tau'$ is very large, as seen from \figref{fig:M2:results:tau_plot}. Since we're considering small perturbations, this implies that terms multiplied with $\tau'$ should be set to zero in \Eqref{eq:M3:theory:perturbation_ODEs}. This is referred to as the \textit{Tight coupling regime}, where the equations we have to solve are slightly modified. There are also changes that have to be made due to numerical stability at early times. We therefore proceed with the discussion of initial conditions in \secref{ssec:M3:implementations}.
 
 \subsubsection{Initial conditions} \label{sssec:M3:theory:initial_conditions}
-For the initial conditions we follow \cite{winther}, with $f_\nu=0$ as we ommit neutrinos \footnote{Note that Winther has a sign error in his expression for $\Psi$}. The set of ODEs we solve are linear, so we can choose a particular normalization, which we adjust for when computing the Power spectrum later on. The initial conditions are      
+For the initial conditions we follow \cite{winther}, with $f_\nu=0$ as we omit neutrinos\footnote{Note that Winther has a sign error in his expression for $\Psi$}. The set of ODEs we solve are linear, so we can choose a particular normalization, which we adjust for when computing the Power spectrum later on. The initial conditions are      
 \begin{subequations} \label{eq:M3:theory:pert_ODE_IC}
     \begin{align}
-        \Psi &= -\frac{2}{3}, \label{eq:M3:implementations:pert_ODE_IC_Psi} \\
-        \Phi &= - \Psi, \label{eq:M3:implementations:pert_ODE_IC_Phi} \\
-        \dcdm &= \db = -\frac{3}{2}\Psi, \label{eq:M3:implementations:pert_ODE_IC_delta_cdm} \\
-        \vcdm &= \vb = -\frac{k}{2\H} \Psi, \label{eq:M3:implementations:pert_ODE_IC_v_cdm} \\
-        \Theta_0 &= -\frac{1}{2}\Psi, \label{eq:M3:implementations:pert_ODE_IC_Theta0} \\
-        \Theta_1 &= \frac{k}{6\H}\Psi, \label{eq:M3:implementations:pert_ODE_IC_Theta1} \\
-        \Theta_2 &= - \frac{20k}{45\H\tau'}\Theta_1, \label{eq:M3:implementations:pert_ODE_IC_Theta2} \\
-        \Theta_\ell &= - \frac{\ell}{2\ell+1} \frac{k}{\H\tau'}\Theta_{\ell-1}. 
+        \Psi &= -\frac{2}{3}, \label{eq:M3:theory:pert_ODE_IC_Psi} \\
+        \Phi &= - \Psi, \label{eq:M3:theory:pert_ODE_IC_Phi} \\
+        \dcdm &= \db = -\frac{3}{2}\Psi, \label{eq:M3:theory:pert_ODE_IC_delta_cdm} \\
+        \vcdm &= \vb = -\frac{k}{2\H} \Psi, \label{eq:M3:theory:pert_ODE_IC_v_cdm} \\
+        \Theta_0 &= -\frac{1}{2}\Psi, \label{eq:M3:theory:pert_ODE_IC_Theta0} \\
+        \Theta_1 &= \frac{k}{6\H}\Psi, \label{eq:M3:theory:pert_ODE_IC_Theta1} \\
+        \Theta_2 &= - \frac{20k}{45\H\tau'}\Theta_1, \label{eq:M3:theory:pert_ODE_IC_Theta2} \\
+        \Theta_\ell &= - \frac{\ell}{2\ell+1} \frac{k}{\H\tau'}\Theta_{\ell-1} \label{eq:M3:theory:pert_ODE_IC_Theta_ell}. 
     \end{align}
 \end{subequations}
 The expressions for $\Theta_\ell$ for $\ell>1$ comes from the fact that $\tau'$ is very large at early times, which we discuss in the next subsection.
