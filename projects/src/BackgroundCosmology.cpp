@@ -300,6 +300,21 @@ double BackgroundCosmology::get_TCMB(double x) const{
   return TCMB * exp(-x); 
 }
 
+double BackgroundCosmology::get_mr_equality(Vector x_array) const{
+  int nx_mr_eq = x_array.size();
+  Vector Delta_Omega_MR(nx_mr_eq);
+  for (int ix=0; ix<nx_mr_eq; ix++){
+    double x = x_array[ix];
+    Delta_Omega_MR[ix] = get_OmegaR(x) - get_OmegaB(x) - get_OmegaCDM(x);
+  } 
+  double MR_eq = 0.0;
+  Spline Delta_Omega_MR_spline;
+  Delta_Omega_MR_spline.create(x_array, Delta_Omega_MR, "MR_EQ_spline");
+  auto x_range = std::pair<double,double>(x_start, x_end);
+  double x_at_rec = Utils::binary_search_for_value(Delta_Omega_MR_spline, MR_eq, x_range);
+  return x_at_rec;
+}
+
 //====================================================
 // Print out info about the class
 //====================================================

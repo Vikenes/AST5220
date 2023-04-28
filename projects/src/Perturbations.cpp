@@ -40,10 +40,16 @@ Perturbations::Perturbations(
 void Perturbations::solve(){
 
   // Integrate all the perturbation equation and spline the result
+  Utils::StartTiming("integrateperturbation");
   integrate_perturbations();
+  Utils::EndTiming("integrateperturbation");
+
 
   // Compute source functions and spline the result
+  Utils::StartTiming("source");
   compute_source_functions();
+  Utils::EndTiming("source");
+
 }
 
 //====================================================
@@ -51,7 +57,6 @@ void Perturbations::solve(){
 // and spline the results
 //====================================================
 void Perturbations::integrate_perturbations(){
-  Utils::StartTiming("integrateperturbation");
 
   //=============================================================
   // Quantities to store 
@@ -198,7 +203,6 @@ void Perturbations::integrate_perturbations(){
 
 
   }
-  Utils::EndTiming("integrateperturbation");
 
   //=============================================================================
   // TODO: Make all splines needed: Theta0,Theta1,Theta2,Phi,Psi,...
@@ -363,7 +367,6 @@ std::pair<double,int> Perturbations::get_tight_coupling_time(const double k) con
 // source function(s)
 //====================================================
 void Perturbations::compute_source_functions(){
-  Utils::StartTiming("source");
 
   //=============================================================================
   // TODO: Make the x and k arrays to evaluate over and use to make the splines
@@ -446,7 +449,6 @@ void Perturbations::compute_source_functions(){
   ST_spline.create(x_array, k_array, ST_array, "Source_Temp_x_k");
   
 
-  Utils::EndTiming("source");
 }
 
 //====================================================
@@ -754,9 +756,9 @@ void Perturbations::output(const double k, const std::string filename) const{
     fp << get_delta_b(x,k)   << " ";
     fp << get_v_cdm(x,k)     << " ";
     fp << get_v_b(x,k)       << " ";
-    fp << get_Theta(x,k,0)    << " ";
-    fp << get_Theta(x,k,1)    << " ";
-    fp << get_Theta(x,k,2)    << " ";
+    fp << get_Theta(x,k,0)   << " ";
+    fp << get_Theta(x,k,1)   << " ";
+    fp << get_Theta(x,k,2)   << " ";
     fp << get_Phi(x,k)       << " ";
     fp << get_Psi(x,k)       << " ";
     fp << get_Pi(x,k)        << " ";
@@ -767,12 +769,12 @@ void Perturbations::output(const double k, const std::string filename) const{
     fp << "\n";
   };
 
-  std::cout << "Saving n=" << npts << " to '" << filename << "'" << std::endl;
+  std::cout << "Saving n=" << npts << " data points to '" << filename << "'" << std::endl;
 
-  // fp << "x dcdm db vcdm vb Th0 Th1 Th2 Phi Psi Pi \n";
+  double x_mr_eq = cosmo->get_mr_equality(x_array);
   auto end = get_tight_coupling_time(k);
   double xend = end.first; 
-  fp << xend << "\n";
+  fp << xend << " " << x_mr_eq << "\n";
   std::for_each(x_array.begin(), x_array.end(), print_data);
 }
 

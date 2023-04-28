@@ -85,6 +85,8 @@ class BackgroundCosmology{
     double get_luminosity_distance_of_x(double x) const;
     double get_comoving_distance_of_x(double x) const;
 
+
+    double get_mr_equality(Vector x_array) const;
 };
 
 #endif
