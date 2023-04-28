@@ -10,9 +10,6 @@ import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning )
 warnings.filterwarnings("ignore", category=FutureWarning )
 
-
-
-
 #   rc and plot params
 TICKLABELSIZE = 20
 LABELSIZE     = 25
@@ -48,6 +45,12 @@ pdf_path = project_path + "/analysis/figures/"
 png_path = pdf_path + "temp/" 
 
 
+# Global parameters used in all functions 
+global X_MR_EQ
+global K_FIGNAMES
+
+
+
 def save_push(fig, pdf_name, save=True, push=False, show=False, tight=True, temp=False):
     """
     This function handles whether you want to show,
@@ -59,7 +62,7 @@ def save_push(fig, pdf_name, save=True, push=False, show=False, tight=True, temp
     """
     if tight:
         fig.tight_layout()
-
+    pdf_name += K_FIGNAMES
     pdf_name += ".pdf"
 
     if temp:
@@ -136,7 +139,6 @@ def load(file, folder=data_path, skiprows=0):
     return np.loadtxt(folder + file, unpack=True, skiprows=skiprows)
 
 
-
 def plot_quantity_for_n_k_values(x, y,
                                  k_legends, 
                                  fname, 
@@ -171,6 +173,8 @@ def plot_quantity_for_n_k_values(x, y,
         else:
             ylim_vline = ylim  
         ax.vlines(xend, *ylim_vline, colors='black', ls='dotted', lw=2)
+        ax.vlines(X_MR_EQ, *ylim_vline, color='red', ls='dotted', lw=2)
+
 
     ax.set_ylim(ylim)
     ax.set_xlim(xlim)
@@ -243,16 +247,16 @@ def plot_cdm_baryon_for_n_k_values(x, y_cdm, y_baryon,
     plt.gca().add_artist(leg2)
  
     end_set = set(xend)
-    lines = []
-    end_leg = ["Tight coupling"]
     for end in end_set:
         if ylim is None:
             ylim_end = [np.min(np.abs(y_cdm, y_baryon)), np.max(np.abs(y_cdm, y_baryon))]
         else:
             ylim_end = ylim
         
-        line = ax.vlines(end, *ylim_end, color='black', ls='dotted', lw=2, label=end_leg)
-        lines.append(line)
+        ax.vlines(end, *ylim_end, color='black', ls='dotted', lw=2)
+        
+        ax.vlines(X_MR_EQ, *ylim_end, color='red', ls='dotted', lw=2)
+
 
     if yticks is not None:
         ax.set_yticks(yticks)
@@ -303,7 +307,6 @@ def plot_photon_baryon_for_2_k_values(x, y_photon, y_baryon,
     plt.gca().add_artist(leg2)
  
     end_set = set(xend)
-    lines = []
     for end in end_set:
         if ylim is None:
             ymin_end = np.min(np.abs(y_photon, y_baryon))
@@ -312,8 +315,9 @@ def plot_photon_baryon_for_2_k_values(x, y_photon, y_baryon,
         else:
             ylim_end = ylim
         
-        line = ax.vlines(end, *ylim_end, color='black', ls='dotted', lw=2)
-        lines.append(line)
+        ax.vlines(end, *ylim_end, color='black', ls='dotted', lw=2)
+        ax.vlines(X_MR_EQ, *ylim_end, color='red', ls='dotted', lw=2)
+
 
     if yticks is not None:
         ax.set_yticks(yticks)

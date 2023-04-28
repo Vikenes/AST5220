@@ -37,6 +37,9 @@ class Perturbations:
         # Make labels for plotting 
         mpc_label     = r"\mathrm{Mpc}"
         self.k_labels = [rf"$k={k}/{mpc_label}$" for k in self.k_vals]
+        k_fignames    =  [s.split("=")[1].split("/")[0][2:] for s in self.k_labels]
+        k_fnames = "_k_" + "_".join(k_fignames)
+        plot.K_FIGNAMES = k_fnames
 
 
         self.data           = self.load_data(self.file_dict)
@@ -45,10 +48,9 @@ class Perturbations:
         self.length_unit    = length_unit
         self.time_unit      = time_unit
 
-        self.tc_end = np.array([float(np.loadtxt(data_path + f, max_rows=1)) for f in files])
 
-        # self.tc_end = np.array(list(set(tc_end)))
-
+        self.load_tc_end_and_mr_eq(files)
+        plot.X_MR_EQ = self.mr_eq
 
     def make_file_dictionary(self, filenames):
         self.k_vals = []
@@ -58,8 +60,14 @@ class Perturbations:
                 k_val = float(file.split("_")[1][:-4][1:])
                 self.k_vals.append(k_val)
                 file_dict[k_val] = file 
-
         return file_dict 
+    
+    def load_tc_end_and_mr_eq(self, files):
+        self.tc_end = np.array([float(np.loadtxt(data_path + f, max_rows=1, usecols=0)) for f in files])
+        self.mr_eq  = float(np.loadtxt(data_path + files[0], max_rows=1, usecols=1))
+
+
+
     
     def load_data_from_txt(self, filename, skiprows=1):
         return np.loadtxt(data_path + filename, unpack=True, skiprows=skiprows) 
@@ -119,8 +127,6 @@ class Perturbations:
         else:
             self.load_delta()
 
-        self.load_Thetas()
-        self.delta_cdm = np.abs(4*self.Theta0)
         ylabel = r"$\delta_\mathrm{CDM},\,\delta_b$"
         ylegends = ["CDM", "baryons"]
         plot.plot_cdm_baryon_for_n_k_values(self.x, self.delta_cdm, self.delta_b, 
@@ -232,7 +238,6 @@ class Perturbations:
                                             xlim=xlim,
                                             legendloc1='upper left', 
                                             legendloc2='lower right',
-                                            legendloc3='upper right',
                                             figsize=(10,6),
                                             save=SAVE, temp=TEMP)
         
@@ -401,29 +406,30 @@ p = Perturbations(f1="perturbations_k0.001.txt",
                   f2="perturbations_k0.01.txt",
                   f3="perturbations_k0.1.txt")
 
+p2 = Perturbations(f1="perturbations_k0.003.txt",
+                   f2 ="perturbations_k0.03.txt",
+                   f3  ="perturbations_k0.3.txt")
 # SAVE=True
 # TEMP=True
-# p.plot_delta()
-# p.plot_delta_gamma(ylim=[-3, 5])
-# p.plot_v()
-# p.plot_v_gamma(ylim=[-1.5,1.5])
-
-# p.plot_Theta(0, ylim=[-0.8,1], legendloc='lower left')
-# p.plot_Theta(1, ylim=[-0.5, 0.6], legendloc='upper left')
-# p.plot_Theta(2, xlim=[-10,0], ylim=[-0.1, 0.2], legendloc='upper right')
-
-# p.plot_Phi()
-# p.plot_Phi_plus_Psi(ylim=[-0.006,0.026])
-
+p2.plot_delta()
+p2.plot_delta_gamma(ylim=[-3, 5])
+p2.plot_v()
+p2.plot_v_gamma(ylim=[-1.5,1.5])
+p2.plot_Theta(2, xlim=[-10,0], ylim=[-0.1, 0.2], legendloc='upper right')
+p2.plot_Phi()
+p2.plot_Phi_plus_Psi(ylim=[-0.006,0.026])
 
 #### MAYBE ########
-p.compare_delta_baryon_photon()
-p.compare_vel_baryon_photon()
+# p.compare_delta_baryon_photon()
+# p.compare_vel_baryon_photon()
+
 
 
 #### NOT USING ###### 
 # p.plot_delta_gamma(ylim=[1e-2,1e1], yabs=True, log=True) ## Not using 
 # p.plot_Psi(ylim=None)
+# p.plot_Theta(0, ylim=[-0.8,1], legendloc='lower left')
+# p.plot_Theta(1, ylim=[-0.5, 0.6], legendloc='upper left')
 
 # p.plot_source_function(xlim=[-7.5,-6], no=1, fname='S_j5_center.pdf')
 # p.plot_source_function(xlim=[-1,0], ylim=[-0.026,0.055], no=1, fname='S_j5_end.pdf')
