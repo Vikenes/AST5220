@@ -152,7 +152,8 @@ def plot_quantity_for_n_k_values(x, y,
                                  legendloc='best', 
                                  yticks=None, 
                                  figsize=(10,6), 
-                                 save=True, 
+                                 save=True,
+                                 push=False, 
                                  temp=False):
 
 
@@ -173,7 +174,6 @@ def plot_quantity_for_n_k_values(x, y,
         else:
             ylim_vline = ylim  
         ax.vlines(xend, *ylim_vline, colors='black', ls='dotted', lw=2)
-        ax.vlines(X_MR_EQ, *ylim_vline, color='red', ls='dotted', lw=2)
 
 
     ax.set_ylim(ylim)
@@ -188,7 +188,7 @@ def plot_quantity_for_n_k_values(x, y,
     if yticks is not None:
         ax.set_yticks(yticks)
 
-    save_push(fig, fname, save, temp=temp)
+    save_push(fig, fname, save, push, temp=temp)
     
 def plot_cdm_baryon_for_n_k_values(x, y_cdm, y_baryon,
                                    k_legends, ylegends,
@@ -204,6 +204,7 @@ def plot_cdm_baryon_for_n_k_values(x, y_cdm, y_baryon,
                                    figsize=(10,6), 
                                    log=True, 
                                    save=True, 
+                                   push=False,
                                    temp=False):
 
 
@@ -255,13 +256,12 @@ def plot_cdm_baryon_for_n_k_values(x, y_cdm, y_baryon,
         
         ax.vlines(end, *ylim_end, color='black', ls='dotted', lw=2)
         
-        ax.vlines(X_MR_EQ, *ylim_end, color='red', ls='dotted', lw=2)
 
 
     if yticks is not None:
         ax.set_yticks(yticks)
 
-    save_push(fig, fname, save, temp=temp)
+    save_push(fig, fname, save, push, temp=temp)
     
 
 def plot_photon_baryon_for_2_k_values(x, y_photon, y_baryon,
@@ -277,20 +277,36 @@ def plot_photon_baryon_for_2_k_values(x, y_photon, y_baryon,
                                    yticks=None, 
                                    figsize=(10,6), 
                                    log=True, 
+                                   yabs=True,
                                    save=True, 
+                                   push=False,
                                    temp=False):
 
 
     fig, ax = plt.subplots(figsize=figsize)
-    y_photon1, y_photon2, y_photon3 = np.abs(y_photon)
-    y_baryon1, y_baryon2, y_baryon3 = np.abs(y_baryon)
+    if yabs:
+        y_photon = np.abs(y_photon)
+        y_baryon = np.abs(y_baryon)
+
+    y_photon1, y_photon2, y_photon3 = y_photon
+    y_baryon1, y_baryon2, y_baryon3 = y_baryon
     y_photon_legend, y_baryon_legend = ylegends 
 
-    k1_leg, k2_leg = k_legends
-    ax.plot(x, y_photon3, ls='solid' , color='blue', label=k2_leg)
-    ax.plot(x, y_baryon3, ls='dashed', color='blue')
-    ax.plot(x, y_photon1, ls='solid' , color='red', label=k1_leg)
-    ax.plot(x, y_baryon1, ls='dashed', color='red')
+    k1_leg, k2_leg, k3_leg = k_legends
+    leg_baryon_k1 = r"$v_b,\:$" + k1_leg
+    leg_photon_k1 = r"$v_\gamma,\:$" + k1_leg
+    leg_baryon_k2 = r"$v_b,\:$" + k2_leg
+    leg_photon_k2 = r"$v_\gamma,\:$" + k2_leg
+    leg_baryon_k3 = r"$v_b,\:$" + k3_leg
+    leg_photon_k3 = r"$v_\gamma,\:$" + k3_leg
+
+    ax.plot(x, y_baryon1, ls='solid' , color='blue', label=k1_leg)
+    ax.plot(x, y_photon1, ls='dashed', color='blue')
+    ax.plot(x, y_baryon2, ls='solid' , color='red',  label=k2_leg)
+    ax.plot(x, y_photon2, ls='dashed', color='red')
+    ax.plot(x, y_baryon3, ls='solid' , color='green',label=k3_leg)
+    ax.plot(x, y_photon3, ls='dashed', color='green')
+
     
     ax.set_ylim(ylim)
     ax.set_xlim(xlim)
@@ -305,7 +321,8 @@ def plot_photon_baryon_for_2_k_values(x, y_photon, y_baryon,
     dashed_line, = ax.plot([], label=y_baryon_legend, c='k', linestyle="--")
     leg2 = ax.legend([solid_line, dashed_line], ylegends, loc=legendloc2)
     plt.gca().add_artist(leg2)
- 
+
+
     end_set = set(xend)
     for end in end_set:
         if ylim is None:
@@ -316,13 +333,12 @@ def plot_photon_baryon_for_2_k_values(x, y_photon, y_baryon,
             ylim_end = ylim
         
         ax.vlines(end, *ylim_end, color='black', ls='dotted', lw=2)
-        ax.vlines(X_MR_EQ, *ylim_end, color='red', ls='dotted', lw=2)
 
 
     if yticks is not None:
         ax.set_yticks(yticks)
 
-    save_push(fig, fname, save, temp=temp)
+    save_push(fig, fname, save, push, temp=temp)
     
 
 
