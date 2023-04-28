@@ -1,15 +1,17 @@
 \subsection{Results}\label{ssec:M3:results}
-In this section we present plots showing the evolution of some perturbation quantities. In Figs. \ref{fig:M3:results:deltas}-\ref{fig:M3:results:Theta2} we indicate the time when tight coupling end by a dotted black vertical line. The modes we have chosen to include in these results are $k=\Bclosed{0.001\mathrm{Mpc},0.01\mathrm{Mpc},0.1\mathrm{Mpc}}$.
+In this section we present plots showing the evolution of some perturbation quantities. The modes we have chosen to include in these results are $k=\Bclosed{0.001,\,0.01,\,0.1}/\mathrm{Mpc}$.
+In Figs. \ref{fig:M3:results:deltas}-\ref{fig:M3:results:Theta2} we indicate the time when tight coupling end by a dotted black vertical line. This occurs for $x=-8.3$ for all three values of $k$. The density component that dominates the Universe is crucial to understand the evolution of the perturbations. The most important one for this discussion is matter-radiation equality, which takes place at $x_\mathrm{eq}=-8.132$, as given in \tabref{tab:M1:results:time_values}.    
 
 %===== overdensities =========
-\subsubsection{Matter perturbations} \label{sssec:M3:results:matter_perturbations}
+\subsubsection{Density perturbations} \label{sssec:M3:results:matter_perturbations}
 We begin by plotting the velocity and density evolution for the matter components, shown in \figref{fig:M3:results:deltas} and \ref{fig:M3:results:vels}, respectively. In both figures, we see that the baryons and CDM follow each other initially, before recombination starts. During recombination, we see that the baryons deviate from the CDM on small scales. This is expected, as pressure from photons will counteract the gravitational collapse of baryons on small scales initially. As the baryon density drops \note{they cool and collapse back in again, until the photons push them out again. This causes the oscillating features seen in both figures}. 
 
 As we approach $x=-6$, the Universe is mostly neutral, as seen from \figref{fig:M2:results:recombination_compare_Xe_peebles_saha}, and baryons are able to fall freely into the CDM potential wells, and we therefore have $\dcdm\sim\db$ during later times. 
 
 For the larger scales, CDM collapses much later. At this point the Universe is already transparent, so baryons simply follow the CDM without oscillating. 
 \begin{figure}[ht!]
-    \includefig{deltas}
+    \includefig{deltas_k_001_01_1}
+    \includefig{delta_gamma_k_001_01_1}
     \caption{Time evolution of $\dcdm$ (solid line) and $\db$ (dashed line) for three different modes. Long before and long after recombination, the two species follow each other closely. Around the epoch of recombination we see large fluctuations for the baryons, particularly for the highest k-mode, i.e. the smallest scales.}
     \label{fig:M3:results:deltas}
 \end{figure}
@@ -17,20 +19,20 @@ For the larger scales, CDM collapses much later. At this point the Universe is a
 For the velocities, we see a similar behaviour between the baryons and CDM as we did for the density. \note{Write more here later} 
 
 \begin{figure}[ht!]
-    \includefig{vels}
+    \includefig{vels_k_001_01_1}
     \caption{Evolution of $\vcdm$ (solid line) and $\vb$ (dashed line) for three different modes. The most evident deviation between the baryons and CDM is for the largest mode.}
     \label{fig:M3:results:vels}
 \end{figure}
 
 \note{Maybe I should plot baryons and photons together}
 \begin{figure}[ht!]
-    \includefig{delta_gamma}
+    \includefig{delta_gamma_k_001_01_1}
     \caption{Time evolution of $\dg$ for three different modes. }
     \label{fig:M3:results:delta_gamma}
 \end{figure}
 
 \begin{figure}[ht!]
-    \includefig{v_gamma}
+    \includefig{v_gamma_k_001_01_1}
     \caption{Evolution of $\vg$.}
     \label{fig:M3:results:v_gamma}
 \end{figure}
@@ -38,14 +40,14 @@ For the velocities, we see a similar behaviour between the baryons and CDM as we
 \subsubsection{Metric perturbations} \label{sssec:M3:results:metric_perturbations}
 The evolution of $\Phi$ is shown in \figref{fig:M3:results:Phi}. 
 \begin{figure}[ht!]
-    \includefig{Phi}
+    \includefig{Phi_k_001_01_1}
     \caption{Evolution of $\Phi$.}
     \label{fig:M3:results:Phi}
 \end{figure}
 
 
 \begin{figure}[ht!]
-    \includefig{Phi_plus_Psi}
+    \includefig{Phi_plus_Psi_k_001_01_1}
     \caption{Evolution of the combined metric perturbations, $\Phi+\Psi$}
     \label{fig:M3:results:Phi_plus_Psi}
 \end{figure}
@@ -53,7 +55,7 @@ The evolution of $\Phi$ is shown in \figref{fig:M3:results:Phi}.
 
 
 \begin{figure}[ht!]
-    \includefig{Theta2}
+    \includefig{Theta2_k_001_01_1}
     \caption{Evolution of the quadrupole, $\Theta_2$. At $x<-10$, there is no apparent contribution of this quantity.}
     \label{fig:M3:results:Theta2}
 \end{figure}
