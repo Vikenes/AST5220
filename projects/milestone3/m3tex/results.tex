@@ -1,15 +1,18 @@
 \subsection{Results}\label{ssec:M3:results}
 
-In this section we present plots showing the evolution of some perturbation quantities. For the monopole and dipole, we express plot these in terms of $\dg$ and $\vg$, respectively. The modes we have chosen to include in these results are $$k=\Bclosed{0.001,\,0.01,\,0.1}/\mathrm{Mpc} \text{\note{ Fix this}}$$
+In this section we present plots showing the evolution of some perturbation quantities. For the monopole and dipole, we express plot these in terms of $\dg$ and $\vg$, respectively. 
 
-In Figs. \ref{fig:M3:results:deltas}-\ref{fig:M3:results:Theta2} we indicate the time when tight coupling end by a dotted black vertical line. This occurs for $x=-8.3$ for all three values of $k$. The density component that dominates the Universe is crucial to understand the evolution of the perturbations. The most important one for this discussion is matter-radiation equality, which takes place at $x_\mathrm{eq}=-8.132$, as given in \tabref{tab:M1:results:time_values}. For brevity, we will from now on refer to modes with large $k$ as \textit{short modes} and modes with small $k$ as \textit{long modes}.     
+For easier comparison between overdensities, we compare $\db$ with $\dcdm$ and $\dg$ in to separate plots, shown in the upper and lower panel in \figref{fig:M3:results:deltas} 
+
+In Figs. \ref{fig:M3:results:deltas}-\ref{fig:M3:results:Theta2} we indicate the time when tight coupling end by a dotted black vertical line. This occurs for $x=-8.3$ for all three values of $k$ \pnote{Fix this sentence}. The density component that dominates the Universe is crucial to understand the evolution of the perturbations. The most important one for this discussion is matter-radiation equality, which takes place at $x_\mathrm{eq}=-8.132$, as given in \tabref{tab:M1:results:time_values}. Since it is so close to the 
+ For brevity, we will from now on refer to modes with large $k$ as \textit{short modes} and modes with small $k$ as \textit{long modes}.     
 
 %===== overdensities =========
 \subsubsection{Density perturbations} \label{sssec:M3:results:density_perturbations}
 We begin by plotting the density evolution for the matter components and photons, shown in the upper and lower panel of \figref{fig:M3:results:deltas}, respectively. We see that the baryons and CDM follow each other closely during the tight coupling regime, and that the $\db$ deviates noticeably from $\dcdm$ during recombination for the shortest mode. On small scales we will initially have overdense regions of CDM undergoing gravitational collapse. This will attract baryons which will fall into the CDM potential wells. As baryons collapse, pressure from photons will increase and push the baryons outwards again. This will repeat until recombination occurs, after which the photons move freely, and baryons can collapse into the gravitational wells set up by CDM. Comparing the short mode in the upper and lower panel in \figref{fig:M3:results:deltas}, we see a manifestation of this process, where $\db$ and $\dg$ oscillates periodically with $\dg$ being somewhat delayed with respect to $\db$. For the longest modes, gravitational collapse doesn't occur until after recombination has happened, and baryons thus follow the CDM at all times.  
 \begin{figure}[ht!]
-    \includefig{deltas_k_001_01_1}
-    \includefig{delta_gamma_k_001_01_1}
+    \includefig{deltas\kmodesplot}
+    \includefig{delta_baryon_photon\kmodesplot} 
     \caption{Upper panel: Time evolution of $\dcdm$ (solid line) and $\db$ (dashed line) for three different modes. Lower panel: Evolution of $\dg=4\Theta_0$}
     \label{fig:M3:results:deltas}
 \end{figure}
@@ -19,30 +22,32 @@ We begin by plotting the density evolution for the matter components and photons
 For the velocities, we see in \figref{fig:M3:results:vel_CDM_b} similar behaviour between CDM and baryons as we did for the densities. 
 
 \begin{figure}[ht!]
-    \includefig{vels_k_001_01_1}
+    \includefig{vels\kmodesplot}
+    \includefig{vel_baryon_photon\kmodesplot}
     \caption{Evolution of $\vcdm$ (solid line) and $\vb$ (dashed line) for three different modes.}
     \label{fig:M3:results:vel_CDM_b}
 \end{figure}
 
-In \figref{fig:M3:results:vel_photon_b} we plot $\vb$ and $\vg$ using a linear scale. At early times, during the tight coupling regime, we have $\vb=\vg$. We see that decoupling between photons and baryons is evident for all three modes of consideration here.  
+In \note{figure \text{vel\_baryon\_photon\_k\_001\_01\_1} (I removed it)} we plot $\vb$ and $\vg$ using a linear scale. At early times, during the tight coupling regime, we have $\vb=\vg$. We see that decoupling between photons and baryons is evident for all three modes of consideration here.  
 
-\begin{figure}[ht!]
-    \includefig{vel_baryon_photon_k_001_01_1}
-    \caption{Evolution of $\vb$ (solid line) and $\vg$ (dashed line) for three different modes.}
-    \label{fig:M3:results:vel_photon_b}
-\end{figure}
+
+% \begin{figure}[ht!]
+%     \includefig{vel_baryon_photon_k_001_01_1}
+%     \caption{Evolution of $\vb$ (solid line) and $\vg$ (dashed line) for three different modes.}
+%     \label{fig:M3:results:vel_photon_b}
+% \end{figure}
 
 \subsubsection{Potential perturbations} \label{sssec:M3:results:metric_perturbations}
 The evolution of $\Phi$ is shown in \figref{fig:M3:results:Phi}. The short modes enter the horizon during radiation domination, where the potential begins to decay and oscillate, as expected \pnote{cite}. For all three modes we have $\Phi$ approximately constant during matter domination, as predicted \pnote{cite}. The decay we see towards the end for all three modes are due to dark energy beginning to dominate. 
 \begin{figure}[ht!]
-    \includefig{Phi_k_001_01_1}
+    \includefig{Phi\kmodesplot}
     \caption{Evolution of $\Phi$.}
     \label{fig:M3:results:Phi}
 \end{figure}
 
 
 \begin{figure}[ht!]
-    \includefig{Phi_plus_Psi_k_001_01_1}
+    \includefig{Phi_plus_Psi\kmodesplot}
     \caption{Evolution of the combined metric perturbations, $\Phi+\Psi$}
     \label{fig:M3:results:Phi_plus_Psi}
 \end{figure}
@@ -50,7 +55,7 @@ The evolution of $\Phi$ is shown in \figref{fig:M3:results:Phi}. The short modes
 
 
 \begin{figure}[ht!]
-    \includefig{Theta2_k_001_01_1}
+    \includefig{Theta2\kmodesplot}
     \caption{Evolution of the quadrupole, $\Theta_2$. At $x<-10$, there is no apparent contribution of this quantity.}
     \label{fig:M3:results:Theta2}
 \end{figure}

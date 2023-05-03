@@ -20,10 +20,14 @@ global SAVE
 global PUSH
 global TEMP
 global XLIM
+global MREQ
+global TCEND 
 SAVE        = False 
 PUSH        = False
 TEMP        = False 
 XLIM        = [-15, 0]
+MREQ        = True 
+TCEND       = False 
 
 class Perturbations:
     def __init__(self, 
@@ -52,7 +56,6 @@ class Perturbations:
 
 
         self.load_tc_end_and_mr_eq(files)
-        plot.X_MR_EQ = self.mr_eq
 
     def make_file_dictionary(self, filenames):
         self.k_vals = []
@@ -132,6 +135,7 @@ class Perturbations:
         ylabel = r"$\delta_\mathrm{CDM},\,\delta_b$"
         ylegends = ["CDM", "baryons"]
         plot.K_FIGNAMES = self.k_fnames
+        
         plot.plot_cdm_baryon_for_n_k_values(self.x, self.delta_cdm, self.delta_b, 
                                             self.k_labels,
                                             ylegends, 
@@ -186,12 +190,12 @@ class Perturbations:
         plot.plot_photon_baryon_for_2_k_values(self.x, delta_gamma, self.delta_b, 
                                             k_legends=k_labels,
                                             ylegends=ylegends, 
-                                            fname="deltas",
+                                            fname="delta_baryon_photon",
                                             xend=self.tc_end,
                                             xlim=xlim,
                                             ylabel=ylabel, ylim=ylim,
                                             legendloc1='upper left', 
-                                            legendloc2='lower right',
+                                            legendloc2='lower left',
                                             figsize=(10,6),
                                             save=SAVE, push=PUSH, temp=TEMP)
 
@@ -417,12 +421,12 @@ class Perturbations:
 #                   f2="perturbations_k0.01.txt",
 #                   f3="perturbations_k0.1.txt")
 
-p = Perturbations(f1="perturbations_k0.001.txt",
+p = Perturbations(f1="perturbations_k0.003.txt",
                    f2 ="perturbations_k0.03.txt",
                    f3  ="perturbations_k0.3.txt")
 SAVE=True
-# PUSH=True
-TEMP=True
+PUSH=True
+# TEMP=True
 
 p.plot_delta()
 p.plot_v()

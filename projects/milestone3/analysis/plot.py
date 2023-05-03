@@ -48,6 +48,7 @@ png_path = pdf_path + "temp/"
 # Global parameters used in all functions 
 global X_MR_EQ
 global K_FIGNAMES
+X_MR_EQ = -8.6577 
 
 
 
@@ -168,13 +169,11 @@ def plot_quantity_for_n_k_values(x, y,
     ax.plot(x, y2, color='red', label=k2_leg)
     ax.plot(x, y3, color='green' , label=k3_leg)
 
-    if xend is not None:
-        if ylim is None:
-            ylim_vline = [np.min(y), np.max(y)]
-        else:
-            ylim_vline = ylim  
-        ax.vlines(xend, *ylim_vline, colors='black', ls='dotted', lw=2)
-
+    if ylim is None:
+        ylim_vline = [np.min(y), np.max(y)]
+    else:
+        ylim_vline = ylim  
+    ax.vlines(X_MR_EQ, *ylim_vline, colors='black', ls='dotted', lw=2)
 
     ax.set_ylim(ylim)
     ax.set_xlim(xlim)
@@ -247,15 +246,15 @@ def plot_cdm_baryon_for_n_k_values(x, y_cdm, y_baryon,
     leg2 = ax.legend([solid_line, dashed_line], ylegends, loc=legendloc2)
     plt.gca().add_artist(leg2)
  
-    end_set = set(xend)
-    for end in end_set:
-        if ylim is None:
-            ylim_end = [np.min(np.abs(y_cdm, y_baryon)), np.max(np.abs(y_cdm, y_baryon))]
-        else:
-            ylim_end = ylim
+    # end_set = set(xend)
+
+    # for end in end_set:
+    if ylim is None:
+        ylim_end = [np.min(np.abs(y_cdm, y_baryon)), np.max(np.abs(y_cdm, y_baryon))]
+    else:
+        ylim_end = ylim
         
-        ax.vlines(end, *ylim_end, color='black', ls='dotted', lw=2)
-        
+    ax.vlines(X_MR_EQ, *ylim_end, color='black', ls='dotted', lw=2)
 
 
     if yticks is not None:
@@ -323,16 +322,14 @@ def plot_photon_baryon_for_2_k_values(x, y_photon, y_baryon,
     plt.gca().add_artist(leg2)
 
 
-    end_set = set(xend)
-    for end in end_set:
-        if ylim is None:
-            ymin_end = np.min(np.abs(y_photon, y_baryon))
-            ymax_end = np.max(np.abs(y_photon, y_baryon))
-            ylim_end = [ymin_end, ymax_end]
-        else:
-            ylim_end = ylim
+    if ylim is None:
+        ymin_end = np.min(np.abs(y_photon, y_baryon))
+        ymax_end = np.max(np.abs(y_photon, y_baryon))
+        ylim_end = [ymin_end, ymax_end]
+    else:
+        ylim_end = ylim
         
-        ax.vlines(end, *ylim_end, color='black', ls='dotted', lw=2)
+    ax.vlines(X_MR_EQ, *ylim_end, color='black', ls='dotted', lw=2)
 
 
     if yticks is not None:

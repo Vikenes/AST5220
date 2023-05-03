@@ -29,7 +29,7 @@ With $\ne$ we can then solve \Eqref{eq:M2:theory:tau_ODE} for $\tau(x)$ with the
 
 We also need the second derivative of $\tau$, as well as the first two derivatives of $\g$. For $\tau''(x)$, we compute it from numerically differentiating the $\tau'(x)$ data. \footnote{Couldn't we just compute it analytically? I get a tiny "bump" in $\tau''$ near $X_e^\mathrm{tol}$, and I don't know if this will cause problems later on, and therefore didn't want to spend too much time on it if wasn't needed.} We use this to compute 
 \begin{equation} \label{eq:M2:implementations:dg_dx}
-    \g'(x) = \vclosed{\tau'(x)^2 - \tau''(x)} e^{-\tau(x)}, 
+    \g'(x) = \pclosed{\tau'(x)^2 - \tau''(x)} e^{-\tau(x)}, 
 \end{equation}
 and obtain $\g''(x)$ by numerically differentiating $\g'(x)$. This is done to avoid potential errors that may occur when numerically computing the second derivative of $\g(x)$, if $\g(x)$ is somewhat ill-behaved at certain times. \footnote{I don't know if this is useful, or helps, at all. I don't know if we care about the derivatives at $x$-values where this might be an issue.} 
 
