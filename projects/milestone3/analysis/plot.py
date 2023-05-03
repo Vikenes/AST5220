@@ -215,12 +215,12 @@ def plot_cdm_baryon_for_n_k_values(x, y_cdm, y_baryon,
 
     # k1, k2, k3 = k 
     k1_leg, k2_leg, k3_leg = k_legends
-    ax.plot(x, y_cdm1   , ls='solid' , color='blue'  , label=k1_leg)
     ax.plot(x, y_baryon1, ls='dashed', color='blue'  )
-    ax.plot(x, y_cdm2   , ls='solid' , color='red', label=k2_leg)
     ax.plot(x, y_baryon2, ls='dashed', color='red')
-    ax.plot(x, y_cdm3   , ls='solid' , color='green' , label=k3_leg)
     ax.plot(x, y_baryon3, ls='dashed', color='green' )
+    ax.plot(x, y_cdm1   , ls='solid' , color='blue'  , label=k1_leg)
+    ax.plot(x, y_cdm2   , ls='solid' , color='red', label=k2_leg)
+    ax.plot(x, y_cdm3   , ls='solid' , color='green' , label=k3_leg)
 
 
     
@@ -293,12 +293,12 @@ def plot_photon_baryon_for_2_k_values(x, y_photon, y_baryon,
     y_photon_legend, y_baryon_legend = ylegends 
 
     k1_leg, k2_leg, k3_leg = k_legends
-    leg_baryon_k1 = r"$v_b,\:$" + k1_leg
-    leg_photon_k1 = r"$v_\gamma,\:$" + k1_leg
-    leg_baryon_k2 = r"$v_b,\:$" + k2_leg
-    leg_photon_k2 = r"$v_\gamma,\:$" + k2_leg
-    leg_baryon_k3 = r"$v_b,\:$" + k3_leg
-    leg_photon_k3 = r"$v_\gamma,\:$" + k3_leg
+    # leg_baryon_k1 = r"$v_b,\:$" + k1_leg
+    # leg_photon_k1 = r"$v_\gamma,\:$" + k1_leg
+    # leg_baryon_k2 = r"$v_b,\:$" + k2_leg
+    # leg_photon_k2 = r"$v_\gamma,\:$" + k2_leg
+    # leg_baryon_k3 = r"$v_b,\:$" + k3_leg
+    # leg_photon_k3 = r"$v_\gamma,\:$" + k3_leg
 
     ax.plot(x, y_baryon1, ls='solid' , color='blue', label=k1_leg)
     ax.plot(x, y_photon1, ls='dashed', color='blue')

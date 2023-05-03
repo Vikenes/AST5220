@@ -180,8 +180,8 @@ class Perturbations:
 
         delta_gamma = 4*self.Theta0
         ylabel = r"$\delta_\gamma,\,\delta_b$"
-        ylegends = ["Photons", "baryons"]
-        k_labels = [self.k_labels[0], self.k_labels[-1]]
+        ylegends = ["Baryons", "Photons"]
+        k_labels = self.k_labels#[self.k_labels[0], self.k_labels[-1]]
         plot.K_FIGNAMES = self.k_fnames
         plot.plot_photon_baryon_for_2_k_values(self.x, delta_gamma, self.delta_b, 
                                             k_legends=k_labels,
@@ -211,7 +211,7 @@ class Perturbations:
 
         v_gamma = -3 * self.Theta1 
         ylabel = r"$v_\gamma,\,v_b$"
-        ylegends = ["baryons", "photons"]
+        ylegends = ["Baryons", "Photons"]
         # k_labels = [self.k_labels[0], self.k_labels[-1]]
         plot.K_FIGNAMES = self.k_fnames
         plot.plot_photon_baryon_for_2_k_values(self.x, v_gamma, self.v_b, 
@@ -413,29 +413,31 @@ class Perturbations:
 
 
 
-p = Perturbations(f1="perturbations_k0.001.txt",
-                  f2="perturbations_k0.01.txt",
-                  f3="perturbations_k0.1.txt")
+# p = Perturbations(f1="perturbations_k0.001.txt",
+#                   f2="perturbations_k0.01.txt",
+#                   f3="perturbations_k0.1.txt")
 
-p2 = Perturbations(f1="perturbations_k0.003.txt",
+p = Perturbations(f1="perturbations_k0.001.txt",
                    f2 ="perturbations_k0.03.txt",
                    f3  ="perturbations_k0.3.txt")
-# SAVE=True
+SAVE=True
 # PUSH=True
-# TEMP=True
+TEMP=True
 
-p2.plot_delta()
-# p.plot_delta_gamma(ylim=[-3, 5])
-# p.plot_v()
-# p.plot_v_gamma(ylim=[-1.5,1.5])
-# p.plot_v_gamma(ylim=[1e-6,5e1], log=True, yabs=True)
-# p.plot_Theta(2, xlim=[-10,0], ylim=[-0.1, 0.2], legendloc='upper right')
-# p.plot_Phi()
-# p.plot_Phi_plus_Psi(ylim=[-0.006,0.026])
+p.plot_delta()
+p.plot_v()
+p.plot_Phi()
+p.plot_Phi_plus_Psi(ylim=[-0.006,0.026])
+p.plot_Theta(2, xlim=[-10,0], ylim=[-0.1, 0.2], legendloc='upper right')
+p.compare_delta_baryon_photon()
+p.compare_vel_baryon_photon(yabs=False, log=False, ylim=[-3,8])
+
 
 #### MAYBE ########
-# p.compare_delta_baryon_photon()
-# p.compare_vel_baryon_photon(yabs=False, log=False, ylim=[-3,8])
+# p.plot_delta_gamma(ylim=[-3, 5])
+# p.plot_v_gamma(ylim=[-1.5,1.5])
+# p.plot_v_gamma(ylim=[1e-6,5e1], log=True, yabs=True)
+
 
 
 
