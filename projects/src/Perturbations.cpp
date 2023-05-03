@@ -698,46 +698,17 @@ void Perturbations::info() const{
   std::cout << "k_min (1/Mpc): " << k_min * Constants.Mpc  << "\n";
   std::cout << "k_max (1/Mpc): " << k_max * Constants.Mpc  << "\n";
   std::cout << "n_k:     " << n_k              << "\n";
-  if(Constants.polarization)
-    std::cout << "We include polarization\n";
-  else
-    std::cout << "We do not include polarization\n";
-  if(Constants.neutrinos)
-    std::cout << "We include neutrinos\n";
-  else
-    std::cout << "We do not include neutrinos\n";
+  
+  // Simple calculator 
+  // double x0 = -5.3;
+  // double eta_horizon = cosmo->eta_of_x(x0);
+  // std::cout << "Horizon at x=" << x0 << ": " << eta_horizon / Constants.Mpc << "\n";
+  // std::cout << "for k = 0.003 / Mpc: k*eta=" << eta_horizon * 0.003/Constants.Mpc << "\n";
+  // std::cout << "for k = 0.03  / Mpc: k*eta=" << eta_horizon * 0.03/Constants.Mpc << "\n";
+  // std::cout << "for k = 0.3   / Mpc: k*eta=" << eta_horizon * 0.3/Constants.Mpc << "\n";
+  std::cout << "xmr eq: " << cosmo->get_mr_equality(x_array_full) << "\n";
 
-  std::cout << "Information about the perturbation system:\n";
-  std::cout << "ind_deltacdm:       " << Constants.ind_deltacdm         << "\n";
-  std::cout << "ind_deltab:         " << Constants.ind_deltab           << "\n";
-  std::cout << "ind_v_cdm:          " << Constants.ind_vcdm             << "\n";
-  std::cout << "ind_v_b:            " << Constants.ind_vb               << "\n";
-  std::cout << "ind_Phi:            " << Constants.ind_Phi              << "\n";
-  std::cout << "ind_start_theta:    " << Constants.ind_start_theta      << "\n";
-  std::cout << "n_ell_theta:        " << Constants.n_ell_theta          << "\n";
-  if(Constants.polarization){
-    std::cout << "ind_start_thetap:   " << Constants.ind_start_thetap   << "\n";
-    std::cout << "n_ell_thetap:       " << Constants.n_ell_thetap       << "\n";
-  }
-  if(Constants.neutrinos){
-    std::cout << "ind_start_nu:       " << Constants.ind_start_nu       << "\n";
-    std::cout << "n_ell_neutrinos     " << Constants.n_ell_neutrinos    << "\n";
-  }
-  std::cout << "n_ell_tot_full:     " << Constants.n_ell_tot_full       << "\n";
 
-  std::cout << "Information about the perturbation system in tight coupling:\n";
-  std::cout << "ind_deltacdm:       " << Constants.ind_deltacdm_tc      << "\n";
-  std::cout << "ind_deltab:         " << Constants.ind_deltab_tc        << "\n";
-  std::cout << "ind_v_cdm:          " << Constants.ind_vcdm_tc          << "\n";
-  std::cout << "ind_v_b:            " << Constants.ind_vb_tc            << "\n";
-  std::cout << "ind_Phi:            " << Constants.ind_Phi_tc           << "\n";
-  std::cout << "ind_start_theta:    " << Constants.ind_start_theta_tc   << "\n";
-  std::cout << "n_ell_theta:        " << Constants.n_ell_theta_tc       << "\n";
-  if(Constants.neutrinos){
-    std::cout << "ind_start_nu:       " << Constants.ind_start_nu_tc    << "\n";
-    std::cout << "n_ell_neutrinos     " << Constants.n_ell_neutrinos_tc << "\n";
-  }
-  std::cout << "n_ell_tot_tc:       " << Constants.n_ell_tot_tc         << "\n";
   std::cout << std::endl;
 }
 
