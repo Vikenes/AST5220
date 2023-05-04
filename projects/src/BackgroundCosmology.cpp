@@ -315,6 +315,17 @@ double BackgroundCosmology::get_mr_equality(Vector x_array) const{
   return x_at_rec;
 }
 
+double BackgroundCosmology::get_k_eta_equals_unity(double k) const{
+  auto x_range = std::pair<double,double>(x_start, x_end);
+  double k_reciprocal = 1.0 / k;
+  double x_k_eta_equal_unity = Utils::binary_search_for_value(
+    eta_of_x_spline,
+    k_reciprocal,
+    x_range
+  );
+  return x_k_eta_equal_unity;
+}
+
 //====================================================
 // Print out info about the class
 //====================================================

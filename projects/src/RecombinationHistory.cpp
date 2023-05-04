@@ -394,6 +394,33 @@ double RecombinationHistory::get_Yp() const{
   return Yp;
 }
 
+double RecombinationHistory::get_x_at_decoupling_tau(double xmin, double xmax) const{
+  const double tau_at_dec = 1.0; 
+  auto x_range_tau = std::pair<double,double>(xmin, xmax);
+  double x_dec_tau = Utils::binary_search_for_value(tau_of_x_spline, 
+                                                    tau_at_dec,
+                                                    x_range_tau);
+  return x_dec_tau;                                                
+}
+
+double RecombinationHistory::get_x_at_decoupling_g(double xmin, double xmax) const{
+  double dg_dx_at_dec = 0.0;
+  auto x_range_g_peak = std::pair<double,double>(xmin, xmax);
+  double x_dec_g_peak = Utils::binary_search_for_value(dg_dx_spline, 
+                                                       dg_dx_at_dec,
+                                                       x_range_g_peak);
+  return x_dec_g_peak;                                                
+}
+
+double RecombinationHistory::get_x_at_recombination(double Xe_rec) const{
+  double Xe_at_recomb = 0.1;
+  auto x_range_recomb = std::pair<double,double>(x_start, x_end);
+  double x_recomb = Utils::binary_search_for_value(Xe_of_x_spline,
+                                                   Xe_at_recomb,
+                                                   x_range_recomb);
+  return x_recomb;
+}
+
 //====================================================
 // Print some useful info about the class
 //====================================================

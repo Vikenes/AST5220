@@ -109,6 +109,16 @@ class RecombinationHistory{
     double ne_of_x(double x) const;
     double cs_of_x(double x) const;
     double get_Yp() const;
+
+    double get_x_at_decoupling_tau(
+        double xmin=Constants.x_start,
+        double xmax=Constants.x_end) const;
+        
+    double get_x_at_decoupling_g(
+        double xmin=Constants.x_start,
+        double xmax=Constants.x_end) const;
+    double get_x_at_recombination(double Xe_rec=0.1) const;
+
 };
 
 #endif

@@ -87,6 +87,7 @@ class BackgroundCosmology{
 
 
     double get_mr_equality(Vector x_array) const;
+    double get_k_eta_equals_unity(double k) const;
 };
 
 #endif

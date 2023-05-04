@@ -700,14 +700,44 @@ void Perturbations::info() const{
   std::cout << "n_k:     " << n_k              << "\n";
   
   // Simple calculator 
-  // double x0 = -5.3;
-  // double eta_horizon = cosmo->eta_of_x(x0);
-  // std::cout << "Horizon at x=" << x0 << ": " << eta_horizon / Constants.Mpc << "\n";
-  // std::cout << "for k = 0.003 / Mpc: k*eta=" << eta_horizon * 0.003/Constants.Mpc << "\n";
-  // std::cout << "for k = 0.03  / Mpc: k*eta=" << eta_horizon * 0.03/Constants.Mpc << "\n";
-  // std::cout << "for k = 0.3   / Mpc: k*eta=" << eta_horizon * 0.3/Constants.Mpc << "\n";
-  std::cout << "xmr eq: " << cosmo->get_mr_equality(x_array_full) << "\n";
+  double x0 = -5.3;
+  double xmreq = cosmo->get_mr_equality(x_array_full);
+  double eta_horizon = cosmo->eta_of_x(x0);
+  double eta_horizon_eq = cosmo->eta_of_x(xmreq);
 
+  double x_dec_tau = rec->get_x_at_decoupling_tau();
+  double x_dec_g   = rec->get_x_at_decoupling_g(x_dec_tau-0.5, x_dec_tau+0.5);
+  double x_rec     = rec->get_x_at_recombination();
+
+  auto print_data = [&] (const double x, std::string xperiod) {
+    double eta_hor_Mpc = cosmo->eta_of_x(x) / Constants.Mpc;
+    std::cout << "Horizon at " << xperiod << "=" << x << ": " << eta_hor_Mpc << "\n";
+    std::cout << "for k = 0.003 / Mpc: k*eta=" << eta_hor_Mpc * 0.003 << "\n";
+    std::cout << "for k = 0.03  / Mpc: k*eta=" << eta_hor_Mpc * 0.03 << "\n";
+    std::cout << "for k = 0.3   / Mpc: k*eta=" << eta_hor_Mpc * 0.3 << "\n";
+  };
+
+  print_data(x_dec_tau, "dec tau");
+  std::cout << "\n";
+  std::cout << "k=0.003/Mpc: k*eta=1 at x=" << cosmo->get_k_eta_equals_unity(0.003/Constants.Mpc) << "\n";
+  std::cout << "k= 0.03/Mpc: k*eta=1 at x=" << cosmo->get_k_eta_equals_unity(0.03/Constants.Mpc) << "\n";
+  std::cout << "k=  0.3/Mpc: k*eta=1 at x=" << cosmo->get_k_eta_equals_unity(0.3/Constants.Mpc);
+  std::cout << "\n";
+  double k003 = 0.003/Constants.Mpc; double x003 = -5.0;
+  double k03  = 0.03/Constants.Mpc;  double x03  = -6.0;  
+  double k3   = 0.3/Constants.Mpc;   double x3   = -7.0;
+
+  std::cout << Constants.c*k003 * (get_v_b(x003, k003)/3.0 + get_Theta(x003, k003, 1))  / cosmo->Hp_of_x(x003) << std::endl;
+  std::cout << Constants.c*k03  * (get_v_b(x03, k03)/3.0 + get_Theta(x03, k03, 1))  / cosmo->Hp_of_x(x03) << std::endl;
+  std::cout << Constants.c*k3   * (get_v_b(x3, k3)/3.0 + get_Theta(x3, k3, 1))  / cosmo->Hp_of_x(x3) << std::endl;
+
+  // std::cout << "\nDecoupling:\n";
+  // std::cout << "tau =1 at x=" << x_dec_tau << "\n";
+  // std::cout << " g' =0 at x=" << x_dec_g << "\n";
+  // std::cout << "Recombination:\n";
+  // std::cout << "Xe=0.1 at x=" << x_rec;
+
+  
 
   std::cout << std::endl;
 }
