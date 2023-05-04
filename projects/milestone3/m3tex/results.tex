@@ -2,21 +2,23 @@
 
 In this section we present plots showing the evolution of some perturbation quantities. For the monopole and dipole, we express plot these in terms of $\dg$ and $\vg$, respectively. For easier comparison between evolution of baryons, photons and CDM, we plot CDM and baryons together in one figure, and baryons and photons together in another figure. In both cases we include all three modes in the same figure. This prevents cluttering of the figures, and helps understand the physics behind the three constituents, as baryons interact with both CDM and photons. 
 
-In Figs. \ref{fig:M3:results:deltas}-\ref{fig:M3:results:Theta2} we indicate the time of matter-radiation equality by a dotted black vertical line. Since we have set $\neff=0$, the matter-radiation equality we consider here occurs at $x_\mathrm{eq}=-8.6577$, as opposed to the time given in \tabref{tab:M1:results:time_values}. For brevity, we will from now on refer to modes with large $k$ as \textit{short modes} and modes with small $k$ as \textit{long modes}, as they are related to small and large scales, respectively. 
+In Figs. \ref{fig:M3:results:deltas}-\ref{fig:M3:results:Theta2} we indicate the time of matter-radiation equality by a dotted black vertical line. Since we have set $\neff=0$, the matter-radiation equality we consider here occurs at $x_\mathrm{eq}=-8.6577$, as opposed to the time given in \tabref{tab:M1:results:time_values}. The time of decoupling and recombination is less affected, taking place at $x\sim-6.98$ once again. For brevity, we will from now on refer to modes with large $k$ as \textit{short modes} and modes with small $k$ as \textit{long modes}, as they are related to small and large scales, respectively. 
 
 We begin by studying the density evolutions in \secref{sssec:M3:results:density_perturbations}, and spend a considerable time discussing these results, with an emphasis on interpreting the physics qualitatively. With a system of many coupled ODEs, this initial discussion will provide us with a simpler way of understanding the mechanism behind the remaining perturbation quantities.
 
 %===== overdensities =========
 \subsubsection{Density perturbations} \label{sssec:M3:results:density_perturbations}
-We begin by plotting the density evolution for the matter components and photons, shown in \figref{fig:M3:results:deltas}, where the upper panel shows $\dcdm$ and $\db$ and the lower panel shows $\db$ and $\dg$. We see that the baryons and CDM follow each other closely during the tight coupling regime, and that the $\db$ deviates noticeably from $\dcdm$ during recombination for the shortest mode. On small scales we will initially have overdense regions of CDM undergoing gravitational collapse. This will attract baryons which will fall into the CDM potential wells. As baryons collapse, pressure from photons will increase and push the baryons outwards again. We see a manifestation of this process in the lower panel, where $\db$ and $\dg$ follow each other as a single fluid before decoupling. 
+\pnote{Mention decoupling x}
+
+We begin by plotting the absolute value of the density evolution for the matter components and photons, shown in \figref{fig:M3:results:deltas}, where the upper panel shows $\dcdm$ and $\db$ and the lower panel shows $\db$ and $\dg$. We see that the baryons and CDM follow each other closely during the tight coupling regime, and that the $\db$ deviates noticeably from $\dcdm$ during recombination for the shortest mode. On small scales we will initially have overdense regions of CDM undergoing gravitational collapse. This will attract baryons which will fall into the CDM potential wells. As baryons collapse, pressure from photons will increase and push the baryons outwards again. We see a manifestation of this process in the lower panel, where $\db$ and $\dg$ follow each other as a single fluid before decoupling. 
 
 This process will repeat until recombination occurs, after which the photons move freely, and baryons can collapse into the gravitational wells set up by CDM. This causes $\db$ to follow $\dcdm$ at late times. When photons decouple from matter and move freely, their temperature are no longer affected by interactions, and we get an approximately constant $\dg$ towards $x=0$.  
 
-For the intermediate mode, oscillations starts much closer to the time of decoupling, and we therefore only see few oscillations in both panels. The large mode enters the horizon much later, with gravitational collapse taking place long after decoupling. Thus, we get $\db\sim\dcdm$ at all times, with a decoupling of $\dg$ taking place once recombination has affected the mode on this scale \pnote{Fix last sentence, explain onset of photon decoupling}. 
+For the intermediate mode, oscillations starts much closer to the time of decoupling, and we therefore only see few oscillations in both panels. The large mode enters the horizon much later, with gravitational collapse taking place long after decoupling. Neglecting terms with factors of $k$ in \Eqref{eq:M3:theory:perturbation_ODEs}, we get $\db=\dcdm$ at all times, since they have identical initial conditions. $\dg$ on the other hand deviates from $\db$ some time after recombination has occurred. \pnote{Fix last sentence, explain onset of photon decoupling}. 
 
 The value of $\dg$ after decoupling differs between the three modes, where shorter modes have a lower final value of $\dg$, i.e. a lower temperature. The gravitational wells are dominated by CDM before decoupling. On small scales CDM will have more time to cluster before decoupling, and is the reason for why we have $\dcdm$ is larger for at a given $x$ for shorter modes. When photons decouple they are redshifted as they climb out of gravitational wells, causing a reduction in their temperature. This redshift is stronger for short modes where $\dcdm$ is higher, and explains the different values of $\dg$ we see at late times for the three modes. \note{Make distinction between gravitational potential and overdensities!}
 
-As we have seen, the decoupled photons are affected by how much a given mode has clustered. The total amount of clustering before decoupling is related to when decoupling happens. However, another crucial factor is how the clustering evolves for the different modes. For the shortest mode, we see that $\dcdm$ grows differently before and after $\xeq$. This is a consequence of the expansion of the Universe slowing down the growth of structure, which we will discuss in more detail in \secref{sssec:M3:results:metric_perturbations}.
+As we have seen, the decoupled photons are affected by how much a given mode has clustered. The total amount of clustering before decoupling is related to when decoupling happens. However, another crucial factor is how the clustering evolves for the different modes. For the shortest mode, we see that $\dcdm$ grows differently before and after $\xeq$. This is a consequence of the expansion of the Universe slowing down the growth of structure, which we will discuss in more detail in \secref{sssec:M3:results:metric_perturbations}. For the two shorter modes we see this effect near $x=0$, as the perturbations begins to flat out when the Universe becomes dominated by dark energy, where the expansion accelerates. 
 
 \begin{figure}[ht!]
     \includefig{deltas\kmodesplot}
@@ -27,7 +29,13 @@ As we have seen, the decoupled photons are affected by how much a given mode has
 
 
 \subsubsection{Velocity perturbations}\label{sssec:M3:results:velocity_perturbations}
-The evolution of  \figref{fig:M3:results:vels} similar behaviour between CDM and baryons as we did for the densities. 
+The evolution of the velocities is shown in \figref{fig:M3:results:vels}, where we compare baryons and CDM in the upper panel, and baryons and photons in the lower panel. Note that we have used a linear scale for the lower panel to reduce clutter.   
+
+The oscillating behaviour displayed by baryons for short modes in \figref{fig:M3:results:deltas} is evident for the velocities, where the velocity extrema coincides with density minima, as expected. For $\vb$ and $\vcdm$ we see similar behaviour as we did for the densities, where baryons and CDM coincide towards early and late times, with decoupling effects in the middle for the two shorter modes. For the longest mode we have $\vcdm=\vb$, following the same argument as we did for their densities. One major difference, is that the acceleration of the matter components, $v'$, has become negative near $x=0$. 
+
+For the shortest mode, $\vcdm$ is no longer a strictly increasing function at early times. Around $x=-10$, $\vcdm$ declines and becomes smaller than the intermediate mode around $\xeq$\footnote{I have no sensible explanation for this}.
+
+During tight coupling we have $\vb\sim\vg$, and near decoupling, at $x\sim-7$, we see that the photons decouple from the plasma. After that, the photons undergo damped oscillations, with a higher frequency for shorter modes. 
 
 \begin{figure}[ht!]
     \includefig{vels\kmodesplot}
@@ -36,24 +44,18 @@ The evolution of  \figref{fig:M3:results:vels} similar behaviour between CDM and
     \label{fig:M3:results:vels}
 \end{figure}
 
-In \note{figure \text{vel\_baryon\_photon\_k\_001\_01\_1} (I removed it)} we plot $\vb$ and $\vg$ using a linear scale. At early times, during the tight coupling regime, we have $\vb=\vg$. We see that decoupling between photons and baryons is evident for all three modes of consideration here.  
-
-
-% \begin{figure}[ht!]
-%     \includefig{vel_baryon_photon_k_001_01_1}
-%     \caption{Evolution of $\vb$ (solid line) and $\vg$ (dashed line) for three different modes.}
-%     \label{fig:M3:results:vel_photon_b}
-% \end{figure}
 
 \subsubsection{Potential perturbations} \label{sssec:M3:results:metric_perturbations}
-The evolution of $\Phi$ is shown in \figref{fig:M3:results:Phi}. The short modes enter the horizon during radiation domination, where the potential begins to decay and oscillate, as expected \pnote{cite}. For all three modes we have $\Phi$ approximately constant during matter domination, as predicted \pnote{cite}. The decay we see towards the end for all three modes are due to dark energy beginning to dominate. 
+The evolution of $\Phi$ is shown in \figref{fig:M3:results:Phi}. The following discussion is based upon the results of \cite[Ch. 8]{Dodelson}. During both matter domination and radiation domination, $\Phi$ is well approximated as being constant. The shortest mode enters the horizon when $x\ll\xeq$, and once it does so, as a result the potential decays and begins to oscillate. This behaviour gives rise to the damped oscillations for photons and baryons in \figref{fig:M3:results:deltas}. During matter domination we get constant $\Phi$ when a mode has entered the horizon, as matter accretion is balanced by the expansion of the Universe. $\Phi$ is then balanced by the expansion of the Universe and the accretion of matter. The constant $\Phi$ explains why all modes in \figref{fig:M3:results:deltas} grow at the same rate at late times, long after decoupling. There is a transition period between the two constant $\Phi$ regimes during matter and radiation domination, which coincides with times when the densities grow at different rates around $\xeq$. Towards $x=0$, we get a notable decrease in $\Phi$ for all modes, which is due to dark energy domination causing an accelerated expansion. 
+
+
 \begin{figure}[ht!]
     \includefig{Phi\kmodesplot}
     \caption{Evolution of $\Phi$.}
     \label{fig:M3:results:Phi}
 \end{figure}
 
-
+In \figref{fig:M3:results:Phi_plus_Psi} we plot the sum of the two metric potentials, $\Phi+\Psi$, which corresponds to the second term on the RHS of \Eqref{eq:M3:theory:perturbation_ODEs_Psi}.
 \begin{figure}[ht!]
     \includefig{Phi_plus_Psi\kmodesplot}
     \caption{Evolution of the combined metric perturbations, $\Phi+\Psi$}
@@ -61,7 +63,7 @@ The evolution of $\Phi$ is shown in \figref{fig:M3:results:Phi}. The short modes
 \end{figure}
 
 
-
+The quadrupole, $\Theta_2$, is plotted in \figref{fig:M3:results:Theta2}, and we see that it only 
 \begin{figure}[ht!]
     \includefig{Theta2\kmodesplot}
     \caption{Evolution of the quadrupole, $\Theta_2$. At $x<-10$, there is no apparent contribution of this quantity.}
