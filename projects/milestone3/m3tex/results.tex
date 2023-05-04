@@ -4,7 +4,7 @@ In this section we present plots showing the evolution of some perturbation quan
 
 In Figs. \ref{fig:M3:results:deltas}-\ref{fig:M3:results:Theta2} we indicate the time of matter-radiation equality by a dotted black vertical line. Since we have set $\neff=0$, the matter-radiation equality we consider here occurs at $x_\mathrm{eq}=-8.6577$, as opposed to the time given in \tabref{tab:M1:results:time_values}. For brevity, we will from now on refer to modes with large $k$ as \textit{short modes} and modes with small $k$ as \textit{long modes}, as they are related to small and large scales, respectively. 
 
-We begin by studying the density evolutions in \secref{sssec:M3:results:density_perturbations}, and spend a considerable time discussing these results in detail. This helps us understand the underlying physics behind the perturbations, and allows for easier interpretation of the remaining results. 
+We begin by studying the density evolutions in \secref{sssec:M3:results:density_perturbations}, and spend a considerable time discussing these results, with an emphasis on interpreting the physics qualitatively. With a system of many coupled ODEs, this initial discussion will provide us with a simpler way of understanding the mechanism behind the remaining perturbation quantities.
 
 %===== overdensities =========
 \subsubsection{Density perturbations} \label{sssec:M3:results:density_perturbations}
@@ -14,26 +14,26 @@ This process will repeat until recombination occurs, after which the photons mov
 
 For the intermediate mode, oscillations starts much closer to the time of decoupling, and we therefore only see few oscillations in both panels. The large mode enters the horizon much later, with gravitational collapse taking place long after decoupling. Thus, we get $\db\sim\dcdm$ at all times, with a decoupling of $\dg$ taking place once recombination has affected the mode on this scale \pnote{Fix last sentence, explain onset of photon decoupling}. 
 
-The value of $\dg$ after decoupling differs between the three modes, where shorter modes have a lower final value of $\dg$, i.e. a lower temperature. The gravitational wells are dominated by CDM before decoupling. On small scales CDM will have more time to cluster before decoupling, and is the reason for why we have $\dcdm$ is larger for at a given $x$ for shorter modes. When photons decouple they are redshifted as they climb out of gravitational wells, causing a reduction in their temperature. This redshift is stronger for short modes where $\dcdm$ is higher, and explains the different values of $\dg$ we see at late times for the three modes. 
+The value of $\dg$ after decoupling differs between the three modes, where shorter modes have a lower final value of $\dg$, i.e. a lower temperature. The gravitational wells are dominated by CDM before decoupling. On small scales CDM will have more time to cluster before decoupling, and is the reason for why we have $\dcdm$ is larger for at a given $x$ for shorter modes. When photons decouple they are redshifted as they climb out of gravitational wells, causing a reduction in their temperature. This redshift is stronger for short modes where $\dcdm$ is higher, and explains the different values of $\dg$ we see at late times for the three modes. \note{Make distinction between gravitational potential and overdensities!}
 
-There are two main factors governing the onset of decoupling for different modes.  
+As we have seen, the decoupled photons are affected by how much a given mode has clustered. The total amount of clustering before decoupling is related to when decoupling happens. However, another crucial factor is how the clustering evolves for the different modes. For the shortest mode, we see that $\dcdm$ grows differently before and after $\xeq$. This is a consequence of the expansion of the Universe slowing down the growth of structure, which we will discuss in more detail in \secref{sssec:M3:results:metric_perturbations}.
 
 \begin{figure}[ht!]
     \includefig{deltas\kmodesplot}
     \includefig{delta_baryon_photon\kmodesplot} 
-    \caption{Upper panel: Time evolution of $\dcdm$ (solid line) and $\db$ (dashed line) for three different modes. Lower panel: Evolution of $\dg=4\Theta_0$}
+    \caption{Evolution of $\delta$ for modes with three different wavenumbers. Upper panel: Comparing $\dcdm$ (solid line) and $\db$ (dashed line). Lower panel: Comparing $\db$ (solid line) and $\dg=4\Theta_0$ (dashed line).}
     \label{fig:M3:results:deltas}
 \end{figure}
 
 
 \subsubsection{Velocity perturbations}\label{sssec:M3:results:velocity_perturbations}
-For the velocities, we see in \figref{fig:M3:results:vel_CDM_b} similar behaviour between CDM and baryons as we did for the densities. 
+The evolution of  \figref{fig:M3:results:vels} similar behaviour between CDM and baryons as we did for the densities. 
 
 \begin{figure}[ht!]
     \includefig{vels\kmodesplot}
     \includefig{vel_baryon_photon\kmodesplot}
-    \caption{Evolution of $\vcdm$ (solid line) and $\vb$ (dashed line) for three different modes.}
-    \label{fig:M3:results:vel_CDM_b}
+    \caption{Evolution of velocities for three different wavenumbers. Upper panel: $\vcdm$ (solid line) compared to $\vb$ (dashed line). Lower panel: $\vb$ (solid line) compared to $\vg$ (dashed line).}
+    \label{fig:M3:results:vels}
 \end{figure}
 
 In \note{figure \text{vel\_baryon\_photon\_k\_001\_01\_1} (I removed it)} we plot $\vb$ and $\vg$ using a linear scale. At early times, during the tight coupling regime, we have $\vb=\vg$. We see that decoupling between photons and baryons is evident for all three modes of consideration here.  
