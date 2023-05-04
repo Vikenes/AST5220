@@ -132,7 +132,7 @@ class Perturbations:
         else:
             self.load_delta()
 
-        ylabel = r"$\delta_\mathrm{CDM},\,\delta_b$"
+        ylabel = r"$|\delta_\mathrm{CDM}| ,\,|\delta_b|$"
         ylegends = ["CDM", "baryons"]
         plot.K_FIGNAMES = self.k_fnames
         
@@ -183,7 +183,7 @@ class Perturbations:
 
 
         delta_gamma = 4*self.Theta0
-        ylabel = r"$\delta_\gamma,\,\delta_b$"
+        ylabel = r"$|\delta_\gamma|,\,|\delta_b|$"
         ylegends = ["Baryons", "Photons"]
         k_labels = self.k_labels#[self.k_labels[0], self.k_labels[-1]]
         plot.K_FIGNAMES = self.k_fnames
@@ -238,7 +238,7 @@ class Perturbations:
         else:
             self.load_v()
 
-        ylabel = r"$v_\mathrm{CDM},\, v_b$"
+        ylabel = r"$|v_\mathrm{CDM}|,\, |v_b|$"
         ylegends = ["CDM", "baryons"]
         plot.K_FIGNAMES = self.k_fnames
         plot.plot_cdm_baryon_for_n_k_values(self.x, self.v_cdm, self.v_b, 
@@ -430,14 +430,15 @@ PUSH=True
 
 p.plot_delta()
 p.plot_v()
-p.plot_Phi()
-p.plot_Phi_plus_Psi(ylim=[-0.006,0.026])
-p.plot_Theta(2, xlim=[-10,0], ylim=[-0.1, 0.2], legendloc='upper right')
+# p.plot_Phi()
+# p.plot_Phi_plus_Psi(ylim=[-0.006,0.026])
+# p.plot_Theta(2, xlim=[-10,0], ylim=[-0.1, 0.2], legendloc='upper right')
 p.compare_delta_baryon_photon()
-p.compare_vel_baryon_photon(yabs=False, log=False, ylim=[-3,8])
+# p.compare_vel_baryon_photon(yabs=False, log=False, ylim=[-3,80])
 
 
 #### MAYBE ########
+# p.compare_vel_baryon_photon(yabs=True, log=True, ylim=[1e-3, 1e1])
 # p.plot_delta_gamma(ylim=[-3, 5])
 # p.plot_v_gamma(ylim=[-1.5,1.5])
 # p.plot_v_gamma(ylim=[1e-6,5e1], log=True, yabs=True)
