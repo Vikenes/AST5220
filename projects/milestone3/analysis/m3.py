@@ -25,7 +25,7 @@ global TCEND
 SAVE        = False 
 PUSH        = False
 TEMP        = False 
-XLIM        = [-15, 0]
+XLIM        = [-14.5, 0]
 MREQ        = True 
 TCEND       = False 
 
@@ -70,7 +70,7 @@ class Perturbations:
     def load_tc_end_and_mr_eq(self, files):
         self.tc_end = np.array([float(np.loadtxt(data_path + f, max_rows=1, usecols=0)) for f in files])
         self.mr_eq  = float(np.loadtxt(data_path + files[0], max_rows=1, usecols=1))
-
+        self.x_entry= np.array([float(np.loadtxt(data_path + f, max_rows=1, usecols=2)) for f in files])
 
 
     
@@ -132,7 +132,7 @@ class Perturbations:
         else:
             self.load_delta()
 
-        ylabel = r"$|\delta_\mathrm{CDM}| ,\,|\delta_b|$"
+        ylabel = r"$|\delta_\mathrm{CDM}| ,\:|\delta_b|$"
         ylegends = ["CDM", "baryons"]
         plot.K_FIGNAMES = self.k_fnames
         
@@ -140,7 +140,7 @@ class Perturbations:
                                             self.k_labels,
                                             ylegends, 
                                             fname="deltas",
-                                            xend=self.tc_end,
+                                            xentry=self.x_entry,
                                             xlim=xlim,
                                             ylabel=ylabel, ylim=ylim,
                                             legendloc1='upper left', 
@@ -162,7 +162,7 @@ class Perturbations:
         plot.plot_quantity_for_n_k_values(x=self.x, y=delta_gamma, 
                                           k_legends = self.k_labels, 
                                           fname="delta_gamma",
-                                          xend=self.tc_end,
+                                          xentry=self.x_entry,
                                           absval_of_y=yabs,
                                           xlabel=r"$x$", ylabel=ylabel,
                                           ylim=ylim, log=log,
@@ -183,7 +183,7 @@ class Perturbations:
 
 
         delta_gamma = 4*self.Theta0
-        ylabel = r"$|\delta_\gamma|,\,|\delta_b|$"
+        ylabel = r"$|\delta_\gamma|,\:|\delta_b|$"
         ylegends = ["Baryons", "Photons"]
         k_labels = self.k_labels#[self.k_labels[0], self.k_labels[-1]]
         plot.K_FIGNAMES = self.k_fnames
@@ -191,7 +191,7 @@ class Perturbations:
                                             k_legends=k_labels,
                                             ylegends=ylegends, 
                                             fname="delta_baryon_photon",
-                                            xend=self.tc_end,
+                                            xentry=self.x_entry,
                                             xlim=xlim,
                                             ylabel=ylabel, ylim=ylim,
                                             legendloc1='upper left', 
@@ -214,7 +214,7 @@ class Perturbations:
 
 
         v_gamma = -3 * self.Theta1 
-        ylabel = r"$v_\gamma,\,v_b$"
+        ylabel = r"$v_\gamma,\:v_b$"
         ylegends = ["Baryons", "Photons"]
         # k_labels = [self.k_labels[0], self.k_labels[-1]]
         plot.K_FIGNAMES = self.k_fnames
@@ -222,7 +222,7 @@ class Perturbations:
                                             self.k_labels,
                                             ylegends, 
                                             fname="vel_baryon_photon",
-                                            xend=self.tc_end,
+                                            xentry=self.x_entry,
                                             xlim=xlim,
                                             ylabel=ylabel, ylim=ylim,
                                             legendloc1='upper left', 
@@ -231,26 +231,27 @@ class Perturbations:
                                             yabs=yabs, log=log,
                                             save=SAVE, push=PUSH, temp=TEMP)
 
-    def plot_v(self, xlim=XLIM, ylim=[1e-5, 1e3]):
+    def plot_v(self, xlim=XLIM, ylim=[1e-4, 5e1]):
 
         if hasattr(self, 'vels'):
             pass
         else:
             self.load_v()
 
-        ylabel = r"$|v_\mathrm{CDM}|,\, |v_b|$"
+        ylabel = r"$|v_\mathrm{CDM}|,\: |v_b|$"
         ylegends = ["CDM", "baryons"]
         plot.K_FIGNAMES = self.k_fnames
         plot.plot_cdm_baryon_for_n_k_values(self.x, self.v_cdm, self.v_b, 
                                             self.k_labels,
                                             ylegends, 
                                             fname="vels",
-                                            xend=self.tc_end,
+                                            xentry=self.x_entry,
                                             ylabel=ylabel, ylim=ylim,
                                             xlim=xlim,
-                                            legendloc1='upper left', 
-                                            legendloc2='lower right',
+                                            legendloc1='lower right', 
+                                            legendloc2='upper left',
                                             figsize=(10,6),
+                                            ypad=10,
                                             save=SAVE, push=PUSH, temp=TEMP)
         
     def plot_v_gamma(self, xlim=XLIM, ylim=[-2, 4], log=False, yabs=False):
@@ -266,7 +267,7 @@ class Perturbations:
         plot.plot_quantity_for_n_k_values(x=self.x, y=v_gamma, 
                                           k_legends = self.k_labels, 
                                           fname="v_gamma",
-                                          xend=self.tc_end,
+                                          xentry=self.x_entry,
                                           absval_of_y=yabs,
                                           xlabel=r"$x$", ylabel=ylabel,
                                           ylim=ylim, log=log,
@@ -290,7 +291,7 @@ class Perturbations:
         plot.plot_quantity_for_n_k_values(x=self.x, y=theta, 
                                           k_legends = self.k_labels, 
                                           fname=theta_fname,
-                                          xend=self.tc_end,
+                                          xentry=self.x_entry,
                                           xlabel=r"$x$", ylabel=theta_label,
                                           ylim=ylim, log=False,
                                           xlim=xlim,
@@ -306,9 +307,9 @@ class Perturbations:
 
         plot.K_FIGNAMES = self.k_fnames
         plot.plot_quantity_for_n_k_values(x=self.x, y=self.Phi, 
-                                          k_legends = self.k_labels, 
+                                          k_legends=self.k_labels, 
                                           fname="Phi",
-                                          xend = self.tc_end,
+                                          xentry=self.x_entry,
                                           xlabel=r"$x$", ylabel=r"$\Phi$",
                                           ylim=ylim, xlim=xlim, 
                                           log=False,
@@ -318,16 +319,17 @@ class Perturbations:
         """
         For stupid testing only, not actually using 
         """
+
         if hasattr(self, 'fields'):
             pass
         else:
             self.load_fields()
 
         plot.K_FIGNAMES = self.k_fnames
-        plot.plot_cdm_baryon_for_n_k_values(x=self.x, y_cdm=self.Psi, y_baryon=self.Phi, 
-                                          k_legends = self.k_labels, ylegends=["psi", "Phi"],
-                                          fname="PsiandPhi",
-                                          xend = self.tc_end,
+        plot.plot_quantity_for_n_k_values(x=self.x, y=self.Psi, 
+                                          k_legends=self.k_labels, 
+                                          fname="Psi",
+                                          xentry=self.x_entry,
                                           xlabel=r"$x$", ylabel=r"$\Phi$",
                                           ylim=ylim, xlim=xlim, 
                                           log=False,
@@ -346,7 +348,7 @@ class Perturbations:
         plot.plot_quantity_for_n_k_values(x=self.x, y=y, 
                                           k_legends = self.k_labels, 
                                           fname="Phi_plus_Psi",
-                                          xend=self.tc_end,
+                                          xentry=self.x_entry,
                                           xlabel=r"$x$", ylabel=ylabel,
                                           ylim=ylim, xlim=xlim, 
                                           log=False,
@@ -415,13 +417,11 @@ class Perturbations:
 
 
 
-
-
 # p = Perturbations(f1="perturbations_k0.001.txt",
 #                   f2="perturbations_k0.01.txt",
 #                   f3="perturbations_k0.1.txt")
 
-p = Perturbations(f1="perturbations_k0.003.txt",
+p = Perturbations(f1="perturbations_k0.001.txt",
                    f2 ="perturbations_k0.03.txt",
                    f3  ="perturbations_k0.3.txt")
 SAVE=True
@@ -430,11 +430,11 @@ PUSH=True
 
 p.plot_delta()
 p.plot_v()
-# p.plot_Phi()
-# p.plot_Phi_plus_Psi(ylim=[-0.006,0.026])
-# p.plot_Theta(2, xlim=[-10,0], ylim=[-0.1, 0.2], legendloc='upper right')
+p.plot_Phi()
+p.plot_Phi_plus_Psi(ylim=[-0.006,0.026])
+p.plot_Theta(2, xlim=[-10,0], ylim=[-0.1, 0.2], legendloc='upper right')
 p.compare_delta_baryon_photon()
-# p.compare_vel_baryon_photon(yabs=False, log=False, ylim=[-3,80])
+p.compare_vel_baryon_photon(xlim=[-12,0], ylim=[-3,8])
 
 
 #### MAYBE ########

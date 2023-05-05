@@ -20,7 +20,8 @@ TITLEPAD      = 15
 
 
 #   Set rc-params
-plt.rc("legend", fontsize=LEGENDSIZE, fancybox=True, loc="best", frameon=True, edgecolor="black")
+plt.rc("legend", fontsize=LEGENDSIZE, fancybox=True, loc="best", 
+       frameon=True, edgecolor="black", framealpha=1)
 plt.rc("font", size=25)
 plt.rc("axes", titlesize=TITLESIZE, labelsize=LABELSIZE, labelpad=LABELPAD, titlepad=TITLEPAD)
 plt.rc("xtick", labelsize=TICKLABELSIZE)
@@ -143,7 +144,7 @@ def load(file, folder=data_path, skiprows=0):
 def plot_quantity_for_n_k_values(x, y,
                                  k_legends, 
                                  fname, 
-                                 xend=None,
+                                 xentry=None,
                                  log=True, 
                                  absval_of_y=False,
                                  xlabel=r"$x$", 
@@ -164,9 +165,10 @@ def plot_quantity_for_n_k_values(x, y,
         fname += "_abs"
 
     y1, y2, y3 = y 
+    
     k1_leg, k2_leg, k3_leg = k_legends
     ax.plot(x, y1, color='blue'  , label=k1_leg)
-    ax.plot(x, y2, color='red', label=k2_leg)
+    ax.plot(x, y2, color='red'   , label=k2_leg)
     ax.plot(x, y3, color='green' , label=k3_leg)
 
     if ylim is None:
@@ -174,6 +176,14 @@ def plot_quantity_for_n_k_values(x, y,
     else:
         ylim_vline = ylim  
     ax.vlines(X_MR_EQ, *ylim_vline, colors='black', ls='dotted', lw=2)
+    if xentry is not None:
+        ax.vlines(xentry[0], *ylim_vline, colors='blue' , ls='-.', alpha=0.5, lw=2)
+        ax.vlines(xentry[1], *ylim_vline, colors='red'  , ls='-.', alpha=0.5, lw=2)
+        ax.vlines(xentry[2], *ylim_vline, colors='green', ls='-.', alpha=0.5, lw=2)
+
+
+
+
 
     ax.set_ylim(ylim)
     ax.set_xlim(xlim)
@@ -192,14 +202,15 @@ def plot_quantity_for_n_k_values(x, y,
 def plot_cdm_baryon_for_n_k_values(x, y_cdm, y_baryon,
                                    k_legends, ylegends,
                                    fname, 
-                                   xend=None,
+                                   xentry=None,
                                    xlabel=r"$x$", 
                                    ylabel=None, 
                                    xlim=None, 
                                    ylim=None, 
                                    legendloc1='best',
                                    legendloc2='best', 
-                                   yticks=None, 
+                                   yticks=None,
+                                   ypad=None, 
                                    figsize=(10,6), 
                                    log=True, 
                                    save=True, 
@@ -221,7 +232,18 @@ def plot_cdm_baryon_for_n_k_values(x, y_cdm, y_baryon,
     ax.plot(x, y_cdm2   , ls='solid' , color='red', label=k2_leg)
     ax.plot(x, y_cdm3   , ls='solid' , color='green' , label=k3_leg)
 
+    if ylim is None:
+        ymin = np.min([y_cdm,y_baryon])
+        ymax = np.max([y_cdm,y_baryon])
+        ylim_vline = [ymin, ymax]
+    else:
+        ylim_vline = ylim  
 
+    if xentry is not None:
+        ax.vlines(xentry[0], *ylim_vline, colors='blue' , ls='-.', alpha=0.5, lw=2)
+        ax.vlines(xentry[1], *ylim_vline, colors='red'  , ls='-.', alpha=0.5, lw=2)
+        ax.vlines(xentry[2], *ylim_vline, colors='green', ls='-.', alpha=0.5, lw=2)
+        # ylegends.append(r"$k\eta=1$")
     
     # ax.vlines(xend2, *ylim)
     # ax.vlines(xend3, *ylim)
@@ -240,9 +262,11 @@ def plot_cdm_baryon_for_n_k_values(x, y_cdm, y_baryon,
     set_ax_info(ax, xlabel, ylabel, legendloc=legendloc1)
     # leg1 = ax.legend(loc=legendloc1)
     plt.gca().add_artist(ax.legend(loc=legendloc1))
- 
+    
+
     solid_line,  = ax.plot([], label=y_cdm_legend   , c='k', linestyle="-")
     dashed_line, = ax.plot([], label=y_baryon_legend, c='k', linestyle="--")
+    # dashdot_line,= ax.plot([], label="Horizon entry", c='k', alpha=0.5, linestyle="-.")
     leg2 = ax.legend([solid_line, dashed_line], ylegends, loc=legendloc2)
     plt.gca().add_artist(leg2)
  
@@ -255,7 +279,8 @@ def plot_cdm_baryon_for_n_k_values(x, y_cdm, y_baryon,
         ylim_end = ylim
         
     ax.vlines(X_MR_EQ, *ylim_end, color='black', ls='dotted', lw=2)
-
+    if ypad is not None:
+        ax.set_ylabel(ylabel,labelpad=ypad)
 
     if yticks is not None:
         ax.set_yticks(yticks)
@@ -266,7 +291,7 @@ def plot_cdm_baryon_for_n_k_values(x, y_cdm, y_baryon,
 def plot_photon_baryon_for_2_k_values(x, y_photon, y_baryon,
                                    k_legends, ylegends,
                                    fname, 
-                                   xend=None,
+                                   xentry=None,
                                    xlabel=r"$x$", 
                                    ylabel=None, 
                                    xlim=None, 
@@ -306,6 +331,22 @@ def plot_photon_baryon_for_2_k_values(x, y_photon, y_baryon,
     ax.plot(x, y_baryon3, ls='solid' , color='green',label=k3_leg)
     ax.plot(x, y_photon3, ls='dashed', color='green')
 
+
+    if ylim is None:
+        ymin_vline = np.min(np.abs(y_photon, y_baryon))
+        ymax_vline = np.max(np.abs(y_photon, y_baryon))
+        ylim_vline = [ymin_vline, ymax_vline]
+    else:
+        ylim_vline = ylim
+    
+    if xentry is not None:
+        ax.vlines(xentry[0], *ylim_vline, colors='blue' , ls='-.', alpha=0.5, lw=2)
+        ax.vlines(xentry[1], *ylim_vline, colors='red'  , ls='-.', alpha=0.5, lw=2)
+        ax.vlines(xentry[2], *ylim_vline, colors='green', ls='-.', alpha=0.5, lw=2)
+        # ylegends.append(r"$k\eta=1$")
+
+    ax.vlines(X_MR_EQ, *ylim_vline, color='black', ls='dotted', lw=2)
+
     
     ax.set_ylim(ylim)
     ax.set_xlim(xlim)
@@ -318,18 +359,11 @@ def plot_photon_baryon_for_2_k_values(x, y_photon, y_baryon,
  
     solid_line,  = ax.plot([], label=y_photon_legend, c='k', linestyle="-")
     dashed_line, = ax.plot([], label=y_baryon_legend, c='k', linestyle="--")
+    # dashdot_line,= ax.plot([], label="Horizon entry", c='k', alpha=0.5, linestyle="-.")
+
     leg2 = ax.legend([solid_line, dashed_line], ylegends, loc=legendloc2)
     plt.gca().add_artist(leg2)
 
-
-    if ylim is None:
-        ymin_end = np.min(np.abs(y_photon, y_baryon))
-        ymax_end = np.max(np.abs(y_photon, y_baryon))
-        ylim_end = [ymin_end, ymax_end]
-    else:
-        ylim_end = ylim
-        
-    ax.vlines(X_MR_EQ, *ylim_end, color='black', ls='dotted', lw=2)
 
 
     if yticks is not None:
