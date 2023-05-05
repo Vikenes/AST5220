@@ -690,6 +690,9 @@ double Perturbations::compute_Psi(const double x, const double k, const double T
 // Print some useful info about the class
 //====================================================
 void Perturbations::info() const{
+  /*
+    A hot mess at the moment. Clean up later
+  */
   std::cout << "\n";
   std::cout << "Info about perturbations class:\n";
   std::cout << "x_start:       " << x_start                << "\n";
@@ -718,6 +721,9 @@ void Perturbations::info() const{
   };
 
   print_k_eta(x_dec_tau, "dec tau");
+  print_k_eta(x_dec_g, "dec g");
+  print_k_eta(x_rec, "rec");
+
 
   auto print_x_entry = [&] (const double k) {
     double kval = k / Constants.Mpc;
