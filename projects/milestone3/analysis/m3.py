@@ -424,17 +424,17 @@ class Perturbations:
 p = Perturbations(f1="perturbations_k0.001.txt",
                    f2 ="perturbations_k0.03.txt",
                    f3  ="perturbations_k0.3.txt")
-SAVE=True
-PUSH=True
+# SAVE=True
+# PUSH=True
 # TEMP=True
 
 p.plot_delta()
-p.plot_v()
-p.plot_Phi()
-p.plot_Phi_plus_Psi(ylim=[-0.006,0.026])
-p.plot_Theta(2, xlim=[-10,0], ylim=[-0.1, 0.2], legendloc='upper right')
+# p.plot_v()
+# p.plot_Phi()
+# p.plot_Phi_plus_Psi(ylim=[-0.006,0.026])
+# p.plot_Theta(2, xlim=[-10,0], ylim=[-0.1, 0.2], legendloc='upper right')
 p.compare_delta_baryon_photon()
-p.compare_vel_baryon_photon(xlim=[-12,0], ylim=[-3,8])
+# p.compare_vel_baryon_photon(xlim=[-12,0], ylim=[-3,8])
 
 
 #### MAYBE ########
