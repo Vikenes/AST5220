@@ -96,17 +96,17 @@ int main(int argc, char **argv){
   // Solve the perturbations
   Perturbations pert(&cosmo, &rec);
   pert.solve();
-  pert.info();
+  // pert.info();
   
   // Output perturbation quantities
-  // double kvalue = 0.003 / Constants.Mpc;
-  // pert.output(kvalue, "milestone3/data/perturbations_k0.003.txt");
+  double kvalue = 0.001 / Constants.Mpc;
+  pert.output(kvalue, "milestone3/data/perturbations_k0.001.txt");
 
-  // kvalue = 0.03 / Constants.Mpc;
-  // pert.output(kvalue, "milestone3/data/perturbations_k0.03.txt");
+  kvalue = 0.03 / Constants.Mpc;
+  pert.output(kvalue, "milestone3/data/perturbations_k0.03.txt");
 
-  // kvalue = 0.3 / Constants.Mpc;
-  // pert.output(kvalue, "milestone3/data/perturbations_k0.3.txt");
+  kvalue = 0.3 / Constants.Mpc;
+  pert.output(kvalue, "milestone3/data/perturbations_k0.3.txt");
 
 
   

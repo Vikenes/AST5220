@@ -709,28 +709,38 @@ void Perturbations::info() const{
   double x_dec_g   = rec->get_x_at_decoupling_g(x_dec_tau-0.5, x_dec_tau+0.5);
   double x_rec     = rec->get_x_at_recombination();
 
-  auto print_data = [&] (const double x, std::string xperiod) {
+  auto print_k_eta = [&] (const double x, std::string xperiod) {
     double eta_hor_Mpc = cosmo->eta_of_x(x) / Constants.Mpc;
     std::cout << "Horizon at " << xperiod << "=" << x << ": " << eta_hor_Mpc << "\n";
-    std::cout << "for k = 0.003 / Mpc: k*eta=" << eta_hor_Mpc * 0.003 << "\n";
+    std::cout << "for k = 0.001 / Mpc: k*eta=" << eta_hor_Mpc * 0.001 << "\n";
     std::cout << "for k = 0.03  / Mpc: k*eta=" << eta_hor_Mpc * 0.03 << "\n";
     std::cout << "for k = 0.3   / Mpc: k*eta=" << eta_hor_Mpc * 0.3 << "\n";
   };
 
-  print_data(x_dec_tau, "dec tau");
-  std::cout << "\n";
-  std::cout << "k=0.003/Mpc: k*eta=1 at x=" << cosmo->get_k_eta_equals_unity(0.003/Constants.Mpc) << "\n";
-  std::cout << "k= 0.03/Mpc: k*eta=1 at x=" << cosmo->get_k_eta_equals_unity(0.03/Constants.Mpc) << "\n";
-  std::cout << "k=  0.3/Mpc: k*eta=1 at x=" << cosmo->get_k_eta_equals_unity(0.3/Constants.Mpc);
-  std::cout << "\n";
+  print_k_eta(x_dec_tau, "dec tau");
+
+  auto print_x_entry = [&] (const double k) {
+    double kval = k / Constants.Mpc;
+    double x_enter = cosmo->get_k_eta_equals_unity(kval);
+    std::cout << "k="<< k << "/Mpc: k*eta=1 at x=" << x_enter << "\n";
+    std::cout << "  Omega_m(x_enter)=" << cosmo->get_OmegaB(x_enter) + cosmo->get_OmegaCDM(x_enter) << "\n";
+    std::cout << "  Omega_R(x_enter)=" << cosmo->get_OmegaR(x_enter) << "\n";
+  };
+
+  Vector k_decimals = {0.001, 0.03, 0.3};
+  std::for_each(k_decimals.begin(), k_decimals.end(), print_x_entry);
+
   double k003 = 0.003/Constants.Mpc; double x003 = -5.0;
-  double k03  = 0.03/Constants.Mpc;  double x03  = -6.0;  
-  double k3   = 0.3/Constants.Mpc;   double x3   = -7.0;
+  // double k03  = 0.03/Constants.Mpc;  double x03  = -6.0;  
+  // double k3   = 0.3/Constants.Mpc;   double x3   = -7.0;
 
-  std::cout << Constants.c*k003 * (get_v_b(x003, k003)/3.0 + get_Theta(x003, k003, 1))  / cosmo->Hp_of_x(x003) << std::endl;
-  std::cout << Constants.c*k03  * (get_v_b(x03, k03)/3.0 + get_Theta(x03, k03, 1))  / cosmo->Hp_of_x(x03) << std::endl;
-  std::cout << Constants.c*k3   * (get_v_b(x3, k3)/3.0 + get_Theta(x3, k3, 1))  / cosmo->Hp_of_x(x3) << std::endl;
-
+  // std::cout << Constants.c*k003 * (get_v_b(x003, k003)/3.0 + get_Theta(x003, k003, 1))  / cosmo->Hp_of_x(x003) << std::endl;
+  // std::cout << Constants.c*k03  * (get_v_b(x03, k03)/3.0 + get_Theta(x03, k03, 1))  / cosmo->Hp_of_x(x03) << std::endl;
+  // std::cout << Constants.c*k3   * (get_v_b(x3, k3)/3.0 + get_Theta(x3, k3, 1))  / cosmo->Hp_of_x(x3) << std::endl;
+  double H0 = cosmo->get_H0();
+  double c  = Constants.c; 
+  double x_test = -7;
+  // double prefactor = - 12.0 * H0*H0 / (exp(2.0*x_test) * c*c*k003) * cosmo->get_OmegaR();
   // std::cout << "\nDecoupling:\n";
   // std::cout << "tau =1 at x=" << x_dec_tau << "\n";
   // std::cout << " g' =0 at x=" << x_dec_g << "\n";
@@ -775,7 +785,8 @@ void Perturbations::output(const double k, const std::string filename) const{
   double x_mr_eq = cosmo->get_mr_equality(x_array);
   auto end = get_tight_coupling_time(k);
   double xend = end.first; 
-  fp << xend << " " << x_mr_eq << "\n";
+  double x_entry = cosmo->get_k_eta_equals_unity(k);
+  fp << xend << " " << x_mr_eq << " " << x_entry << "\n";
   std::for_each(x_array.begin(), x_array.end(), print_data);
 }
 
