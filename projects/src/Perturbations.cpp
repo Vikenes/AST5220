@@ -9,30 +9,7 @@ Perturbations::Perturbations(
     RecombinationHistory *rec) : 
   cosmo(cosmo), 
   rec(rec)
-{
-  /* TBD 
-   - Ask Nanna how to store global variables here. 
-  integrate_perturbations():
-   - Implement PI spline??
-   - Store derivative of quantities 
-     - Store other Theta values??
-   - Create vector of Splines
-   - Check if storing integration values can be done in one go. 
-   - Make functions for Computing some of the quantities. 
-  
-  set_ic and set_ic_after_tc():
-   - Remove redundant stuff 
-   - Simplify/rewrite stuff 
-
-  Implement source function! 
-   - Check if Derivatives should be computed analytically,
-     or if I should get them from the ODESolver directly. 
-
-  rhs_tight_coupling_ode and rhs_full_ode:
-   - Remove redundant stuff
-   - Simplify/clean expressions 
-  */
-}
+{}
 
 //====================================================
 // Do all the solving
@@ -62,12 +39,6 @@ void Perturbations::integrate_perturbations(){
   // Quantities to store 
   //=============================================================
   
-  /* TBD
-     - Skip individual flat arrays -> spline 2D array directly??
-     - Create splines for all theta values??
-     - Loop over theta splines? 
-        -- Don't do intermediate Theta step   
-  */
   const int nx_nk = n_x * n_k;
   Vector delta_cdm_array_flat(nx_nk);
   Vector delta_b_array_flat(nx_nk);
@@ -101,13 +72,15 @@ void Perturbations::integrate_perturbations(){
   const double abserr = 1e-8;
   const double relerr = 1e-8;
   // Loop over all wavenumbers
+
+  #pragma omp parallel for schedule(dynamic, 1)
   for(int ik = 0; ik < n_k; ik++){
 
     // Progress bar...
-    if( (10*ik) / n_k != (10*ik+10) / n_k ) {
-      std::cout << (100*ik+100)/n_k << "% " << std::flush;
-      if(ik == n_k-1) std::cout << std::endl;
-    }
+    // if( (10*ik) / n_k != (10*ik+10) / n_k ) {
+    //   std::cout << (100*ik+100)/n_k << "% " << std::flush;
+    //   if(ik == n_k-1) std::cout << std::endl;
+    // }
 
     // Current value of k
     double k = k_array[ik];
