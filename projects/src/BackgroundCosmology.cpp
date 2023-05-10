@@ -300,19 +300,66 @@ double BackgroundCosmology::get_TCMB(double x) const{
   return TCMB * exp(-x); 
 }
 
+double BackgroundCosmology::get_acceleration_onset() const{
+  Vector x_array = Utils::linspace(x_start, x_end, nx);
+  Vector dHpdx_vector(nx);
+  std::transform(x_array.begin(), x_array.end(), dHpdx_vector.begin(), 
+    [&](double x) {return dHpdx_of_x(x);}
+  );
+  
+  Spline dHpdx_spline;
+  dHpdx_spline.create(x_array, dHpdx_vector, "dHp_dx_spline");
+  double dH_dx_acc_onset = 0.0;
+  auto x_range = std::pair<double,double>(x_start, x_end);
+
+  double x_acc_onset = Utils::binary_search_for_value(
+    dHpdx_spline,
+    dH_dx_acc_onset,
+    x_range
+  );
+  
+  return x_acc_onset;
+}
+
 double BackgroundCosmology::get_mr_equality(Vector x_array) const{
   int nx_mr_eq = x_array.size();
   Vector Delta_Omega_MR(nx_mr_eq);
-  for (int ix=0; ix<nx_mr_eq; ix++){
-    double x = x_array[ix];
-    Delta_Omega_MR[ix] = get_OmegaR(x) - get_OmegaB(x) - get_OmegaCDM(x);
-  } 
-  double MR_eq = 0.0;
+  std::transform(x_array.begin(), x_array.end(), Delta_Omega_MR.begin(),
+      [&](double x) {
+        return get_OmegaR(x) + get_OmegaNu(x) - get_OmegaB(x) - get_OmegaCDM(x);
+      });
+      
   Spline Delta_Omega_MR_spline;
   Delta_Omega_MR_spline.create(x_array, Delta_Omega_MR, "MR_EQ_spline");
+  double MR_eq = 0.0;
   auto x_range = std::pair<double,double>(x_start, x_end);
-  double x_at_rec = Utils::binary_search_for_value(Delta_Omega_MR_spline, MR_eq, x_range);
-  return x_at_rec;
+  
+  double x_mr_eq = Utils::binary_search_for_value(
+    Delta_Omega_MR_spline, 
+    MR_eq, 
+    x_range);
+
+  return x_mr_eq;
+}
+
+double BackgroundCosmology::get_mL_equality() const{
+  Vector x_array = Utils::linspace(x_start, x_end, nx);
+  Vector Delta_Omega_ML(nx);
+
+  std::transform(x_array.begin(), x_array.end(), Delta_Omega_ML.begin(),
+      [&](double x) {
+        return get_OmegaB(x) + get_OmegaCDM(x) - get_OmegaLambda(x);
+      }
+  );
+  double ML_eq = 0.0;
+  Spline Delta_Omega_ML_spline;
+  Delta_Omega_ML_spline.create(x_array, Delta_Omega_ML, "ML_EQ_spline");
+  auto x_range = std::pair<double,double>(x_start, x_end);
+  double x_ml_eq = Utils::binary_search_for_value(
+    Delta_Omega_ML_spline, 
+    ML_eq, 
+    x_range);
+  return x_ml_eq;
 }
 
 double BackgroundCosmology::get_k_eta_equals_unity(double k) const{
@@ -375,6 +422,11 @@ void BackgroundCosmology::output(const std::string filename) const{
     fp << get_luminosity_distance_of_x(x) << " ";
     fp <<"\n";
   };
+
+  double x_mr_eq      = get_mr_equality(x_array);
+  double x_mL_eq      = get_mL_equality();
+  double x_acc_onset  = get_acceleration_onset();
+  fp << x_mr_eq << " " << x_mL_eq << " " << x_acc_onset << "\n";
   std::for_each(x_array.begin(), x_array.end(), print_data);
 }
 

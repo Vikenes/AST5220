@@ -128,10 +128,13 @@ def load(file, folder=data_path, skiprows=0):
 
 
 
-def plot_single_param(x, quantity, fname, mr_eq=None, mL_eq=None, acc=None, 
-                        xlabel=None, ylabel=None, xlim=None, ylim=None, 
-                        title=None, legend=False, legendloc='best', yticks=None, 
-                        figsize=(8,6), log=True, save=True, push=False, temp=False):
+def plot_single_param(x, quantity, fname, 
+                      mr_eq=None, mL_eq=None, acc=None, 
+                      xlabel=None, ylabel=None, 
+                      xlim=None, ylim=None,
+                      legend=False, legendloc='best', yticks=None,
+                      title=None, figsize=(8,6), log=True, 
+                      save=True, push=False, temp=False):
 
     fig, ax = plt.subplots(figsize=figsize)
     ax.plot(x, quantity, color='blue')
@@ -165,8 +168,12 @@ def plot_single_param(x, quantity, fname, mr_eq=None, mL_eq=None, acc=None,
     save_push(fig, fname, save, push, temp=temp)
     
 
-def plot_omega_params(x, m, r, L, fname, xlabel=None, ylabel=None, title=None, 
-                    xlim=[-15,3], ylim=[0,1.1], save=True, push=False, temp=False):
+def plot_omega_params(x, m, r, L, 
+                      fname, title=None,
+                      mr_eq=None, ml_eq=None, acc=None,
+                      xlabel=r"$x$", ylabel=None,
+                      xlim=[-15,3], ylim=[0,1.2], 
+                      save=True, push=False, temp=False):
 
     fig, ax = plt.subplots(figsize=(9,7))
 
@@ -181,13 +188,33 @@ def plot_omega_params(x, m, r, L, fname, xlabel=None, ylabel=None, title=None,
     if ylim is not None:
         ax.set_ylim(ylim)
 
-    leg1 = plt.legend(handles=[r_], loc='center left' , handlelength=1, fontsize=20)
-    leg3 = plt.legend(handles=[l_], loc='center right', handlelength=1, fontsize=20)
-    leg2 = plt.legend(handles=[m_], loc=(0.44, 0.48)     ,handlelength=1, fontsize=20)
+    leg1 = plt.legend(handles=[r_], loc='upper left' , handlelength=1, fontsize=20)
+    leg2 = plt.legend(handles=[m_], loc=(0.44, 0.88)  , handlelength=1, fontsize=20)
+    # leg2 = plt.legend(handles=[m_], loc='upper center'  , handlelength=1, fontsize=20)
+    leg3 = plt.legend(handles=[l_], loc='upper right', handlelength=1, fontsize=20)
 
     ax.add_artist(leg1)
     ax.add_artist(leg2)
     ax.add_artist(leg3)
+    v_handles = []
+    if mr_eq is not None:
+        v1 = ax.vlines(mr_eq, *ylim, ls='dashed', alpha=0.5,
+                       color='red', label=r'$\Omega_\mathrm{rel}=\Omega_m$')
+        v_handles.append(v1)
+
+    if ml_eq is not None:
+        v2 = ax.vlines(ml_eq, *ylim, ls='dashed', alpha=0.5,
+                       color='green', label=r'$\Omega_m=\Omega_\Lambda$')
+        v_handles.append(v2)
+        
+    if acc is not None:
+        v3 = ax.vlines(acc, *ylim, ls='dashed', alpha=0.5, 
+                       color='purple', label=r'$\ddot{a}=0$')
+        v_handles.append(v3)
+        
+    if len(v_handles)>0:
+        v_leg = plt.legend(handles=v_handles, loc='center left')
+        ax.add_artist(v_leg) 
 
     set_ax_info(ax, xlabel, ylabel, title, legend=False)#, legendloc="center")
     
@@ -195,10 +222,13 @@ def plot_omega_params(x, m, r, L, fname, xlabel=None, ylabel=None, title=None,
 
 
 
-def compare_dH_and_ddH_over_H(x, dH_over_H, ddH_over_H, dH_label, ddH_label, x_mr_eq, x_mL_eq, 
-                        title=None, xlim=[-16,5], save=True, push=False, temp=False):
+def compare_dH_and_ddH_over_H(x, dH_over_H, ddH_over_H, 
+                              dH_label, ddH_label, 
+                              x_mr_eq, x_mL_eq, 
+                              title=None, xlim=[-16,5], ylim=[-1.1, 1.5],
+                              save=True, push=False, temp=False):
     
-    fig, ax = plt.subplots(figsize=(10,8))
+    fig, ax = plt.subplots(figsize=(11,8))
 
     dH_,  = ax.plot(x, dH_over_H, color='blue', label=dH_label)
     ddH_, = ax.plot(x, ddH_over_H, color='k', label=ddH_label)
@@ -211,19 +241,27 @@ def compare_dH_and_ddH_over_H(x, dH_over_H, ddH_over_H, dH_label, ddH_label, x_m
     ax.hlines(1/4, xmin=x_mr_eq, xmax=x_mL_eq,ls='dashed',color='green')
     ax.hlines(1, xmin=x_mL_eq, xmax=xlim[-1],  ls='dashed',color='orange')
 
+    l4 = ax.vlines(x_mr_eq, *ylim, ls='dotted', alpha=0.5,
+                    color='red', label=r'$\Omega_\mathrm{rel}=\Omega_m$')
+    l5 = ax.vlines(x_mL_eq, *ylim, ls='dotted', alpha=0.5,
+                    color='green', label=r'$\Omega_m=\Omega_\Lambda$')
+    
     leg1 = plt.legend(handles=[dH_, ddH_], loc='center left', fontsize=40, handlelength=1)
-    leg2 = plt.legend(handles=[l1,l2,l3])
+    leg2 = plt.legend(handles=[l1,l2,l3], loc='lower right')
+    leg3 = plt.legend(handles=[l4, l5], loc=(0.435,0.85))#, bbox_to_anchor=(-0.1,1))
     ax.add_artist(leg1)
     ax.add_artist(leg2)
+    ax.add_artist(leg3)
 
     ax.set_xlim(xlim)
+    ax.set_ylim(ylim)
 
     set_ax_info(ax, xlabel='$x$', title=title, legend=False)
     # ax.set_xticks([-15,-12,-9, -6, -3, 0, 3])
     ax.set_xticks([-15,-10,-5, 0, 5])
 
 
-    save_push(fig, 'dH_and_ddH_over_H.pdf', save, temp=temp)
+    save_push(fig, 'dH_and_ddH_over_H.pdf', save, push=push, temp=temp)
 
 
         
@@ -244,27 +282,40 @@ def compare_ddH_over_H(x, ddH_H, H_label, x_mr_eq, x_mL_eq,
 
 
 
-def plot_t_and_eta(x, t, etac, fname, xlim=[-17,5], 
-                   mr_eq=None, mL_eq=None, acc=None, save=True, temp=False):
-    fig, ax = plt.subplots(figsize=(8,6))
+def plot_t_and_eta(x, t, etac, fname, 
+                   mr_eq=None, mL_eq=None, acc=None, 
+                   xlim=[-17,5], ylim=[5e-16, 5e2],
+                   ylabel=None, xlabel=r"$x$",
+                   save=True, temp=False, push=False):
+
+    fig, ax = plt.subplots(figsize=(10,7))
+
+    l1, = ax.plot(x, etac, color='blue', label=r'$\eta(x)/c$')
+    l2, = ax.plot(x, t, color='k', label=r'$t(x)$')
+    # ylims = ax.get_ylim()
+    if mr_eq is not None:
+        l3 = ax.vlines(mr_eq, *ylim, ls='dashed', color='red', alpha=0.5, label=r'$\Omega_\mathrm{rad}=\Omega_m$')
+    if mL_eq is not None:
+        l4 = ax.vlines(mL_eq, *ylim, ls='dashed', color='green', alpha=0.5, label=r'$\Omega_m=\Omega_\Lambda$')
+    if acc is not None:
+        l5 = ax.vlines(acc, *ylim, ls='dashed', color='purple', alpha=0.5, label=r'$\ddot{a}=0$')
+
+    leg1 = plt.legend(handles=[l1,l2], loc='upper left')
+    leg2 = plt.legend(handles=[l3,l4,l5], loc=(0.425, 0.1))
+    ax.add_artist(leg1)
+    ax.add_artist(leg2)
+
+
+
+    # ylabel=r'Time $[\mathrm{Gyr}]$'
+    # xlabel=r"$x$"
 
     ax.set_xlim(xlim)
-    ax.plot(x, etac, color='blue', label=r'$\eta(x)/c$')
-    ax.plot(x, t, color='k', label=r'$t(x)$')
-    ylims = ax.get_ylim()
-    if mr_eq is not None:
-        ax.vlines(mr_eq, *ylims, ls='dashed', color='red', alpha=0.5, label=r'$\Omega_\mathrm{rad}=\Omega_m$')
-    if mL_eq is not None:
-        ax.vlines(mL_eq, *ylims, ls='dashed', color='green', alpha=0.5, label=r'$\Omega_m=\Omega_\Lambda$')
-    if acc is not None:
-        ax.vlines(acc, *ylims, ls='dashed', color='purple', alpha=0.5, label=r'$\ddot{a}=0$')
+    ax.set_ylim(ylim)
+    ax.set_yscale('log')
 
-    ylabel=r'Time $[\mathrm{Gyr}]$'
-    xlabel=r"$x$"
-
-
-    set_ax_info(ax, xlabel, ylabel)
-    save_push(fig, fname, save=save, temp=temp)
+    set_ax_info(ax, xlabel, ylabel, legend=False)
+    save_push(fig, fname, save=save, temp=temp, push=push)
 
 
 
