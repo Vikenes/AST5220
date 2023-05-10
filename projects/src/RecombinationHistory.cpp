@@ -72,8 +72,6 @@ void RecombinationHistory::solve_number_density_electrons(){
       // the Peebles equation
       //==============================================================
 
-      std::cout << "End of Saha regime reached at x=" << x_array[i-1] << std::endl; 
-
       // The Peebles ODE equation
       ODEFunction dXedx = [&](double x, const double *Xe, double *dXedx){
         return rhs_peebles_ode(x, Xe, dXedx);
