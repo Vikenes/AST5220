@@ -14,10 +14,8 @@ int main(int argc, char **argv){
 
   // Background parameters
   double h           = 0.67;
-  // double h           = 0.7;
   double OmegaB      = 0.05;
   double OmegaCDM    = 0.267;
-  // double OmegaCDM    = 0.45;
   double OmegaK      = 0.0;
   // double Neff        = 3.046;
   double Neff        = 0.0;
@@ -43,6 +41,7 @@ int main(int argc, char **argv){
   // cosmo.info();
   
   // Output background evolution quantities
+  // cosmo.output("milestone1/data/cosmology_new.txt");          // 
   // cosmo.output("milestone1/data/cosmology.txt");          // Consistency checks and analysis  
   // cosmo.output("milestone1/data/cosmology_dL.txt");       // Comparing with supernova data 
   // cosmo.output("milestone1/data/cosmology_times.txt");    // High resolution for important times  
@@ -111,7 +110,7 @@ int main(int argc, char **argv){
 
   
   // Remove when module is completed
-  return 0;
+  // return 0;
   
   //=========================================================================
   // Module IV
@@ -119,7 +118,7 @@ int main(int argc, char **argv){
 
   PowerSpectrum power(&cosmo, &rec, &pert, A_s, n_s, kpivot_mpc);
   power.solve();
-  power.output("cells.txt");
+  // power.output("cells.txt");
   
   // Remove when module is completed
   return 0;

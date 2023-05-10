@@ -27,7 +27,7 @@ void PowerSpectrum::solve(){
   //=========================================================================
   // TODO: Choose the range of k's and the resolution to compute Theta_ell(k)
   //=========================================================================
-  Vector k_array;
+  Vector k_array = Utils::linspace(k_min, k_max, n_k);
   Vector log_k_array = log(k_array);
 
   //=========================================================================
@@ -47,15 +47,9 @@ void PowerSpectrum::solve(){
   // Implement solve_for_cell
   //=========================================================================
   auto cell_TT = solve_for_cell(log_k_array, thetaT_ell_of_k_spline, thetaT_ell_of_k_spline);
-  cell_TT_spline.create(ells, cell_TT, "Cell_TT_of_ell");
+  // cell_TT_spline.create(ells, cell_TT, "Cell_TT_of_ell");
   
-  //=========================================================================
-  // TODO: Do the same for polarization...
-  //=========================================================================
-  // ...
-  // ...
-  // ...
-  // ...
+
 }
 
 //====================================================
@@ -67,7 +61,7 @@ void PowerSpectrum::generate_bessel_function_splines(){
   
   // Make storage for the splines
   j_ell_splines = std::vector<Spline>(ells.size());
-    
+  
   //=============================================================================
   // TODO: Compute splines for bessel functions j_ell(z)
   // Choose a suitable range for each ell
@@ -75,16 +69,25 @@ void PowerSpectrum::generate_bessel_function_splines(){
   // might break down. Use j_ell(z) = Utils::j_ell(ell, z)
   //=============================================================================
 
+  const double zmax = k_max * cosmo->eta_of_x(0.0);
+  const double zmin = 0.0; 
+  const int n_samples_per_oscillation = 20;
+  const double dz = 2.0 * M_PI / (double)n_samples_per_oscillation; 
+  const int n_z = (zmax - zmin) / dz;
+
+  #pragma omp parallel for schedule(dynamic, 1)
   for(size_t i = 0; i < ells.size(); i++){
     const int ell = ells[i];
 
-    // ...
-    // ...
-    // ...
-    // ...
-
-    // Make the j_ell_splines[i] spline
+    Vector z_array = Utils::linspace(zmin, zmax, n_z);
+    Vector j_ell_array(n_z);
+    for(int iz=0; iz < n_z; iz++){
+      j_ell_array[iz] = Utils::j_ell(ell, z_array[iz]);
+    }
+    std::string j_ell_name = "j_" + std::to_string(ell); 
+    j_ell_splines[i].create(z_array, j_ell_array, j_ell_name);
   }
+  
 
   Utils::EndTiming("besselspline");
 }
@@ -101,6 +104,9 @@ Vector2D PowerSpectrum::line_of_sight_integration_single(
 
   // Make storage for the results
   Vector2D result = Vector2D(ells.size(), Vector(k_array.size()));
+  const int nells = ells.size();
+  const double eta0 = cosmo->eta_of_x(0.0);
+  const double dx = (x_end - x_start) / (double)n_x;
 
   for(size_t ik = 0; ik < k_array.size(); ik++){
 
@@ -109,9 +115,13 @@ Vector2D PowerSpectrum::line_of_sight_integration_single(
     // F_ell(k) = Int dx jell(k(eta-eta0)) * S(x,k) for all the ell values for the 
     // given value of k
     //=============================================================================
-    // ...
-    // ...
-    // ...
+    double k = k_array[ik];
+    for(int iell=0; iell<nells; iell++){
+      std::function<double(double)> integrand = [&](double x){
+        return source_function(x, k) * j_ell_splines[iell](k*(eta0 - cosmo->eta_of_x(x)));
+      };
+      result[iell][ik] = integrate_trapezoidal(integrand, x_start, x_end, dx); 
+    }
 
     // Store the result for Source_ell(k) in results[ell][ik]
   }
@@ -142,25 +152,18 @@ void PowerSpectrum::line_of_sight_integration(Vector & k_array){
 
   // Do the line of sight integration
   Vector2D thetaT_ell_of_k = line_of_sight_integration_single(k_array, source_function_T);
-
+  std::cout << "Finished single" << std::endl;
   // Spline the result and store it in thetaT_ell_of_k_spline
   // ...
-  // ...
-  // ...
-  // ...
-
-  //============================================================================
-  // TODO: Solve for ThetaE_ell(k) and spline
-  //============================================================================
-  if(Constants.polarization){
-
-    // ...
-    // ...
-    // ...
-    // ...
-
+  for(int i=0; i<nells; i++){
+    int ell = ells[i];
+    std::string Theta_ell_name = "Theta_" + std::to_string(ell) + "of_k_spline";
+    thetaT_ell_of_k_spline[i].create(k_array, thetaT_ell_of_k[i], Theta_ell_name);
   }
+
 }
+
+
 
 //====================================================
 // Compute Cell (could be TT or TE or EE) 
@@ -177,10 +180,7 @@ Vector PowerSpectrum::solve_for_cell(
   // or equivalently solve the ODE system dCell/dlogk = 4 * pi * P(k) * f_ell * g_ell
   //============================================================================
 
-  // ...
-  // ...
-  // ...
-  // ...
+  
 
   Vector result;
 
@@ -211,6 +211,27 @@ double PowerSpectrum::get_matter_power_spectrum(const double x, const double k_m
   // ...
 
   return pofk;
+}
+
+
+double PowerSpectrum::integrate_trapezoidal(
+    std::function<double(double)> &f, 
+    const double zmin,
+    const double zmax,
+    const double dz){
+
+  double sum = 0.0;
+  double z = zmin;
+
+  sum += 0.5 * f(z);
+  z += dz;
+
+  while(z < zmax){
+    sum += f(z);
+    z += dz;
+  }
+
+  return sum * dz;
 }
 
 //====================================================
