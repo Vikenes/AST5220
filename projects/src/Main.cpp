@@ -17,8 +17,7 @@ int main(int argc, char **argv){
   double OmegaB      = 0.05;
   double OmegaCDM    = 0.267;
   double OmegaK      = 0.0;
-  // double Neff        = 3.046;
-  double Neff        = 0.0;
+  double Neff        = 3.046;
   double TCMB        = 2.7255;
 
   // Recombination parameters
@@ -35,92 +34,123 @@ int main(int argc, char **argv){
   // Module I
   //=========================================================================
 
-  // Set up and solve the background
-  BackgroundCosmology cosmo(h, OmegaB, OmegaCDM, OmegaK, Neff, TCMB);
-  cosmo.solve();
-  // cosmo.info();
-  
-  // Output background evolution quantities
-  // cosmo.output("milestone1/data/cosmology_new.txt");          // 
-  // cosmo.output("milestone1/data/cosmology.txt");          // Consistency checks and analysis  
-  // cosmo.output("milestone1/data/cosmology_dL.txt");       // Comparing with supernova data 
-  // cosmo.output("milestone1/data/cosmology_times.txt");    // High resolution for important times  
+  bool m1_output = false;
+  bool m2_output = false;
+  bool m3_output = false;
+  bool m4_output = true;
 
-  //=====================
-  // Run simulation with parameters 
-  // from the best supernova fit 
-  //=====================
-  // double h_est          = 0.70189;
-  // double OmegaM_est     = 0.25932;
-  // double OmegaK_est     = 0.0673887;
-  // double OmegaCDM_est   = OmegaM_est - OmegaB;
-  // BackgroundCosmology bestSNfit(h_est, OmegaB, OmegaCDM_est, OmegaK_est, Neff, TCMB);
-  // bestSNfit.solve();
-  // bestSNfit.info();
-  // bestSNfit.output("milestone1/data/bestfit_cosmology_dL.txt");
+  if(m1_output){
+    // Set up and solve the background
+    BackgroundCosmology cosmo(h, OmegaB, OmegaCDM, OmegaK, Neff, TCMB);
+    cosmo.solve();
+    cosmo.info();
+    
+    // Output background evolution quantities
+    // cosmo.output("milestone1/data/cosmology_new.txt");          // 
+    // cosmo.output("milestone1/data/cosmology.txt");          // Consistency checks and analysis  
+    // cosmo.output("milestone1/data/cosmology_dL.txt");       // Comparing with supernova data 
+    // cosmo.output("milestone1/data/cosmology_times.txt");    // High resolution for important times  
 
-  // Utils::StartTiming("Supernova");
-  // mcmc_fit_to_supernova_data("milestone1/data/supernovadata.txt", "milestone1/data/supernovafit.txt");
-  // Utils::EndTiming("Supernova"); 
+    //=====================
+    // Run simulation with parameters 
+    // from the best supernova fit 
+    //=====================
+    // double h_est          = 0.70189;
+    // double OmegaM_est     = 0.25932;
+    // double OmegaK_est     = 0.0673887;
+    // double OmegaCDM_est   = OmegaM_est - OmegaB;
+    // BackgroundCosmology bestSNfit(h_est, OmegaB, OmegaCDM_est, OmegaK_est, Neff, TCMB);
+    // bestSNfit.solve();
+    // bestSNfit.info();
+    // bestSNfit.output("milestone1/data/bestfit_cosmology_dL.txt");
 
-  // Remove when module is completed
-  // return 0;
+    // Utils::StartTiming("Supernova");
+    // mcmc_fit_to_supernova_data("milestone1/data/supernovadata.txt", "milestone1/data/supernovafit.txt");
+    // Utils::EndTiming("Supernova"); 
+
+  }
 
   //=========================================================================
   // Module II
   //=========================================================================
+  if(m2_output){
+    // Set up and solve the background
+    BackgroundCosmology cosmo(h, OmegaB, OmegaCDM, OmegaK, Neff, TCMB);
+    cosmo.solve();
+
+    // Solve the recombination history
+    RecombinationHistory rec(&cosmo, Yp);
+    rec.solve();
+    rec.info();
   
-  // Solve the recombination history
-  RecombinationHistory rec(&cosmo, Yp);
-  rec.solve();
-  // rec.info();
-
-
-  // Output recombination quantities
-  // rec.output("milestone2/data/recombination.txt");
-  // rec.output("milestone2/data/recombination_saha.txt");
-  // rec.output("milestone2/data/recombination_split.txt");
-
-  //===== Find decoupling times ======
-  // rec.output_important_times("milestone2/data/rec_times.txt");
-  // rec.output_important_times("milestone2/data/rec_times_saha.txt");
-  // rec.output_important_times("milestone2/data/rec_times.txt");
-
   
+    // Output recombination quantities
+    rec.output("milestone2/data/recombination.txt");
+    rec.output("milestone2/data/recombination_saha.txt");
+    rec.output("milestone2/data/recombination_split.txt");
+  
+    //===== Find decoupling times ======
+    rec.output_important_times("milestone2/data/rec_times.txt");
+    rec.output_important_times("milestone2/data/rec_times_saha.txt");
+  }
 
   //=========================================================================
   // Module III
   //=========================================================================
- 
-  // Solve the perturbations
-  Perturbations pert(&cosmo, &rec);
-  pert.solve();
-  // pert.info();
+  if(m3_output){
+    // Set up and solve the background
+    // Set Neff = 0 in this milestone to ignore neutrinos.
+    BackgroundCosmology cosmo(h, OmegaB, OmegaCDM, OmegaK, 0.0, TCMB);
+    cosmo.solve();
+
+    // Solve the recombination history
+    RecombinationHistory rec(&cosmo, Yp);
+    rec.solve();
   
-  // Output perturbation quantities
-  // double kvalue = 0.001 / Constants.Mpc;
-  // pert.output(kvalue, "milestone3/data/perturbations_k0.001.txt");
+    // Solve the perturbations
+    Perturbations pert(&cosmo, &rec);
+    pert.solve();
+    pert.info();
+    
+    // Output perturbation quantities
+    double kvalue = 0.001 / Constants.Mpc;
+    pert.output(kvalue, "milestone3/data/perturbations_k0.001.txt");
 
-  // kvalue = 0.03 / Constants.Mpc;
-  // pert.output(kvalue, "milestone3/data/perturbations_k0.03.txt");
+    kvalue = 0.03 / Constants.Mpc;
+    pert.output(kvalue, "milestone3/data/perturbations_k0.03.txt");
 
-  // kvalue = 0.3 / Constants.Mpc;
-  // pert.output(kvalue, "milestone3/data/perturbations_k0.3.txt");
+    kvalue = 0.3 / Constants.Mpc;
+    pert.output(kvalue, "milestone3/data/perturbations_k0.3.txt");
+  }
 
 
-  
-  // Remove when module is completed
-  // return 0;
   
   //=========================================================================
   // Module IV
   //=========================================================================
+  if(m4_output){
+    bool source = false;
+    // Set up and solve the background
+    // Set Neff = 0 in this milestone to ignore neutrinos.
+    // BackgroundCosmology cosmo(h, OmegaB, OmegaCDM, OmegaK, 0.0, TCMB);
+    BackgroundCosmology cosmo(0.7, OmegaB, 0.45, OmegaK, 0.0, TCMB);
+    cosmo.solve();
 
-  PowerSpectrum power(&cosmo, &rec, &pert, A_s, n_s, kpivot_mpc);
-  power.solve();
-  power.output("milestone4/data/cellspar.txt");
+    // Solve the recombination history
+    RecombinationHistory rec(&cosmo, Yp);
+    rec.solve();
+  
+    // Solve the perturbations
+    Perturbations pert(&cosmo, &rec);
+    pert.solve(source);
+
+    PowerSpectrum power(&cosmo, &rec, &pert, A_s, n_s, kpivot_mpc);
+    // power.solve(false);
+    // power.output("milestone4/data/cellsignoreterms.txt");
+    power.outputPS("milestone4/data/matterPS.txt", 1000);
   
   // Remove when module is completed
+  }
   return 0;
 
   // Utils::EndTiming("Everything");
