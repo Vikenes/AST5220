@@ -109,7 +109,7 @@ class Perturbations{
         RecombinationHistory *rec); 
 
     // Do all the solving
-    void solve();
+    void solve(bool source=true);
     
     // Print some useful info about the class
     void info() const;

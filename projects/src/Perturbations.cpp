@@ -14,7 +14,7 @@ Perturbations::Perturbations(
 //====================================================
 // Do all the solving
 //====================================================
-void Perturbations::solve(){
+void Perturbations::solve(bool source){
 
   // Integrate all the perturbation equation and spline the result
   Utils::StartTiming("integrateperturbation");
@@ -23,9 +23,11 @@ void Perturbations::solve(){
 
 
   // Compute source functions and spline the result
-  Utils::StartTiming("source");
-  compute_source_functions();
-  Utils::EndTiming("source");
+  if(source){
+    Utils::StartTiming("source");
+    compute_source_functions();
+    Utils::EndTiming("source");
+  }
 
 }
 
