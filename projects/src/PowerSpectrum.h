@@ -33,13 +33,14 @@ class PowerSpectrum {
     const double k_max = Constants.k_max;
 
     const int los_samples_per_osc = 8;
-    const int bessel_samples_per_osc = 20;
+    const int bessel_samples_per_osc = 16;
     const int cell_samples_per_osc = 16;
 
     // The x-values we integrate to compute Theta_ell(k) etc. for
     const int n_x        = 1000;
     const double x_start = Constants.x_start;
     const double x_end   = Constants.x_end;
+    const double x_start_LOS = -11.0;
 
     
     // The ells's we will compute Theta_ell and Cell for
@@ -121,7 +122,7 @@ class PowerSpectrum {
         double kpivot_mpc);
     
     // Do all the solving: bessel functions, LOS integration and then compute Cells
-    void solve();
+    void solve(bool load_data);
 
     // The dimensionless primordial power-spectrum Delta = 2pi^2/k^3 P(k)
     double primordial_power_spectrum(const double k) const;
@@ -142,6 +143,8 @@ class PowerSpectrum {
 
     // Output Cells in units of l(l+1)/2pi (muK)^2
     void output(std::string filename) const;
+    void outputPS(std::string filename, int nk) const;
+
 };
 
 #endif

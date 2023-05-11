@@ -24,7 +24,7 @@ PowerSpectrum::PowerSpectrum(
 //====================================================
 // Do all the solving
 //====================================================
-void PowerSpectrum::solve(){
+void PowerSpectrum::solve(bool load_data){
 
   //=========================================================================
   // TODO: Choose the range of k's and the resolution to compute Theta_ell(k)
@@ -39,21 +39,25 @@ void PowerSpectrum::solve(){
   Vector k_array = Utils::linspace(k_min, k_max, nk);
   Vector log_k_array = Utils::linspace(log(k_min), log(k_max), nlogk);
 
+  
   //=========================================================================
-  // TODO: Make splines for j_ell. 
-  // Implement generate_bessel_function_splines
+  // Load data from previous run.
+  // Mainly for testing purposes to avoid long simulations. 
+  //=========================================================================
+
+
+  //=========================================================================
+  // Generate_bessel_function_splines
   //=========================================================================
   generate_bessel_function_splines();
 
   //=========================================================================
-  // TODO: Line of sight integration to get Theta_ell(k)
-  // Implement line_of_sight_integration
+  // Line of sight integration to get Theta_ell(k)
   //=========================================================================
   line_of_sight_integration(k_array);
 
   //=========================================================================
-  // TODO: Integration to get Cell by solving dCell^f/dlogk = Delta(k) * f_ell(k)^2
-  // Implement solve_for_cell
+  // Integration to get Cell by solving dCell^f/dlogk = Delta(k) * f_ell(k)^2
   //=========================================================================
   auto cell_TT = solve_for_cell(log_k_array, thetaT_ell_of_k_spline, thetaT_ell_of_k_spline);
   cell_TT_spline.create(ells, cell_TT, "Cell_TT_of_ell");
@@ -64,7 +68,6 @@ void PowerSpectrum::solve(){
 //====================================================
 // Generate splines of j_ell(z) needed for LOS integration
 //====================================================
-
 void PowerSpectrum::generate_bessel_function_splines(){
   Utils::StartTiming("besselspline");
   
@@ -117,6 +120,24 @@ Vector2D PowerSpectrum::line_of_sight_integration_single(
   const double eta0 = cosmo->eta_of_x(0.0);
   const double dx = (x_end - x_start) / (double)n_x;
 
+  Vector x_array = Utils::linspace(x_start, x_end, n_x);
+
+  const int n_x_LOS = int((x_end - x_start_LOS) / dx);
+  Vector x_LOS = Utils::linspace(x_start_LOS, x_end, n_x_LOS);
+
+  // std::cout << "nxlos=" << n_x_LOS << std::endl;
+  // return result;   
+  // Vector x_LOS;
+  // for(int ix=0; ix<n_x; ix++){
+  //   double x_ = x_array[ix];
+  //   if(rec->g_tilde_of_x(x_) > 1e-5 || x_ > -4.){
+  //     x_LOS.push_back(x_);
+  //   }
+  // }
+  // std::cout << "N=" << x_LOS.size() << std::endl;
+  // std::cout << "x_0=" << x_LOS[0] << std::endl;
+
+
   #pragma omp parallel for schedule(dynamic, 1)
   for(size_t ik = 0; ik < k_array.size(); ik++){
 
@@ -126,15 +147,25 @@ Vector2D PowerSpectrum::line_of_sight_integration_single(
     // given value of k
     //=============================================================================
     double k = k_array[ik];
+   
     for(int iell=0; iell<nells; iell++){
-      std::function<double(double)> integrand = [&](double x){
-        return source_function(x, k) * j_ell_splines[iell](k*(eta0 - cosmo->eta_of_x(x)));
-      };
-      result[iell][ik] = integrate_trapezoidal(integrand, x_start, x_end, dx); 
+      // std::function<double(double)> integrand = [&](double x){
+        // return source_function(x, k) * j_ell_splines[iell](k*(eta0 - cosmo->eta_of_x(x)));
+      // };
+      double integral_sum = 0;
+      // double x;  
+      double x = x_start_LOS;  
+      for(int ix=0; ix<x_LOS.size(); ix++){
+        // x = x_LOS[ix];
+        integral_sum += source_function(x, k) * j_ell_splines[iell](k*(eta0 - cosmo->eta_of_x(x)));
+        x += dx;
+      }
+      result[iell][ik] = integral_sum * dx; 
     }
 
     // Store the result for Source_ell(k) in results[ell][ik]
   }
+  std::cout << std::endl;
 
   Utils::EndTiming("lineofsight");
   return result;
@@ -231,11 +262,18 @@ double PowerSpectrum::get_matter_power_spectrum(const double x, const double k_m
   //=============================================================================
   // TODO: Compute the matter power spectrum
   //=============================================================================
+  double c = Constants.c;
+  double k_SI = k_mpc / Constants.Mpc;
+  double Phi = pert->get_Phi(x, k_SI);
+  double OmegaM_tot = cosmo->get_OmegaB() + cosmo->get_OmegaCDM();
+  double a = 1.;
+  double H0 = cosmo->get_H0();
 
-  // ...
-  // ...
-  // ...
+  double Delta_M = c*c*k_SI*k_SI * Phi / (3./2. * OmegaM_tot * H0*H0);
+  double k_mpc_cubed = k_mpc * k_mpc * k_mpc;
+  double P_primordial = 2.0*M_PI*M_PI * primordial_power_spectrum(k_SI) / k_mpc_cubed; 
 
+  pofk = abs(Delta_M*Delta_M) * P_primordial;
   return pofk;
 }
 
@@ -261,6 +299,7 @@ double PowerSpectrum::integrate_trapezoidal(
 
   return sum * dz;
 }
+
 
 //====================================================
 // Get methods
@@ -303,3 +342,30 @@ void PowerSpectrum::output(std::string filename) const{
   std::for_each(ellvalues.begin(), ellvalues.end(), print_data);
 }
 
+void PowerSpectrum::outputPS(std::string filename, int nk) const{
+  // Output in standard units of muK^2
+  std::ofstream fp(filename.c_str());
+  // const int ellmax = int(ells[ells.size()-1]);
+  
+  const double Mpc = Constants.Mpc;
+  auto kvalues = Utils::linspace(k_min*Mpc, k_max*Mpc, nk-1);
+  // auto kvalues = exp(logkvalues);
+  const double h = cosmo->get_h();
+  const double knorm = 1.0 / h;
+  const double PSnorm = h*h*h; // / (knorm*knorm*knorm);
+
+
+  auto print_data = [&] (const double k) {
+    double k_h_Mpc = k * knorm;
+    fp << k_h_Mpc                                     << " ";
+    fp << get_matter_power_spectrum(0.0, k) * PSnorm  << " ";
+    fp << "\n";
+  };
+
+  std::cout << "Writing file to: " << filename << std::endl;
+
+  std::for_each(kvalues.begin(), kvalues.end(), print_data);
+
+  std::cout << "Finished writing to file" << std::endl;
+
+}
