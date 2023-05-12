@@ -25,24 +25,28 @@ PUSH = False
 class ExpansionHistory:
 
     def __init__(self, 
-                 filename,
+                 fname_cosmology,
+                 fname_fitted_cosmology,
                  time_unit=u.Myr,
                  length_unit=u.Mpc):
-        self.data   = self.load(filename) 
+        self.data   = self.load(fname_cosmology) 
         self.x      = self.data[0]
-        self.x_mr_eq, self.x_ml_eq, self.x_acc_onset = self.load_important_times(filename) 
+        self.x_mr_eq, self.x_ml_eq, self.x_acc_onset = self.load_important_times(fname_cosmology) 
 
         self.time_unit = time_unit
         self.length_unit = length_unit
+
+        self.supernovadata = self.load("supernovadata.txt")
+        self.fname_fitted_cosmology = fname_fitted_cosmology
 
         self.H_loaded = False 
         self.eta_t_loaded = False 
         self.omegas_loaded = False 
 
-    def load(self, filename):
+    def load(self, filename, skiprows=1):
         data = np.loadtxt(DATA_PATH + filename, 
                           unpack=True, 
-                          skiprows=1)
+                          skiprows=skiprows)
         return data 
         
     def load_important_times(self, filename):
@@ -83,6 +87,29 @@ class ExpansionHistory:
         self.OmegaM = OmegaB + OmegaCDM
         self.OmegaRel = OmegaR + OmegaNu 
         self.OmegaLambda = OmegaLambda
+
+
+
+    def luminosity_distance(self, data):
+        ### Return z and dL for a given data file
+        #  limited to region with observational data 
+        x_sim    =  data[0]
+        dL_sim   = (data[-1]*u.m).to(u.Gpc)
+
+        z_data = self.supernovadata[0]
+        z_min = np.min(z_data) - 0.005
+        z_max = np.max(z_data) + 0.01
+
+        z_sim = self.z_of_x(x_sim) 
+        z_sim_mask = (z_sim <= z_max) & (z_sim >= z_min)
+        z_sim = z_sim[z_sim_mask]
+
+        dL_sim = dL_sim[z_sim_mask]
+        
+        return z_sim, dL_sim 
+
+
+
 
     def z_of_x(self, x):
         return np.exp(-x) - 1    
@@ -179,12 +206,33 @@ class ExpansionHistory:
                                title=title, 
                                save=SAVE, temp=TEMP, push=PUSH)
 
+
+    def plot_dL(self):
+        ### Plot dL from data and compare with simulation with Planck parameters  
+        ### plot_fit=True: Plot dL from the simulation with parameters obtained from supernovafit.
+        #       Planck results included for comparison
+        z, dL, dL_error = self.supernovadata
+        planck_data     = self.load("cosmology_dL.txt")
+        fit_data        = self.load(self.fname_fitted_cosmology)
+
+        z_planck, dL_planck = self.luminosity_distance(planck_data)
+        z_fit, dL_fit       = self.luminosity_distance(fit_data)
+
+        data    = [z,        dL, dL_error]
+        planck  = [z_planck, dL_planck.value]
+        fit     = [z_fit,    dL_fit.value]
+
+
+        plot.plot_dL(data, planck, fit, fname="dL_z_compare_fitted.pdf", save=SAVE, temp=TEMP)
+
+
+
 Cosmology = ExpansionHistory("cosmology_new.txt")
 
-# Cosmology.plot_eta_H_over_c()
-# Cosmology.plot_dH_ddH_over_H()
-# Cosmology.plot_Hp()
-# Cosmology.plot_eta_t()
+Cosmology.plot_eta_H_over_c()
+Cosmology.plot_dH_ddH_over_H()
+Cosmology.plot_Hp()
+Cosmology.plot_eta_t()
 Cosmology.plot_omegas()
 exit()
 
@@ -203,192 +251,6 @@ def data(fname="cosmology.txt"):
 data()
 
 
-def load_H_parameters(convert_units=True):
-    # Load Hp, Hp'(x) and H''(x)
-    H_params = simulation_data[1:4] / u.s 
-
-    if convert_units: 
-        H_params = H_params.to(100*u.km / u.s / u.Mpc) 
-
-    Hp, dHp_dx, ddHp_ddx = H_params 
-
-    return Hp, dHp_dx, ddHp_ddx
-
-
-def load_eta_and_t(convert_units=True):
-    eta = simulation_data[4] * u.m 
-    t   = simulation_data[5] * u.s 
-
-    if convert_units:
-        eta = eta.to(u.Mpc)
-        t = t.to(u.Gyr)
-
-    return eta, t 
-
-
-def load_omegas():
-    OmegaB, OmegaCDM, OmegaLambda = simulation_data[6:9]
-    OmegaR, OmegaNu, OmegaK = simulation_data[9:12]
-
-    OmegaM = OmegaB + OmegaCDM
-    OmegaRel = OmegaR + OmegaNu 
-
-    return OmegaM, OmegaRel, OmegaLambda 
-
-
-def equality_times(idx=False):
-    # Find matter radiation equality and matter-dark energy equality
-    # Returns the corresponding x-values by default. 
-    # idx=True returns the index of these times. 
-    OmegaM, OmegaRel, OmegaLambda = load_omegas()
-
-    Rad_dom_end = np.where(OmegaRel < OmegaM+OmegaLambda)[0][0]
-    Lambda_dom_onset = np.where(OmegaLambda > OmegaM+OmegaRel)[0][0]
-
-    MR_eq_idx = np.abs(OmegaRel[:Rad_dom_end+1] - OmegaM[:Rad_dom_end+1]).argmin() 
-    ML_eq_idx = np.abs(OmegaM[MR_eq_idx:Lambda_dom_onset+1] - OmegaLambda[MR_eq_idx:Lambda_dom_onset+1]).argmin()
-    ML_eq_idx += MR_eq_idx 
-
-        
-    if idx:
-        return MR_eq_idx, ML_eq_idx
-    else:
-        return x[MR_eq_idx], x[ML_eq_idx]
-
-def acceleration_onset(idx=False):
-
-    Hp, dHp_dx = load_H_parameters()[0:2]
-    a_dot_dot = (np.exp(-x) * Hp * dHp_dx).to((u.Gyr)**(-2)) 
-
-    accleration_onset_idx = np.argmin(np.abs(a_dot_dot))
-    if idx:
-        return accleration_onset_idx
-    else:
-        return x[accleration_onset_idx]
-
-
-def z_of_x(x_):
-    return np.exp(-x_) - 1 
-
-def radiation_matter_equality(idx=False):
-    OmegaM, OmegaRel, OmegaLambda = load_omegas()
-    matter_dom_onset_idx = np.where(OmegaM > OmegaRel+OmegaLambda)[0][0]
-
-
-
-def Hp_plot():
-    ### Plot Hp(x) ### 
-    Hp = load_H_parameters()[0]
-    ylabel = r'$\mathcal{H}\: \left[ \frac{100\,\mathrm{km/s}}{\mathrm{Mpc}} \right] $'
-
-    mr_eq, mL_eq = equality_times()
-    
-    plot.plot_single_param(x, Hp, "compare_Hp.pdf", 
-                            mr_eq=mr_eq, mL_eq=mL_eq, acc=acceleration_onset(),
-                            xlabel=r"$x$", ylabel=ylabel, 
-                            xlim=[-16,3], ylim=[1e-1, 1e4], 
-                            legend=True, legendloc='lower left', 
-                            save=SAVE, temp=TEMP)
-
-
-
-def eta_plot():
-    ### Plot eta(x). Not included in report. ### 
-    eta = load_eta_and_t()[0]
-    ylabel = r'$\eta\:\:[\mathrm{Mpc}]$'
-    mr_eq, mL_eq = equality_times()
-    plot.plot_single_param(x, eta, "compare_eta.pdf", 
-                            xlabel=r"x", ylabel=ylabel, 
-                            xlim=[-15,5], ylim=[0.1, 5e5],
-                            mr_eq=mr_eq, mL_eq=mL_eq, log=False,
-                            legend=True, save=SAVE, temp=TEMP)
-
-
-def eta_H_plot():
-    ### Plot eta*Hp/c ### 
-    Hp = load_H_parameters()[0]
-    eta = load_eta_and_t()[0]
-    ylabel = r'$\eta \mathcal{H} / c $'
-
-    eta_Hp_over_c = (eta*Hp/c).to(1)
-    mr_eq, mL_eq = equality_times()
-    plot.plot_single_param(x, eta_Hp_over_c, "compare_eta_H_over_c.pdf", 
-                            mr_eq=mr_eq, mL_eq=mL_eq, legend=True,
-                            xlabel=r"x", ylabel=ylabel, 
-                            xlim=[-16,2], ylim=[0.75, 4], 
-                            yticks=[1,2,3,4],
-                            log=False, save=SAVE, temp=TEMP)
-
-
-def plot_omegas():
-    ### Plot density parameters ### 
-    OmegaM, OmegaRel, OmegaLambda = load_omegas()
-    title = r"$\Omega_i(x)$"
-
-    plot.plot_omega_params(x, OmegaM, OmegaRel, OmegaLambda, xlabel=r'$x$', 
-                        fname="omega_i_of_x.pdf", title=title, save=SAVE, temp=TEMP)
-    
-
-
-def dH_ddH_over_H():
-    ### Compare H'/H and H''/H with analytical approx. ### 
-    Hp, dHp, ddHp = load_H_parameters()
-    m_dom, L_dom = equality_times()
-
-    dH_label = r"$\frac{\mathcal{H}'(x)}{\mathcal{H}(x)}$"
-    ddH_label = r"$\frac{\mathcal{H}''(x)}{\mathcal{H}(x)}$"
-
-
-    plot.compare_dH_and_ddH_over_H(x, dHp/Hp, ddHp/Hp, dH_label, ddH_label, m_dom, L_dom, 
-                                   title=None, save=SAVE, temp=TEMP)
-
-
-def eta_t_plot():
-    ### Plot eta and t ### 
-    eta, t = load_eta_and_t()
-    eta_c = (eta / c).to(u.Gyr)
-
-    mr_eq, mL_eq = equality_times()
-
-    plot.plot_t_and_eta(x, t, eta_c, fname="t_and_eta_c.pdf", mr_eq=mr_eq, mL_eq=mL_eq, 
-                        acc=None, save=SAVE, temp=TEMP)
-
-
-def luminosity_distance(data):
-    ### Return z and dL for a given data file
-    #  limited to region with observational data 
-    x_sim =  data[0]
-    dL_sim   = (data[-1]*u.m).to(u.Gpc)
-
-    z_sim = z_of_x(x_sim) 
-    z_sim_mask = (z_sim <= 1.31) & (z_sim >= 0.005)
-    z_sim = z_sim[z_sim_mask]
-
-    dL_sim = dL_sim[z_sim_mask]
-    
-    return z_sim, dL_sim 
-
-
-def plot_dL(plot_fit=False):
-    ### Plot dL from data and compare with simulation with Planck parameters  
-    ### plot_fit=True: Plot dL from the simulation with parameters obtained from supernovafit.
-    #       Planck results included for comparison
-    z, dL, dL_error = plot.load("supernovadata.txt", skiprows=1)
-    planck_data     = plot.load("cosmology_dL.txt" , skiprows=1)
-    fit_data        = plot.load("bestfit_cosmology_dL.txt" , skiprows=1)
-
-    z_planck, dL_planck = luminosity_distance(planck_data)
-    z_fit, dL_fit = luminosity_distance(fit_data)
-
-    data    = [z,        dL, dL_error]
-    planck  = [z_planck, dL_planck.value]
-    fit     = [z_fit,    dL_fit.value]
-
-
-    if plot_fit:
-        plot.plot_dL(data, planck, fit, fname="dL_z_compare_fitted.pdf", save=SAVE, temp=TEMP)
-    else:
-        plot.plot_dL(data, planck, fname='dL_z_compare_planck.pdf', save=SAVE, temp=TEMP)
 
 
 
@@ -485,15 +347,9 @@ def table():
     data()
 
 
-SAVE=True 
-TEMP=True 
-dH_ddH_over_H()
-Hp_plot()
-eta_plot()
-eta_H_plot()
-eta_t_plot()
+# SAVE=True 
+# TEMP=True 
 
-plot_omegas()
 
 plot_dL()
 plot_dL(plot_fit=True)
