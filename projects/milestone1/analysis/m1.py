@@ -26,19 +26,17 @@ class ExpansionHistory:
 
     def __init__(self, 
                  fname_cosmology,
-                 fname_fitted_cosmology,
                  time_unit=u.Myr,
                  length_unit=u.Mpc):
         self.data   = self.load(fname_cosmology) 
         self.x      = self.data[0]
-        self.x_mr_eq, self.x_ml_eq, self.x_acc_onset = self.load_important_times(fname_cosmology) 
-
+        
         self.time_unit = time_unit
         self.length_unit = length_unit
+        
+        self.load_important_times(fname_cosmology) 
 
-        self.supernovadata = self.load("supernovadata.txt")
-        self.fname_fitted_cosmology = fname_fitted_cosmology
-
+        self.supernova_loaded = False
         self.H_loaded = False 
         self.eta_t_loaded = False 
         self.omegas_loaded = False 
@@ -48,12 +46,36 @@ class ExpansionHistory:
                           unpack=True, 
                           skiprows=skiprows)
         return data 
+    
+    def load_supernova_data(self, filename="supernovadata.txt"):
+        self.supernova_loaded = True
+        self.supernovadata = self.load(filename)
+
         
     def load_important_times(self, filename):
-        x_mr_eq, x_ml_eq, x_acc_onset = np.loadtxt(DATA_PATH + filename, 
-                                                   unpack=True, 
-                                                   max_rows=1)
-        return x_mr_eq, x_ml_eq, x_acc_onset
+        important_times = np.loadtxt(DATA_PATH + filename, 
+                                    unpack=True, 
+                                    max_rows=1)
+        
+        equality_times_x = important_times[0:3]
+        equality_times_t = important_times[3:6]
+        equality_times_z = np.exp(-equality_times_x) - 1
+        self.x_mr_eq, self.x_ml_eq, self.x_acc_onset = equality_times_x 
+        self.z_mr_eq, self.z_ml_eq, self.z_acc_onset = equality_times_z
+        
+        t_mr_eq, t_ml_eq, t_acc_onset = equality_times_t
+        self.t_mr_eq = (t_mr_eq*u.s).to(u.yr)
+        self.t_ml_eq = (t_ml_eq*u.s).to(u.Gyr)
+        self.t_acc_onset = (t_acc_onset*u.s).to(u.Gyr)
+
+
+
+        t0 = important_times[6] * u.s 
+        eta0 = important_times[7] * u.m 
+        self.t0 = t0.to(u.Gyr)
+        self.eta0_over_c = (eta0/c).to(u.Gyr)
+
+
     
 
     def load_H_parameters(self, convert_units=True):
@@ -93,14 +115,14 @@ class ExpansionHistory:
     def luminosity_distance(self, data):
         ### Return z and dL for a given data file
         #  limited to region with observational data 
-        x_sim    =  data[0]
+        z_sim    =  data[0]
         dL_sim   = (data[-1]*u.m).to(u.Gpc)
 
         z_data = self.supernovadata[0]
         z_min = np.min(z_data) - 0.005
         z_max = np.max(z_data) + 0.01
 
-        z_sim = self.z_of_x(x_sim) 
+        # z_sim = self.z_of_x(x_sim) 
         z_sim_mask = (z_sim <= z_max) & (z_sim >= z_min)
         z_sim = z_sim[z_sim_mask]
 
@@ -176,8 +198,6 @@ class ExpansionHistory:
         if not self.eta_t_loaded:
             self.load_eta_and_t()
 
-        # yunit  = f"\mathrm{self.time_unit}" 
-        # print(self.time_unit);exit()
         ylabel = rf"Time $[\mathrm{{{self.time_unit}}}]$"
         eta_over_c = (self.eta / c).to(self.time_unit)
         plot.plot_t_and_eta(self.x, self.t, eta_over_c, 
@@ -207,13 +227,17 @@ class ExpansionHistory:
                                save=SAVE, temp=TEMP, push=PUSH)
 
 
-    def plot_dL(self):
+    def plot_dL(self, fname_dL_planck, fname_dL_fitted):
         ### Plot dL from data and compare with simulation with Planck parameters  
         ### plot_fit=True: Plot dL from the simulation with parameters obtained from supernovafit.
         #       Planck results included for comparison
+        
+        if not self.supernova_loaded:
+            self.load_supernova_data() 
+
         z, dL, dL_error = self.supernovadata
-        planck_data     = self.load("cosmology_dL.txt")
-        fit_data        = self.load(self.fname_fitted_cosmology)
+        planck_data     = self.load(fname_dL_planck)
+        fit_data        = self.load(fname_dL_fitted)
 
         z_planck, dL_planck = self.luminosity_distance(planck_data)
         z_fit, dL_fit       = self.luminosity_distance(fit_data)
@@ -227,134 +251,80 @@ class ExpansionHistory:
 
 
 
+
+    def load_supernovafit(self, burn):
+        # Load result from supernova fit 
+        # Leave out the first N=burn results  
+        supernova_mcmc_results = self.load("supernovafit.txt", skiprows=1+burn)
+        chi2, h, OmegaM, OmegaK = supernova_mcmc_results
+        return chi2, h, OmegaM, OmegaK
+
+
+    def plot_supernova_fit_omegas(self, burn=1000):
+        # Plot OmegaM-OmegaK confidence region.
+        chi2, h, OmegaM, OmegaK = self.load_supernovafit(burn)
+    
+        OmegaLambda = 1 - OmegaM - OmegaK 
+        chi2min = np.min(chi2)
+        chi2_1sigma = chi2 < chi2min + 3.53
+        chi2_2sigma = chi2 < chi2min + 8.02
+
+        plot.plot_OmegaM_OmegaLambda_plane(OmegaM, OmegaLambda, 
+                                        chi2_1sigma, chi2_2sigma, chi2_min=np.argmin(chi2),
+                                        fname=f"mcmc_supernova_fit_Nburn{burn}.pdf", 
+                                        save=SAVE, temp=TEMP)
+
+
+    def plot_supernova_fit_H0_pdf(self, burn=1000):
+        # Plot H0 pdf
+        h = self.load_supernovafit(burn)[1]
+
+        H0 = h * (100*u.km / u.s / u.Mpc)
+
+        H0_mean = np.mean(H0)
+        H0_std  = np.std(H0) 
+        H0_var  = np.var(H0) 
+
+        print(f"H0 mean: {H0_mean:.5f}")
+        print(f"H0 std : {H0_std:.5f}")
+
+        
+        H0_min = H0_mean - 4*H0_std 
+        H0_max = H0_mean + 4*H0_std 
+        N_bins = 100 
+        bins   = np.linspace(H0_min, H0_max, N_bins)
+
+        H0_gaussian_distr = (2*np.pi*H0_std**2)**(-1/2) * np.exp(-(bins - H0_mean)**2 / (2 * H0_var))
+
+        plot.plot_H0_posterior_pdf(H0, bins, H0_gaussian_distr,
+                                    fname=f'H0_pdf_Nburn{burn}.pdf', save=SAVE, temp=TEMP)
+
+
+    def make_table(self):
+        """
+        Funker ikke. Pandas er no mig innimellom...
+        """
+
+        # print(self.t_mr_eq)
+        # print(self.t_acc_onset)
+        # print(self.t_ml_eq)
+        mr_eq = [self.x_mr_eq, self.z_mr_eq, self.t_mr_eq]
+        ml_eq = [self.x_ml_eq, self.z_ml_eq, self.t_ml_eq]
+        acc_onset = [self.x_acc_onset, self.z_acc_onset, self.t_acc_onset]
+        # print(self.t0,"\n", self.eta0)
+        # exit()
+        plot.time_table(mr_eq, ml_eq, acc_onset, self.t0, self.eta0_over_c,
+                        save=SAVE, temp=TEMP, push=PUSH)
+
 Cosmology = ExpansionHistory("cosmology_new.txt")
 
-Cosmology.plot_eta_H_over_c()
-Cosmology.plot_dH_ddH_over_H()
-Cosmology.plot_Hp()
-Cosmology.plot_eta_t()
-Cosmology.plot_omegas()
-exit()
+# Cosmology.plot_eta_H_over_c()
+# Cosmology.plot_dH_ddH_over_H()
+# Cosmology.plot_Hp()
+# Cosmology.plot_eta_t()
+# Cosmology.plot_omegas()
+# Cosmology.plot_dL(fname_dL_fitted="bestfit_dL.txt", fname_dL_planck="planck_dL.txt")
+# Cosmology.plot_supernova_fit_omegas()
+# Cosmology.plot_supernova_fit_H0_pdf()
+# Cosmology.make_table()
 
-
-def data(fname="cosmology.txt"):
-    """
-    Some functions (table()) use data from another file. 
-    This is a stupid, but simple way of not having to change all functions for this one purpose. 
-    I would have made a class if I had more time.  
-    """
-    global simulation_data
-    global x 
-    simulation_data = plot.load(fname)
-    x = simulation_data[0]
-
-data()
-
-
-
-
-
-
-def load_supernovafit(burn):
-    # Load result from supernova fit 
-    # Leave out the first N=burn results  
-    supernova_mcmc_results = plot.load("supernovafit.txt", skiprows=1+burn)
-    chi2, h, OmegaM, OmegaK = supernova_mcmc_results
-    return chi2, h, OmegaM, OmegaK
-
-
-def supernova_fit_omegas(burn=1000):
-    # Plot OmegaM-OmegaK confidence region.
-    chi2, h, OmegaM, OmegaK = load_supernovafit(burn)
-   
-    OmegaLambda = 1 - OmegaM - OmegaK 
-    chi2min = np.min(chi2)
-    chi2_1sigma = chi2 < chi2min + 3.53
-    chi2_2sigma = chi2 < chi2min + 8.02
-
-    plot.plot_OmegaM_OmegaLambda_plane(OmegaM, OmegaLambda, 
-                                       chi2_1sigma, chi2_2sigma, chi2_min=np.argmin(chi2),
-                                       fname=f"mcmc_supernova_fit_Nburn{burn}.pdf", 
-                                       save=SAVE, temp=TEMP)
-
-
-def supernova_fit_H0_pdf(burn=1000):
-    # Plot H0 pdf
-    chi2, h, OmegaM, OmegaK = load_supernovafit(burn)
-
-    H0 = h * (100*u.km / u.s / u.Mpc)
-
-    H0_mean = np.mean(H0)
-    H0_std  = np.std(H0) 
-    H0_var  = np.var(H0) 
-
-    print(f"H0 mean: {H0_mean:.5f}")
-    print(f"H0 std : {H0_std:.5f}")
-
-    
-    H0_min = H0_mean - 4*H0_std 
-    H0_max = H0_mean + 4*H0_std 
-    N_bins = 100 
-    bins   = np.linspace(H0_min, H0_max, N_bins)
-
-    H0_gaussian_distr = (2*np.pi*H0_std**2)**(-1/2) * np.exp(-(bins - H0_mean)**2 / (2 * H0_var))
-
-    plot.plot_H0_posterior_pdf(H0, bins, H0_gaussian_distr,
-                                fname=f'H0_pdf_Nburn{burn}.pdf', save=SAVE, temp=TEMP)
-
-
-def table():
-    # make table. 
-    # Used pandas initially, but changed the table so much that it's not applicable anymore.
-
-    data("cosmology_times.txt") # load data with higher resolution
-    MR_eq_idx, ML_eq_idx = equality_times(idx=True)
-    acc_onset_idx = acceleration_onset(idx=True)
-    x_today_idx = np.abs(x).argmin()
-
-    eta, t = load_eta_and_t() 
-
-    x_mr = x[MR_eq_idx]
-    x_ml = x[ML_eq_idx]
-    x_ac = x[acc_onset_idx]
-
-    t_mr = t[MR_eq_idx]
-    t_ml = t[ML_eq_idx]
-    t_ac = t[acc_onset_idx]
-
-    z_mr = z_of_x(x_mr)
-    z_ml = z_of_x(x_ml)
-    z_ac = z_of_x(x_ac)
-
-    t_today = t[x_today_idx]
-    eta_over_c_today = (eta[x_today_idx] / c).to(u.Gyr) 
-
-    print(f"mr: x={x_mr:.3f}, z={z_mr:.3f}, t={t_mr.to(u.Gyr)/10**(-5):.3f}")
-    print(f"ac: x={x_ac:.3f}, z={z_ac:.3f}, t={t_ac:.3f}")
-    print(f"ml: x={x_ml:.3f}, z={z_ml:.3f}, t={t_ml:.3f}")
-    print(f"t today= {t_today:.3f}")
-    print(f"eta0   = {eta_over_c_today:.3f}")
-
-    mr_eq = [x_mr, z_mr, t_mr.to(u.Gyr).value]
-    ml_eq = [x_ml, z_ml, t_ml.value]
-    acc   = [x_ac, z_ac, t_ac.value]
-
-    #### Previous table generating with pandas     
-    # print('making table')
-    # plot.time_table(mr_eq, ml_eq, acc, t_today, eta_over_c_today, show=True, save=False)
-
-    # Restore data set to the original one 
-    data()
-
-
-# SAVE=True 
-# TEMP=True 
-
-
-plot_dL()
-plot_dL(plot_fit=True)
-
-supernova_fit_omegas()
-supernova_fit_H0_pdf()
-
-# table()

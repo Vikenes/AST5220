@@ -394,36 +394,90 @@ def plot_H0_posterior_pdf(H0, bins, H0_gaussian, fname, save=True, temp=False):
     save_push(fig, fname, save, temp=temp)
 
 
-def time_table(mr_eq, ml_eq, acc_onset, t0, eta0, save=False, show=False):
+def time_table(mr_eq, ml_eq, acc_onset, t0, eta0_over_c, 
+               save=False, temp=False, push=False):
     """
     Complete mess...
     """
 
+    # mr_eq = [x_mr_eq, z_mr_eq, t_mr_eq]
+    # ml_eq = [x_ml_eq, z_ml_eq, t_ml_eq]
+    # acc_onset = [x_acc_onset, z_acc_onset, t_acc_onset]
+    # t0 = r"$t_0\:[\mathrm{Gyr}]$" 
+    # eta0_row = [eta0_over_c, r"\multicolumn{4}{c}{ }"] 
+
+    row_labels = [r"$x$", 
+                  r"$z$", 
+                  r"$t\,\mathrm{Gyr}$"]#,
+
+   
+    data = np.array([row_labels, mr_eq, acc_onset, ml_eq]).T
+    # data = np.vstack([data, t0_row])
+   
+    col_labels = [r" ", 
+                  r"$\Omega_m=\Omega_r$", 
+                  r"$\ddot{a}=0$", 
+                  r"$\Omega_m=\Omega_\Lambda$"]
+    col_fmt = "l|ccc"
+
+    # row_labels = [r"$x$", r"$z$", r"$t\,\mathrm{Gyr}$"]
+    # t0_col_name = r"$t_0\:[\mathrm{Gyr}]$"
+    # eta_col_name = r"$\eta_0 / c\: [\mathrm{Gyr}]$"
 
 
-    eta_col_name = r"$\eta_0 / c\: [\mathrm{Gyr}]$"
-    t0_col_name = r"$t_0\:[\mathrm{Gyr}]$"
-    column_names = [r"$\Omega_m=\Omega_r$", r"$\Omega_m=\Omega_\Lambda$", r"Acceleration onset", t0_col_name, eta_col_name]
+    table_name = "time_valuesNEW"
+    table_label = "tab:M1:results:time_values" 
+    table_fname = table_name + ".tex"
 
-    row_labels = np.asarray([r"$x$", r"$z$", r"$t$"])
-    data = {
-        r"var"                      : row_labels, 
-        r"$\Omega_m=\Omega_r$"      : mr_eq,
-        r"$\Omega_m=\Omega_\Lambda$": ml_eq,
-        r"Acceleration onset"       : acc_onset,
-        t0_col_name                 : t0,
-        eta_col_name                : eta0
-    }
+    table_caption = "Important times during the evolution of the Universe, "
+    table_caption += r"expressed in terms of $x$, redshift, $z$ and cosmic time, $t$. "
+    table_caption += "In the last two rows we also present today’s time values"
 
-
-    df = pd.DataFrame(data, index=None)
     if save:
-        fname = latex_path+"time_valuesDONTOVERWRITE.tex"
-        df.style.format("{:.3f}", subset=column_names).hide(axis="index").to_latex(buf=fname, hrules=True)
+        if temp:
+            table_fname = "TEMP" + table_fname
 
-    if show:
-        df.style.format("{:.3f}", subset=column_names).hide(axis="index")
-        print(df.to_string())
+        buffer = latex_path + "AVOIDOVERWRITE" + table_fname
+    else:
+        buffer = None 
+
+    # df = pd.DataFrame(data)
+    # df = df.append(pd.Series(['\midrule','\midrule', '\midrule', '\midrule'], index=df.columns), ignore_index=True)
+    # print(df)
+    # exit()
+    table = pd.DataFrame(data).to_latex(
+            index=False, 
+            header=col_labels, 
+            escape=False, 
+            column_format=col_fmt,
+            multirow=True,
+            caption=table_caption,
+            label=table_label,
+            position="h",
+            buf=buffer
+        )
+
+
+    if save:
+        print(f"Saving time table for M1:")
+        print(f"   {table_fname}")
+        
+    else:
+        print(table)
+        print(t0)
+        print(eta0_over_c)
+
+
+
+
+    # df = pd.DataFrame(data, index=None)
+    # if save:
+    #     fname = latex_path+"time_valuesDONTOVERWRITE.tex"
+    #     df.style.format("{:.3f}", subset=column_names).hide(axis="index").to_latex(buf=fname, hrules=True)
+
+    # if show:
+    #     df.style.format("{:.3f}", subset=column_names).hide(axis="index")
+    #     print(df.to_string())
 
 
 
