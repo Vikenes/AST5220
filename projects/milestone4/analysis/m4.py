@@ -15,7 +15,7 @@ but the actual plotting is done in plot.py
 import plot
 M3_PATH = "/home/vetle/Documents/master_studies/subjects/V23/AST5220/projects/milestone3/data/"
 DATA_PATH = "/home/vetle/Documents/master_studies/subjects/V23/AST5220/projects/milestone4/data/"
-
+TEST_PATH = DATA_PATH + "testurns/"
 global SAVE 
 global PUSH
 global TEMP
