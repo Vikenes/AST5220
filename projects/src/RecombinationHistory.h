@@ -30,6 +30,10 @@ class RecombinationHistory{
     // Xe for when to switch between Saha and Peebles
     // const double Xe_saha_limit = 1e-6;
     const double Xe_saha_limit = 0.99;
+    
+    
+    double c_;
+    double sigma_T_; 
 
 
 

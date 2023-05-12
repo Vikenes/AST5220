@@ -62,6 +62,14 @@ class PowerSpectrum {
     //     1400, 1550, 1700,   1850, 
     //     2000};
 
+
+    // Constants being used throughout 
+    double c_;
+    double eta0_;
+    int nells_;
+    double H0_;
+    double OmegaMtot_;
+
     //=====================================================================
     // [1] Create bessel function splines needed for the LOS integration
     //=====================================================================

@@ -36,8 +36,8 @@ int main(int argc, char **argv){
 
   bool m1_output = false;
   bool m2_output = false;
-  bool m3_output = false;
-  bool m4_output = true;
+  bool m3_output = true;
+  bool m4_output = false;
 
   if(m1_output){
     // Set up and solve the background
@@ -132,8 +132,8 @@ int main(int argc, char **argv){
     bool source = false;
     // Set up and solve the background
     // Set Neff = 0 in this milestone to ignore neutrinos.
-    // BackgroundCosmology cosmo(h, OmegaB, OmegaCDM, OmegaK, 0.0, TCMB);
-    BackgroundCosmology cosmo(0.7, OmegaB, 0.45, OmegaK, 0.0, TCMB);
+    BackgroundCosmology cosmo(h, OmegaB, OmegaCDM, OmegaK, 0.0, TCMB);
+    // BackgroundCosmology cosmo(0.7, OmegaB, 0.45, OmegaK, 0.0, TCMB);
     cosmo.solve();
 
     // Solve the recombination history

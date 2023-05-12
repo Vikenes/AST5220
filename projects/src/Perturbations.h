@@ -47,15 +47,14 @@ class Perturbations{
     Spline2D ST_spline{"ST_spline"};
     
     // Splines of mulipole quantities
-    Spline2D Theta0_spline{"Theta0_spline"};
-    Spline2D Theta1_spline{"Theta1_spline"};
-    Spline2D Theta2_spline{"Theta2_spline"};
-    Spline2D Theta3_spline{"Theta2_spline"};
-
-
-
-
     std::vector<Spline2D> Theta_splines;
+
+    double c_;
+    double H0_; 
+    double H0_squared_;
+    double OmegaR0_;
+    double OmegaB0_;
+    double OmegaCDM0_;
 
 
     //==========================================================
@@ -69,14 +68,14 @@ class Perturbations{
     
     // Right hand side of the ODE in the tight coupling regime
     int rhs_tight_coupling_ode(double x, double k, const double *y, double *dydx);
-    
+
     // Compute the time when tight coupling ends
     std::pair<double,int> get_tight_coupling_time(const double k) const;
-    
+
     //==========================================================
     // [2] The full ODE system 
     //==========================================================
-    
+  
     // Set initial condition after tight coupling
     Vector set_ic_after_tight_coupling(
         const Vector &y_tight_coupling, 
@@ -89,15 +88,11 @@ class Perturbations{
     //==========================================================
     // [3] Integrate the full system
     //==========================================================
-    
-    // Integrate perturbations and spline the result
     void integrate_perturbations();
     
     //==========================================================
     // [4] Compute source functions from the result
     //==========================================================
-    
-    // Compute source functions and spline the result
     void compute_source_functions();
 
   public:
@@ -128,7 +123,6 @@ class Perturbations{
     double get_Theta(const double x, const double k, const int ell) const;
 
     double compute_Theta2_tc(const double x, const double k, const double Theta1) const;
-    double compute_Theta3_tc(const double x, const double k, const double Theta2) const;
     double compute_Psi(const double x, const double k, const double Theta2, const double Phi) const;
     double get_Source_T(const double x, const double k) const;
 };
