@@ -30,43 +30,65 @@ int main(int argc, char **argv){
   double n_s         = 0.965;
   double kpivot_mpc  = 0.05;
 
+  bool m1_output = false;
+  bool supernova = false;
+  bool m2_output = false;
+  bool m3_output = false;
+  bool m4_output = false;
+
+
   //=========================================================================
   // Module I
   //=========================================================================
 
-  bool m1_output = false;
-  bool m2_output = false;
-  bool m3_output = true;
-  bool m4_output = false;
-
+  m1_output=true;
+  // supernova=true;
   if(m1_output){
     // Set up and solve the background
+    std::string M1_OUTPATH = "milestone1/data/";
+    
     BackgroundCosmology cosmo(h, OmegaB, OmegaCDM, OmegaK, Neff, TCMB);
     cosmo.solve();
     cosmo.info();
     
-    // Output background evolution quantities
-    // cosmo.output("milestone1/data/cosmology_new.txt");          // 
-    // cosmo.output("milestone1/data/cosmology.txt");          // Consistency checks and analysis  
-    // cosmo.output("milestone1/data/cosmology_dL.txt");       // Comparing with supernova data 
-    // cosmo.output("milestone1/data/cosmology_times.txt");    // High resolution for important times  
+    if(supernova){
+      // Output background evolution quantities
+      Utils::StartTiming("Supernova");
+      Vector best_fit_params = mcmc_fit_to_supernova_data(
+        M1_OUTPATH + "supernovadata.txt", 
+        M1_OUTPATH + "supernovafitnew.txt");
+      Utils::EndTiming("Supernova"); 
+      
+      //=====================
+      // Run simulation with parameters 
+      // from the best supernova fit 
+      //=====================
+      double h_est          = best_fit_params[0];//0.70189;
+      double OmegaM_est     = best_fit_params[1];//0.25932;
+      double OmegaK_est     = best_fit_params[2];//0.0673887;
+      double OmegaCDM_est   = OmegaM_est - OmegaB; 
 
-    //=====================
-    // Run simulation with parameters 
-    // from the best supernova fit 
-    //=====================
-    // double h_est          = 0.70189;
-    // double OmegaM_est     = 0.25932;
-    // double OmegaK_est     = 0.0673887;
-    // double OmegaCDM_est   = OmegaM_est - OmegaB;
-    // BackgroundCosmology bestSNfit(h_est, OmegaB, OmegaCDM_est, OmegaK_est, Neff, TCMB);
-    // bestSNfit.solve();
-    // bestSNfit.info();
-    // bestSNfit.output("milestone1/data/bestfit_cosmology_dL.txt");
+      BackgroundCosmology bestSNfit(h_est, OmegaB, OmegaCDM_est, OmegaK_est, 0, TCMB);
 
-    // Utils::StartTiming("Supernova");
-    // mcmc_fit_to_supernova_data("milestone1/data/supernovadata.txt", "milestone1/data/supernovafit.txt");
-    // Utils::EndTiming("Supernova"); 
+      bestSNfit.solve();
+      bestSNfit.output_dL(
+        M1_OUTPATH + "bestfit_dL.txt", 
+        -2.0, 0.0
+      );
+      cosmo.output_dL(
+        M1_OUTPATH + "planck_dL.txt",
+        -2.0, 0.0
+      );
+
+    }
+
+    else{
+      // cosmo.output(M1_OUTPATH + "NEWcosmology_compare.txt");          // 
+      cosmo.output(M1_OUTPATH + "cosmology_new.txt");          // Consistency checks and analysis  
+      // cosmo.output(M1_OUTPATH + "NEWcosmology_times.txt");    // High resolution for important times  
+    }
+
+
 
   }
 

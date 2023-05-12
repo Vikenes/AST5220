@@ -30,7 +30,7 @@
 #include <array>
 #include <vector>
 
-void mcmc_fit_to_supernova_data(std::string supernovadata_filename, std::string outfile){
+std::vector<double> mcmc_fit_to_supernova_data(std::string supernovadata_filename, std::string outfile){
 
   // The number of parameters to fit
   const int nparam = 3;
@@ -62,7 +62,7 @@ void mcmc_fit_to_supernova_data(std::string supernovadata_filename, std::string 
       z_arr.push_back(z);
       L_arr.push_back(L);
       dL_arr.push_back(dL);
-      std::cout << "z: " << z << " " << L << " " << dL << "\n";
+      // std::cout << "z: " << z << " " << L << " " << dL << "\n";
     }
     std::cout << "We found n = " << z_arr.size() << " points\n";
   };
@@ -113,7 +113,7 @@ void mcmc_fit_to_supernova_data(std::string supernovadata_filename, std::string 
     double param_OmegaCDM = parameters[1] - param_OmegaB; // OmegaCDM = OmegaM - OmegaB
     double param_OmegaK   = parameters[2];
     BackgroundCosmology cosmo(param_h, param_OmegaB, param_OmegaCDM, param_OmegaK, param_Neff, param_TCMB);
-    cosmo.solve_eta();
+    cosmo.solve_eta(-12., 0.0);
     //=========================================================================================
 
     // Compute chi^2
@@ -166,15 +166,15 @@ void mcmc_fit_to_supernova_data(std::string supernovadata_filename, std::string 
       parameters = new_parameters;
 
       // Write sample to file and screen
-      std::cout << "#          chi2            h           OmegaM           OmegaK               Acceptrate\n";
-      std::cout << std::setw(15) << chi2 << " ";
+      // std::cout << "#          chi2            h           OmegaM           OmegaK               Acceptrate\n";
+      // std::cout << std::setw(15) << chi2 << " ";
       out       << std::setw(15) << chi2 << " ";
       for(int i = 0; i < nparam; i++){
-        std::cout << std::setw(15) << parameters[i] << " ";
+        // std::cout << std::setw(15) << parameters[i] << " ";
         out << std::setw(15) << parameters[i] << " ";
       }
       out << "\n";
-      std::cout << std::setw(15) << " " << nsample/double(steps)*100.0 << "%\n";
+      // std::cout << std::setw(15) << " " << nsample/double(steps)*100.0 << "%\n";
       
       // Record new best-fit 
       if(chi2 < chi2_min){
@@ -189,4 +189,9 @@ void mcmc_fit_to_supernova_data(std::string supernovadata_filename, std::string 
   for(int i = 0; i < nparam; i++)
     std::cout << best_parameters[i] << " ";
   std::cout << "\n";
+
+  std::vector<double> result(best_parameters.begin(), best_parameters.end()); 
+
+  return result;
+
 }

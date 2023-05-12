@@ -22,12 +22,15 @@ class BackgroundCosmology{
     double OmegaNu;                 // Neutrino density today (follows from TCMB and Neff)
     double OmegaK;                  // Curvature density = 1 - OmegaM - OmegaR - OmegaNu - OmegaLambda
     double H0;                      // The Hubble parameter today H0 = 100h km/s/Mpc
+    double OmegaM_tot;
+    double OmegaRad_tot;
 
     // Start and end of x-integration (can be changed)
     double x_start = Constants.x_start;
-    double x_end   = Constants.x_end;
-    const int nx   = 1e5;
-    const int npts = 1e5;
+    double x_end   = 5.0;//Constants.x_end;
+    const int nx   = 1e4;
+    const int npts = 1e4;
+    const double dx = (double)(x_end-x_start)/nx;
 
     // Splines to be made
     Spline eta_of_x_spline{"eta"};
@@ -51,11 +54,17 @@ class BackgroundCosmology{
 
     // Do all the solving
     void solve();
-    void solve_eta();
+    void solve_eta(double x_low=Constants.x_start, 
+                   double x_high=Constants.x_end);
     void solve_t();
 
     // Output some results to file
     void output(const std::string filename) const;
+    void output_dL(
+      const std::string filename,
+      const double x_low,
+      const double x_high) const;
+
 
     // Get functions that we must implement
     double eta_of_x(double x) const;

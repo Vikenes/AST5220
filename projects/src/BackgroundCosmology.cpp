@@ -34,7 +34,8 @@ BackgroundCosmology::BackgroundCosmology(
   OmegaNu = Neff * 7.0 / 8.0 * pow(4.0/11.0, 4.0/3.0) * OmegaR;
   OmegaLambda = 1.0 - (OmegaB + OmegaCDM + OmegaK + OmegaR + OmegaNu); 
 
-  
+  OmegaM_tot = OmegaB + OmegaCDM;
+  OmegaRad_tot = OmegaR + OmegaNu;
 
 }
 
@@ -96,12 +97,13 @@ void BackgroundCosmology::solve(){
 }
 
 // Solve the background
-void BackgroundCosmology::solve_eta(){
+void BackgroundCosmology::solve_eta(double x_low, double x_high){
   //=============================================================================
   // Solve the ODE for eta(x), and create a Spline. 
   // Use for supernova fitting, to avoid unnecessary computations of t(x).
   //=============================================================================
-  Vector x_array = Utils::linspace(x_start, x_end, nx);
+  int nx_eta = int((x_high-x_low)/dx);
+  Vector x_array = Utils::linspace(x_low, x_high, nx_eta);
 
   // The ODE for deta/dx
   ODEFunction detadx = [&](double x, const double *eta, double *detadx){
@@ -110,8 +112,7 @@ void BackgroundCosmology::solve_eta(){
   };
 
   // The initial conditions for deta/dx
-  double eta_ini = Constants.c / Hp_of_x(x_start);
-  Vector eta_ic{eta_ini};
+  Vector eta_ic{Constants.c / Hp_of_x(x_low)};
 
   // Solve the ODE 
   ODESolver eta_ode;
@@ -119,9 +120,7 @@ void BackgroundCosmology::solve_eta(){
 
   // Spline result 
   auto eta_array = eta_ode.get_data_by_component(0);
-  eta_of_x_spline.create(x_array, eta_array, "Eta(x) spline");
-
-
+  eta_of_x_spline.create(x_array, eta_array);
 }
 
 
@@ -171,11 +170,11 @@ double BackgroundCosmology::H_of_x(double x) const{
 double BackgroundCosmology::Hp_of_x(double x) const{
   // Reduce number of exp-calls.
   // Increase efficiency for supernova fitting. 
-  double exp_of_minus_x = exp(-x); 
+  double exp_of_minus_x = std::exp(-x); 
   double exp_of_minus_2x = exp_of_minus_x * exp_of_minus_x;
 
-  double Hp = H0 * sqrt((OmegaB + OmegaCDM) * exp_of_minus_x 
-                        + (OmegaR + OmegaNu) * exp_of_minus_2x 
+  double Hp = H0 * std::sqrt(OmegaM_tot * exp_of_minus_x 
+                        + OmegaRad_tot * exp_of_minus_2x 
                         + OmegaK 
                         + OmegaLambda / exp_of_minus_2x);
   return Hp;
@@ -186,11 +185,13 @@ double BackgroundCosmology::Hp_of_x(double x) const{
 */
 double BackgroundCosmology::dHpdx_of_x(double x) const{
   // Term inside square root. 
-  double dv_sqrt_term = -      (OmegaB + OmegaCDM) * exp(-x)
-                        - 2. * (OmegaR + OmegaNu) * exp(-2.*x) 
-                        + 2. * OmegaLambda * exp(2.*x);
+  const double exp_of_minus_x = exp(-x);
+  const double exp_of_minus_2x = exp_of_minus_x * exp_of_minus_x; 
+  double dv_sqrt_term = -      (OmegaB + OmegaCDM) * exp_of_minus_x
+                        - 2. * (OmegaR + OmegaNu) * exp_of_minus_2x 
+                        + 2. * OmegaLambda / exp_of_minus_2x;
 
-  double dHp = pow(H0,2.) / (2. * Hp_of_x(x)) * dv_sqrt_term; 
+  double dHp = 0.5 * H0*H0 / Hp_of_x(x) * dv_sqrt_term; 
 
   return dHp;
 }
@@ -426,7 +427,40 @@ void BackgroundCosmology::output(const std::string filename) const{
   double x_mr_eq      = get_mr_equality(x_array);
   double x_mL_eq      = get_mL_equality();
   double x_acc_onset  = get_acceleration_onset();
-  fp << x_mr_eq << " " << x_mL_eq << " " << x_acc_onset << "\n";
+
+  double t_mr_eq      = get_t_of_x(x_mr_eq);
+  double t_mL_eq      = get_t_of_x(x_mL_eq);
+  double t_acc_onset  = get_t_of_x(x_acc_onset);
+
+  double t0 = get_t_of_x(0.0);
+  double eta0 = eta_of_x(0.0);
+
+  fp << x_mr_eq << " " << x_mL_eq << " " << x_acc_onset << " ";
+  fp << t_mr_eq << " " << t_mL_eq << " " << t_acc_onset << " ";
+  fp << t0      << " " << eta0    << "\n";
   std::for_each(x_array.begin(), x_array.end(), print_data);
 }
 
+void BackgroundCosmology::output_dL(
+      const std::string filename,
+      const double x_low,
+      const double x_high) const{
+
+  // const double x_min = x_low;
+  // const double x_max = x_high;
+  const int    n_pts = 5000;
+
+  std::cout << "Writing to " << filename << ", for " 
+  << x_low << " < x < " << x_high << std::endl;
+  
+  Vector x_array = Utils::linspace(x_low, x_high, n_pts);
+
+  std::ofstream fp(filename.c_str());
+  auto print_data = [&] (const double x) {
+    fp << exp(-x)-1.                      << " ";
+    fp << get_luminosity_distance_of_x(x) << " ";
+    fp <<"\n";
+  };
+  fp << "z dL\n";
+  std::for_each(x_array.begin(), x_array.end(), print_data);
+}

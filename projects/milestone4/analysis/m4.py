@@ -15,7 +15,7 @@ but the actual plotting is done in plot.py
 import plot
 M3_PATH = "/home/vetle/Documents/master_studies/subjects/V23/AST5220/projects/milestone3/data/"
 DATA_PATH = "/home/vetle/Documents/master_studies/subjects/V23/AST5220/projects/milestone4/data/"
-TEST_PATH = DATA_PATH + "testurns/"
+TEST_PATH = DATA_PATH + "testruns/"
 global SAVE 
 global PUSH
 global TEMP
@@ -35,11 +35,11 @@ class PowerSpectrum:
 
 
         self.ell1, self.C_ell1 = np.loadtxt(DATA_PATH + f1, unpack=True)
-        self.ell2, self.C_ell2 = np.loadtxt(DATA_PATH + f2, unpack=True)
-        self.ell3, self.C_ell3 = np.loadtxt(DATA_PATH + f3, unpack=True)
+        self.ell2, self.C_ell2 = np.loadtxt(TEST_PATH + f2, unpack=True)
+        self.ell3, self.C_ell3 = np.loadtxt(TEST_PATH + f3, unpack=True)
 
-        # self.plot()
-        # self.plot_diff(self.C_ell2, self.C_ell3)
+        self.plot()
+        self.plot_diff(self.C_ell2, self.C_ell3)
         
 
     def plot(self):
