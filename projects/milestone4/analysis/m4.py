@@ -13,7 +13,7 @@ All calculations and such are performed in this file,
 but the actual plotting is done in plot.py
 """
 import plot
-
+M3_PATH = "/home/vetle/Documents/master_studies/subjects/V23/AST5220/projects/milestone3/data/"
 DATA_PATH = "/home/vetle/Documents/master_studies/subjects/V23/AST5220/projects/milestone4/data/"
 
 global SAVE 
@@ -61,6 +61,67 @@ class PowerSpectrum:
         plt.xscale('log')
         plt.yscale('log')
         plt.show()
+
+
+    def plot_source_function(self, xlim=XLIM, ylim=None, no=0, fname=None):
+        # plot.K_FIGNAMES = self.k_fnames
+        # if hasattr(self, 'source'):
+            # pass
+        # else:
+            # self.load_source_func()
+        
+        if no == 0:
+            if fname is None:
+                fname = "S_alone"
+            plot.plot_source_function(self.x, self.S_tilde,
+                                      k_legends=self.k_labels,
+                                      ylabel=r"$\tilde{S}$",
+                                      fname=fname,
+                                      xlim=xlim,ylim=ylim,
+                                      save=SAVE, push=PUSH, temp=TEMP)
+
+        if no == 1:
+            if fname is None:
+                fname = "S_j5"
+            plot.plot_source_function(self.x, self.S_tilde_j5, 
+                                      k_legends=self.k_labels,
+                                      ylabel=r"$\tilde{S} j_5 $",
+                                      fname=fname,
+                                      xlim=xlim,ylim=ylim,
+                                      save=SAVE, push=PUSH, temp=TEMP)
+
+        elif no == 2:
+            if fname is None:
+                fname = "S_j50"
+            plot.plot_source_function(self.x, self.S_tilde_j50, 
+                                      k_legends=self.k_labels,
+                                      ylabel=r"$\tilde{S} j_{50} $",
+                                      fname=fname,
+                                      xlim=xlim,ylim=ylim,
+                                      save=SAVE, push=PUSH, temp=TEMP)
+            # plt.title(r"$\tilde{S}(k,x) j_{50}$")
+            # plt.plot(self.x, self.S_tilde_j50[2])
+            # plt.xlim(xlim)
+            # plt.ylim(ylim)
+            # plt.show()
+        elif no == 3:
+            if fname is None:
+                fname = "S_j500"
+            plot.plot_source_function(self.x, self.S_tilde_j500, 
+                                      k_legends=self.k_labels,
+                                      ylabel=r"$\tilde{S} j_{500} $",
+                                      fname=fname,
+                                      xlim=xlim,ylim=ylim,
+                                      save=SAVE, push=PUSH, temp=TEMP)
+            # plt.title(r"$\tilde{S}(k,x) j_{500}$")
+            # plt.plot(self.x, self.S_tilde_j500[2])
+            # plt.xlim(xlim)
+            # plt.ylim(ylim)
+            # plt.show()
+        else:
+            pass     
+
+   
 
 
 # pspec = PowerSpectrum(f1="thisworks.txt", f2="cellspar.txt", f3="cellsnewx.txt")

@@ -5,7 +5,6 @@ import os
 import warnings 
 warnings.filterwarnings("ignore", category=DeprecationWarning )
 
-from scipy.integrate import simpson 
 
 
 """
@@ -61,7 +60,7 @@ class Perturbations:
         self.k_vals = []
         file_dict = {}
         for file in filenames:
-            if file.startswith("perturbations_k"):
+            if file.startswith("perturbations_k") or file.startswith("TESTperturbations_k"):
                 k_val = float(file.split("_")[1][:-4][1:])
                 self.k_vals.append(k_val)
                 file_dict[k_val] = file 
@@ -148,27 +147,7 @@ class Perturbations:
                                             figsize=(10,6),
                                             save=SAVE, push=PUSH, temp=TEMP)
 
-    def plot_delta_gamma(self, xlim=XLIM, ylim=[-2, 4],
-                         log=False, yabs=False):
-
-        if hasattr(self, 'Thetas'):
-            pass
-        else:
-            self.load_Thetas()
-
-        delta_gamma = 4 * self.Theta0
-        ylabel = r"$\delta_\gamma$"
-        plot.K_FIGNAMES = self.k_fnames
-        plot.plot_quantity_for_n_k_values(x=self.x, y=delta_gamma, 
-                                          k_legends = self.k_labels, 
-                                          fname="delta_gamma",
-                                          xentry=self.x_entry,
-                                          absval_of_y=yabs,
-                                          xlabel=r"$x$", ylabel=ylabel,
-                                          ylim=ylim, log=log,
-                                          xlim=xlim,
-                                          save=SAVE, push=PUSH, temp=TEMP)
-
+   
     def compare_delta_baryon_photon(self, xlim=XLIM, ylim=[1e-2, 1e4]):
 
         if hasattr(self, 'deltas'):
@@ -254,27 +233,6 @@ class Perturbations:
                                             ypad=10,
                                             save=SAVE, push=PUSH, temp=TEMP)
         
-    def plot_v_gamma(self, xlim=XLIM, ylim=[-2, 4], log=False, yabs=False):
-
-        if hasattr(self, 'Thetas'):
-            pass
-        else:
-            self.load_Thetas()
-
-        v_gamma = -3 * self.Theta1
-        ylabel = r"$v_\gamma$"
-        plot.K_FIGNAMES = self.k_fnames
-        plot.plot_quantity_for_n_k_values(x=self.x, y=v_gamma, 
-                                          k_legends = self.k_labels, 
-                                          fname="v_gamma",
-                                          xentry=self.x_entry,
-                                          absval_of_y=yabs,
-                                          xlabel=r"$x$", ylabel=ylabel,
-                                          ylim=ylim, log=log,
-                                          xlim=xlim,
-                                          legendloc='upper left',
-                                          save=SAVE, push=PUSH, temp=TEMP)
-    
     def plot_Theta(self, Theta_number=0, xlim=XLIM, ylim=[-0.5, 1], legendloc='best'):
 
         if hasattr(self, 'Thetas'):
@@ -315,26 +273,6 @@ class Perturbations:
                                           log=False,
                                           save=SAVE, push=PUSH, temp=TEMP)
     
-    def plot_Psi(self, xlim=XLIM, ylim=[0, 0.7]):
-        """
-        For stupid testing only, not actually using 
-        """
-
-        if hasattr(self, 'fields'):
-            pass
-        else:
-            self.load_fields()
-
-        plot.K_FIGNAMES = self.k_fnames
-        plot.plot_quantity_for_n_k_values(x=self.x, y=self.Psi, 
-                                          k_legends=self.k_labels, 
-                                          fname="Psi",
-                                          xentry=self.x_entry,
-                                          xlabel=r"$x$", ylabel=r"$\Phi$",
-                                          ylim=ylim, xlim=xlim, 
-                                          log=False,
-                                          save=SAVE, push=PUSH, temp=TEMP)
-
     def plot_Phi_plus_Psi(self, xlim=XLIM, ylim=None):
 
         if hasattr(self, 'fields'):
@@ -355,112 +293,34 @@ class Perturbations:
                                           legendloc='upper left',
                                           save=SAVE, push=PUSH, temp=TEMP)
 
-    def plot_source_function(self, xlim=XLIM, ylim=None, no=0, fname=None):
-        plot.K_FIGNAMES = self.k_fnames
-        if hasattr(self, 'source'):
-            pass
-        else:
-            self.load_source_func()
-
-        if no == 0:
-            if fname is None:
-                fname = "S_alone"
-            plot.plot_source_function(self.x, self.S_tilde,
-                                      k_legends=self.k_labels,
-                                      ylabel=r"$\tilde{S}$",
-                                      fname=fname,
-                                      xlim=xlim,ylim=ylim,
-                                      save=SAVE, push=PUSH, temp=TEMP)
-
-        if no == 1:
-            if fname is None:
-                fname = "S_j5"
-            plot.plot_source_function(self.x, self.S_tilde_j5, 
-                                      k_legends=self.k_labels,
-                                      ylabel=r"$\tilde{S} j_5 $",
-                                      fname=fname,
-                                      xlim=xlim,ylim=ylim,
-                                      save=SAVE, push=PUSH, temp=TEMP)
-
-        elif no == 2:
-            if fname is None:
-                fname = "S_j50"
-            plot.plot_source_function(self.x, self.S_tilde_j50, 
-                                      k_legends=self.k_labels,
-                                      ylabel=r"$\tilde{S} j_{50} $",
-                                      fname=fname,
-                                      xlim=xlim,ylim=ylim,
-                                      save=SAVE, push=PUSH, temp=TEMP)
-            # plt.title(r"$\tilde{S}(k,x) j_{50}$")
-            # plt.plot(self.x, self.S_tilde_j50[2])
-            # plt.xlim(xlim)
-            # plt.ylim(ylim)
-            # plt.show()
-        elif no == 3:
-            if fname is None:
-                fname = "S_j500"
-            plot.plot_source_function(self.x, self.S_tilde_j500, 
-                                      k_legends=self.k_labels,
-                                      ylabel=r"$\tilde{S} j_{500} $",
-                                      fname=fname,
-                                      xlim=xlim,ylim=ylim,
-                                      save=SAVE, push=PUSH, temp=TEMP)
-            # plt.title(r"$\tilde{S}(k,x) j_{500}$")
-            # plt.plot(self.x, self.S_tilde_j500[2])
-            # plt.xlim(xlim)
-            # plt.ylim(ylim)
-            # plt.show()
-        else:
-            pass     
-
-   
 
 
 
 # p = Perturbations(f1="perturbations_k0.001.txt",
-#                   f2="perturbations_k0.01.txt",
-#                   f3="perturbations_k0.1.txt")
+                #   f2="perturbations_k0.03.txt",
+                #   f3="perturbations_k0.3.txt")
 
-p = Perturbations(f1="perturbations_k0.001.txt",
+p2 = Perturbations(f1="perturbations_k0.001.txt",
                    f2 ="perturbations_k0.03.txt",
                    f3  ="perturbations_k0.3.txt")
 # SAVE=True
 # PUSH=True
 # TEMP=True
 
-p.plot_delta()
+# p.plot_delta()
+# p.compare_delta_baryon_photon()
+# p.compare_vel_baryon_photon(xlim=[-12,0], ylim=[-3,8])
 # p.plot_v()
 # p.plot_Phi()
 # p.plot_Phi_plus_Psi(ylim=[-0.006,0.026])
 # p.plot_Theta(2, xlim=[-10,0], ylim=[-0.1, 0.2], legendloc='upper right')
-p.compare_delta_baryon_photon()
-# p.compare_vel_baryon_photon(xlim=[-12,0], ylim=[-3,8])
 
+p2.plot_delta()
+p2.compare_delta_baryon_photon()
+p2.compare_vel_baryon_photon(xlim=[-12,0], ylim=[-3,8])
+p2.plot_v()
+p2.plot_Phi()
 
-#### MAYBE ########
-# p.compare_vel_baryon_photon(yabs=True, log=True, ylim=[1e-3, 1e1])
-# p.plot_delta_gamma(ylim=[-3, 5])
-# p.plot_v_gamma(ylim=[-1.5,1.5])
-# p.plot_v_gamma(ylim=[1e-6,5e1], log=True, yabs=True)
+p2.plot_Phi_plus_Psi(ylim=[-0.006,0.026])
+p2.plot_Theta(2, xlim=[-10,0], ylim=[-0.1, 0.2], legendloc='upper right')
 
-
-
-
-#### NOT USING ###### 
-# p.plot_delta_gamma(ylim=[1e-2,1e1], yabs=True, log=True) ## Not using 
-# p.plot_Psi(ylim=None)
-# p.plot_Theta(0, ylim=[-0.8,1], legendloc='lower left')
-# p.plot_Theta(1, ylim=[-0.5, 0.6], legendloc='upper left')
-
-# p.plot_source_function(xlim=[-7.5,-6], no=1, fname='S_j5_center.pdf')
-# p.plot_source_function(xlim=[-1,0], ylim=[-0.026,0.055], no=1, fname='S_j5_end.pdf')
-
-# p.plot_source_function(xlim=[-7.5,-6], no=2, fname='S_j50_center.pdf')
-# p.plot_source_function(xlim=[-3,0], ylim=[-0.001,0.0015], no=2, fname='S_j50_mid_end.pdf')
-# p.plot_source_function(xlim=[-1,0], ylim=[-0.001,0.0015], no=2, fname='S_j50_end.pdf')
-
-# p.plot_source_function(xlim=[-7.5,-6], no=3, fname='S_j500_center.pdf')
-# p.plot_source_function(xlim=[-5,0], ylim=[-3e-5,6e-5], no=3, fname='S_j500_end.pdf')
-
-# p.plot_source_function(xlim=[-7.5,-6], no=0, fname='S_no_l_center.pdf')
-# p.plot_source_function(xlim=[-1,0], ylim=[-0.01,0.5], no=0, fname='S_no_l_end.pdf')
