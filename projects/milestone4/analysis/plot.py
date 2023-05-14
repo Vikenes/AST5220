@@ -38,7 +38,7 @@ plt.rcParams['font.family'] = 'Times New Roman'
 
 # Paths 
 # project_path = os.path.abspath(".")
-project_path = "/home/vetle/Documents/master_studies/subjects/V23/AST5220/projects/milestone3"
+project_path = "/home/vetle/Documents/master_studies/subjects/V23/AST5220/projects/milestone4"
 
 data_path = project_path + "/data/"
 latex_path = project_path + "/report/tables/"
@@ -47,9 +47,6 @@ png_path = pdf_path + "temp/"
 
 
 # Global parameters used in all functions 
-global X_MR_EQ
-global K_FIGNAMES
-X_MR_EQ = -8.6577 
 
 
 
@@ -64,7 +61,6 @@ def save_push(fig, pdf_name, save=True, push=False, show=False, tight=True, temp
     """
     if tight:
         fig.tight_layout()
-    pdf_name += K_FIGNAMES
     pdf_name += ".pdf"
 
     if temp:
@@ -96,7 +92,9 @@ def save_push(fig, pdf_name, save=True, push=False, show=False, tight=True, temp
 
 
 def set_ax_info(ax, xlabel, ylabel=False, title=None, legend=True, 
-                double_legends=[], legendloc='best', legend_size=False):
+                double_legends=[], legendloc='best', legend_size=False,
+                xlim=None, ylim=None, yticks=None,
+                ypad=None):
     """Write title and labels on an axis with the correct fontsizes.
     Args:
         ax (matplotlib.axis): the axis on which to display information
@@ -127,6 +125,20 @@ def set_ax_info(ax, xlabel, ylabel=False, title=None, legend=True,
 
 
 
+    if ylim is not None:
+        print('yl')
+        ax.set_ylim(ylim)
+    
+    if xlim is not None:
+        print('xl')
+        ax.set_xlim(xlim)
+
+    if ypad is not None:
+        ax.set_ylabel(ylabel,labelpad=ypad)
+
+    if yticks is not None:
+        print('yt')
+        ax.set_yticks(yticks)
 
 # -----------------------------------------------------------------------------
 #   General plot code above
@@ -136,280 +148,114 @@ def set_ax_info(ax, xlabel, ylabel=False, title=None, legend=True,
 
 
 
-def load(file, folder=data_path, skiprows=0):
-    # Tired of repeating unpack, delimiter, skiprows for all... 
-    return np.loadtxt(folder + file, unpack=True, skiprows=skiprows)
-
-
-def plot_quantity_for_n_k_values(x, y,
-                                 k_legends, 
-                                 fname, 
-                                 xentry=None,
-                                 log=True, 
-                                 absval_of_y=False,
-                                 xlabel=r"$x$", 
-                                 ylabel=None, 
-                                 xlim=None, 
-                                 ylim=None, 
-                                 legendloc='best', 
-                                 yticks=None, 
-                                 figsize=(10,6), 
-                                 save=True,
-                                 push=False, 
-                                 temp=False):
+def plot_C_ell(x, y,
+               fname, 
+               logx=True, 
+               logy=True,
+               xlabel=r"$\ell$", 
+               keq=None,
+               ylabel=None, 
+               xlim=None, 
+               ylim=None, 
+               legendloc='best', 
+               yticks=None, 
+               ypad=None,
+               figsize=(10,6), 
+               save=True,push=False, temp=False):
 
 
     fig, ax = plt.subplots(figsize=figsize)
-    if absval_of_y:
-        y = np.abs(y)
-        fname += "_abs"
 
-    y1, y2, y3 = y 
+
     
-    k1_leg, k2_leg, k3_leg = k_legends
-    ax.plot(x, y1, color='blue'  , label=k1_leg)
-    ax.plot(x, y2, color='red'   , label=k2_leg)
-    ax.plot(x, y3, color='green' , label=k3_leg)
-
-    if ylim is None:
-        ylim_vline = [np.min(y), np.max(y)]
-    else:
-        ylim_vline = ylim  
-    ax.vlines(X_MR_EQ, *ylim_vline, colors='black', ls='dotted', lw=2)
-    if xentry is not None:
-        ax.vlines(xentry[0], *ylim_vline, colors='blue' , ls='-.', alpha=0.5, lw=2)
-        ax.vlines(xentry[1], *ylim_vline, colors='red'  , ls='-.', alpha=0.5, lw=2)
-        ax.vlines(xentry[2], *ylim_vline, colors='green', ls='-.', alpha=0.5, lw=2)
+    ax.plot(x, y, color='blue'  )
 
 
 
 
-
-    ax.set_ylim(ylim)
-    ax.set_xlim(xlim)
-
-    if log:
+    
+    set_ax_info(ax, xlabel, ylabel, legend=False, 
+                ylim=ylim, xlim=xlim, yticks=yticks,
+                ypad=ypad)
+    if logy:
         ax.set_yscale('log')
-        fname += "_log"
-    
-    set_ax_info(ax, xlabel, ylabel, legendloc=legendloc)
 
-    if yticks is not None:
-        ax.set_yticks(yticks)
-
-    save_push(fig, fname, save, push, temp=temp)
-    
-def plot_cdm_baryon_for_n_k_values(x, y_cdm, y_baryon,
-                                   k_legends, ylegends,
-                                   fname, 
-                                   xentry=None,
-                                   xlabel=r"$x$", 
-                                   ylabel=None, 
-                                   xlim=None, 
-                                   ylim=None, 
-                                   legendloc1='best',
-                                   legendloc2='best', 
-                                   yticks=None,
-                                   ypad=None, 
-                                   figsize=(10,6), 
-                                   log=True, 
-                                   save=True, 
-                                   push=False,
-                                   temp=False):
+    if logx:
+        ax.set_xscale('log')
 
 
-    fig, ax = plt.subplots(figsize=figsize)
-    y_cdm1   , y_cdm2   , y_cdm3    = np.abs(y_cdm)
-    y_baryon1, y_baryon2, y_baryon3 = np.abs(y_baryon)
-    y_cdm_legend, y_baryon_legend = ylegends 
-
-    # k1, k2, k3 = k 
-    k1_leg, k2_leg, k3_leg = k_legends
-    ax.plot(x, y_baryon1, ls='dashed', color='blue'  )
-    ax.plot(x, y_baryon2, ls='dashed', color='red')
-    ax.plot(x, y_baryon3, ls='dashed', color='green' )
-    ax.plot(x, y_cdm1   , ls='solid' , color='blue'  , label=k1_leg)
-    ax.plot(x, y_cdm2   , ls='solid' , color='red', label=k2_leg)
-    ax.plot(x, y_cdm3   , ls='solid' , color='green' , label=k3_leg)
-
-    if ylim is None:
-        ymin = np.min([y_cdm,y_baryon])
-        ymax = np.max([y_cdm,y_baryon])
-        ylim_vline = [ymin, ymax]
-    else:
-        ylim_vline = ylim  
-
-    if xentry is not None:
-        ax.vlines(xentry[0], *ylim_vline, colors='blue' , ls='-.', alpha=0.5, lw=2)
-        ax.vlines(xentry[1], *ylim_vline, colors='red'  , ls='-.', alpha=0.5, lw=2)
-        ax.vlines(xentry[2], *ylim_vline, colors='green', ls='-.', alpha=0.5, lw=2)
-        # ylegends.append(r"$k\eta=1$")
-    
-    # ax.vlines(xend2, *ylim)
-    # ax.vlines(xend3, *ylim)
-
-
-    # ax.plot([], ls='solid' , c='k', label=y_cdm_legend)
-    # ax.plot([], ls='dashed', c='k', label=y_baryon_legend)
-
-
-    
-    ax.set_ylim(ylim)
-    ax.set_xlim(xlim)
-
-    if log:
-        ax.set_yscale('log')
-    set_ax_info(ax, xlabel, ylabel, legendloc=legendloc1)
-    # leg1 = ax.legend(loc=legendloc1)
-    plt.gca().add_artist(ax.legend(loc=legendloc1))
-    
-
-    solid_line,  = ax.plot([], label=y_cdm_legend   , c='k', linestyle="-")
-    dashed_line, = ax.plot([], label=y_baryon_legend, c='k', linestyle="--")
-    # dashdot_line,= ax.plot([], label="Horizon entry", c='k', alpha=0.5, linestyle="-.")
-    leg2 = ax.legend([solid_line, dashed_line], ylegends, loc=legendloc2)
-    plt.gca().add_artist(leg2)
- 
-    # end_set = set(xend)
-
-    # for end in end_set:
-    if ylim is None:
-        ylim_end = [np.min(np.abs(y_cdm, y_baryon)), np.max(np.abs(y_cdm, y_baryon))]
-    else:
-        ylim_end = ylim
-        
-    ax.vlines(X_MR_EQ, *ylim_end, color='black', ls='dotted', lw=2)
-    if ypad is not None:
-        ax.set_ylabel(ylabel,labelpad=ypad)
-
-    if yticks is not None:
-        ax.set_yticks(yticks)
-
-    save_push(fig, fname, save, push, temp=temp)
-    
-
-def plot_photon_baryon_for_2_k_values(x, y_photon, y_baryon,
-                                   k_legends, ylegends,
-                                   fname, 
-                                   xentry=None,
-                                   xlabel=r"$x$", 
-                                   ylabel=None, 
-                                   xlim=None, 
-                                   ylim=None, 
-                                   legendloc1='best',
-                                   legendloc2='best', 
-                                   yticks=None, 
-                                   figsize=(10,6), 
-                                   log=True, 
-                                   yabs=True,
-                                   save=True, 
-                                   push=False,
-                                   temp=False):
-
-
-    fig, ax = plt.subplots(figsize=figsize)
-    if yabs:
-        y_photon = np.abs(y_photon)
-        y_baryon = np.abs(y_baryon)
-
-    y_photon1, y_photon2, y_photon3 = y_photon
-    y_baryon1, y_baryon2, y_baryon3 = y_baryon
-    y_photon_legend, y_baryon_legend = ylegends 
-
-    k1_leg, k2_leg, k3_leg = k_legends
-    # leg_baryon_k1 = r"$v_b,\:$" + k1_leg
-    # leg_photon_k1 = r"$v_\gamma,\:$" + k1_leg
-    # leg_baryon_k2 = r"$v_b,\:$" + k2_leg
-    # leg_photon_k2 = r"$v_\gamma,\:$" + k2_leg
-    # leg_baryon_k3 = r"$v_b,\:$" + k3_leg
-    # leg_photon_k3 = r"$v_\gamma,\:$" + k3_leg
-
-    ax.plot(x, y_baryon1, ls='solid' , color='blue', label=k1_leg)
-    ax.plot(x, y_photon1, ls='dashed', color='blue')
-    ax.plot(x, y_baryon2, ls='solid' , color='red',  label=k2_leg)
-    ax.plot(x, y_photon2, ls='dashed', color='red')
-    ax.plot(x, y_baryon3, ls='solid' , color='green',label=k3_leg)
-    ax.plot(x, y_photon3, ls='dashed', color='green')
-
-
-    if ylim is None:
-        ymin_vline = np.min(np.abs(y_photon, y_baryon))
-        ymax_vline = np.max(np.abs(y_photon, y_baryon))
-        ylim_vline = [ymin_vline, ymax_vline]
-    else:
-        ylim_vline = ylim
-    
-    if xentry is not None:
-        ax.vlines(xentry[0], *ylim_vline, colors='blue' , ls='-.', alpha=0.5, lw=2)
-        ax.vlines(xentry[1], *ylim_vline, colors='red'  , ls='-.', alpha=0.5, lw=2)
-        ax.vlines(xentry[2], *ylim_vline, colors='green', ls='-.', alpha=0.5, lw=2)
-        # ylegends.append(r"$k\eta=1$")
-
-    ax.vlines(X_MR_EQ, *ylim_vline, color='black', ls='dotted', lw=2)
-
-    
-    ax.set_ylim(ylim)
-    ax.set_xlim(xlim)
-
-    if log:
-        ax.set_yscale('log')
-    set_ax_info(ax, xlabel, ylabel, legendloc=legendloc1)
-    # leg1 = ax.legend(loc=legendloc1)
-    plt.gca().add_artist(ax.legend(loc=legendloc1))
- 
-    solid_line,  = ax.plot([], label=y_photon_legend, c='k', linestyle="-")
-    dashed_line, = ax.plot([], label=y_baryon_legend, c='k', linestyle="--")
-    # dashdot_line,= ax.plot([], label="Horizon entry", c='k', alpha=0.5, linestyle="-.")
-
-    leg2 = ax.legend([solid_line, dashed_line], ylegends, loc=legendloc2)
-    plt.gca().add_artist(leg2)
-
-
-
-    if yticks is not None:
-        ax.set_yticks(yticks)
 
     save_push(fig, fname, save, push, temp=temp)
     
 
 
-def plot_source_function(x, y,
-                         k_legends,
-                        fname, 
-                        xlabel=r"$x$", 
-                        ylabel=None, 
-                        xlim=None, 
-                        ylim=None, 
-                        legendloc='best', 
-                        yticks=None, 
-                        figsize=(10,6), 
-                        log=False, 
-                        save=True, 
-                        temp=False):
+
+def plot_matter_PS(x, y, 
+                   fname,  
+                   logx=True, logy=True, 
+                   xlabel=None, ylabel=None,  
+                   xlim=None, ylim=None,  
+                   keq=None, 
+                   ypad=None, 
+                   figsize=(10,6),  
+                   save=True,push=False, temp=False):
 
 
     fig, ax = plt.subplots(figsize=figsize)
-    y1, y2, y3 = y 
-    k1_leg, k2_leg, k3_leg = k_legends
-    ax.plot(x, y1, color='blue'  , label=k1_leg)
-    ax.plot(x, y2, color='orange', label=k2_leg)
-    ax.plot(x, y3, color='green' , label=k3_leg)
 
-    ax.set_ylim(ylim)
-    ax.set_xlim(xlim)
 
-    if log:
-        ax.set_yscale('log')
     
-    set_ax_info(ax, xlabel, ylabel, legendloc=legendloc)
-
-    if yticks is not None:
-        ax.set_yticks(yticks)
-
-    print(f'Showing: {fname}')
-    save_push(fig, fname, save, temp=temp)
+    ax.plot(x, y, color='blue')
 
 
+
+
+    
+    set_ax_info(ax, xlabel, ylabel, legend=False, 
+                ylim=ylim, xlim=xlim, ypad=ypad)
+
+    if logy:
+        ax.set_yscale('log')
+
+    if logx:
+        ax.set_xscale('log')
+
+
+
+    save_push(fig, fname, save, push, temp=temp)
+
+
+def comp_C_ell(x, y,
+               xlabel=r"$\ell$", 
+               keq=None,
+               ylabel=None, 
+               xlim=None, 
+               ylim=None, 
+               legendloc='best', 
+               yticks=None, 
+               ypad=None,
+               figsize=(10,6), 
+               save=True,push=False, temp=False):
+
+
+    fig, ax = plt.subplots(figsize=figsize)
+
+
+    
+    ax.plot(x, y, color='blue'  )
+
+
+
+
+    
+    set_ax_info(ax, xlabel, ylabel, legend=False, 
+                ylim=ylim, xlim=xlim, yticks=yticks,
+                ypad=ypad)
+
+
+
+    # save_push(fig, pdf_name=None, save=save, push=push, temp=temp)
+    plt.show()
 
 if __name__=='__main__':
     pass 

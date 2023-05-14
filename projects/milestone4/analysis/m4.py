@@ -30,37 +30,46 @@ MREQ        = True
 TCEND       = False 
 
 class PowerSpectrum:
-    def __init__(self, f1, f2, f3):
+    def __init__(self, f1_Cell, f1_MPS):
         
+        # f1_Cell=f1_Cell[f1_Cell.index("_")+1:]
+        # print(f1_Cell)
+        self.f1_Cell = f1_Cell[f1_Cell.index("_")+1:].strip(".txt")
+        self.f1_MPS = f1_MPS[f1_MPS.index("_")+1:].strip(".txt")
+        self.ell, self.C_ell = np.loadtxt(DATA_PATH + f1_Cell, unpack=True)
+        self.k, self.Pk      = np.loadtxt(DATA_PATH + f1_MPS , unpack=True) 
+        # self.ell, self.C_ell1 = np.loadtxt(DATA_PATH + f1, unpack=True)
+        # self.ell2, self.C_ell2 = np.loadtxt(TEST_PATH + f2, unpack=True)
+        # self.ell3, self.C_ell3 = np.loadtxt(TEST_PATH + f3, unpack=True)
 
+        # self.plot()
+        # self.plot_diff(self.C_ell2, self.C_ell3)
 
-        self.ell1, self.C_ell1 = np.loadtxt(DATA_PATH + f1, unpack=True)
-        self.ell2, self.C_ell2 = np.loadtxt(TEST_PATH + f2, unpack=True)
-        self.ell3, self.C_ell3 = np.loadtxt(TEST_PATH + f3, unpack=True)
-
-        self.plot()
-        self.plot_diff(self.C_ell2, self.C_ell3)
+    def plot_Cell(self):
+        ylabel = r"$\ell(\ell+1)C_\ell/2\pi$"
+        fname = "C_ell_" + self.f1_Cell
+        plot.plot_C_ell(self.ell, self.C_ell,
+                        fname=fname,
+                        ylabel=ylabel, ypad=10,
+                        save=SAVE, temp=TEMP, push=PUSH)
         
+    def comp_Cell(self, file_compare):
+        ell_compare, C_ell_compare = np.loadtxt(DATA_PATH + file_compare, unpack=True) 
+        ylabel = r"$\ell(\ell+1)C_\ell/2\pi$"
+        plot.comp_C_ell(self.ell, self.C_ell - C_ell_compare,
+                        ylabel=ylabel, ypad=10,
+                        save=SAVE, temp=TEMP, push=PUSH)
 
-    def plot(self):
-        plt.plot(self.ell1,  self.C_ell1, c='blue')
-        plt.plot(self.ell2, self.C_ell2, '--', c='k')
-        plt.plot(self.ell3, self.C_ell3, ':', alpha=0.5)
-        plt.xscale('log')
-        plt.yscale('log')
-        plt.show()
-
-    def plot_diff(self, c1, c2):
-        plt.plot(self.ell1, c1 - c2)
-        plt.xscale('log')
-        plt.show()
-
-    def plot_mps(self, file):
-        k, pk = np.loadtxt(DATA_PATH + file, unpack=True)
-        plt.plot(k, pk/2)
-        plt.xscale('log')
-        plt.yscale('log')
-        plt.show()
+    def plot_matter_power_spectrum(self):
+        ylabel = r"$P(k)\quad[(\mathrm{Mpc/h})^3]$"
+        xlabel = r"$k \quad [\mathrm{h/Mpc}]$"
+        fname = "Matter_PS_" + self.f1_MPS
+        plot.plot_matter_PS(self.k, self.Pk,
+                            fname=fname,
+                            ylabel=ylabel, 
+                            xlabel=xlabel, 
+                            ypad=10,
+                            save=SAVE, temp=TEMP, push=PUSH)
 
 
     def plot_source_function(self, xlim=XLIM, ylim=None, no=0, fname=None):
@@ -125,11 +134,15 @@ class PowerSpectrum:
 
 
 # pspec = PowerSpectrum(f1="thisworks.txt", f2="cellspar.txt", f3="cellsnewx.txt")
-pspec = PowerSpectrum(f1="thisworks.txt", f2="cellsnewx.txt", f3="cellsignoreterms.txt")
-pspec.plot_mps("matterPS.txt")
+# pspec = PowerSpectrum(f1_Cell="cells.txt", f1_MPS="matterPS.txt")#, f3="cellsignoreterms.txt")
+pspec = PowerSpectrum(f1_Cell="cells_nx5000_nk5443_nlogk10886.txt", f1_MPS="matterPS_nk1000.txt")
 
+SAVE=True
+PUSH=True
+pspec.plot_Cell()
+TEMP=True
+pspec.plot_Cell()
 
-# SAVE=True
-# PUSH=True
-# TEMP=True
+# pspec.comp_Cell(file_compare="thisworks.txt")
+# pspec.plot_matter_power_spectrum()
 
