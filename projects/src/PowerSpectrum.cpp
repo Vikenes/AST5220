@@ -328,7 +328,7 @@ double PowerSpectrum::get_cell_EE(const double ell) const{
 // Output the cells to file
 //====================================================
 
-void PowerSpectrum::output(std::string filename) const{
+void PowerSpectrum::output(std::string filename) const{ 
   int nk    = n_k_from_N_osc_samples(los_samples_per_osc);
   int nlogk = n_k_from_N_osc_samples(cell_samples_per_osc);
   int pos = filename.find(".txt");
