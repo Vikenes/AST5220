@@ -300,6 +300,15 @@ class ExpansionHistory:
                                     fname=f'H0_pdf_Nburn{burn}.pdf', save=SAVE, temp=TEMP)
 
 
+    def best_fit_values(self, burn=1000):
+        chi2, h, OmegaM, OmegaK = self.load_supernovafit(burn)
+        H0 = h * (100*u.km / u.s / u.Mpc)
+
+        H0_std = np.std(H0)
+        OmegaM_std = np.std(OmegaM)
+        OmegaK_std = np.std(OmegaK)
+
+
     def make_table(self):
         """
         Funker ikke. Pandas er no mig innimellom...

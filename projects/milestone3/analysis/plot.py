@@ -96,7 +96,8 @@ def save_push(fig, pdf_name, save=True, push=False, show=False, tight=True, temp
 
 
 def set_ax_info(ax, xlabel, ylabel=False, title=None, legend=True, 
-                double_legends=[], legendloc='best', legend_size=False):
+                double_legends=[], legendloc='best', legend_size=False,
+                xlim=None, ylim=None, logy=False):
     """Write title and labels on an axis with the correct fontsizes.
     Args:
         ax (matplotlib.axis): the axis on which to display information
@@ -126,8 +127,13 @@ def set_ax_info(ax, xlabel, ylabel=False, title=None, legend=True,
             ax.legend(loc=legendloc)
 
 
+    if ylim is not None:
+        ax.set_ylim(ylim)
+    
+    if xlim is not None:
+        ax.set_xlim(xlim)
 
-
+    
 # -----------------------------------------------------------------------------
 #   General plot code above
 #   XXX
@@ -212,7 +218,7 @@ def plot_cdm_baryon_for_n_k_values(x, y_cdm, y_baryon,
                                    yticks=None,
                                    ypad=None, 
                                    figsize=(10,6), 
-                                   log=True, 
+                                   logy=True, 
                                    save=True, 
                                    push=False,
                                    temp=False):
@@ -252,14 +258,15 @@ def plot_cdm_baryon_for_n_k_values(x, y_cdm, y_baryon,
     # ax.plot([], ls='solid' , c='k', label=y_cdm_legend)
     # ax.plot([], ls='dashed', c='k', label=y_baryon_legend)
 
+    if logy:
+        ax.set_yscale('log')
 
     
-    ax.set_ylim(ylim)
-    ax.set_xlim(xlim)
 
-    if log:
-        ax.set_yscale('log')
-    set_ax_info(ax, xlabel, ylabel, legendloc=legendloc1)
+
+    set_ax_info(ax, xlabel, ylabel, legendloc=legendloc1, 
+                xlim=xlim, ylim=ylim)
+    
     # leg1 = ax.legend(loc=legendloc1)
     plt.gca().add_artist(ax.legend(loc=legendloc1))
     
