@@ -20,6 +20,7 @@ PowerSpectrum::PowerSpectrum(
 {
   c_ = Constants.c;
   eta0_ = cosmo->eta_of_x(0.0);
+  TWO_PI_over_eta0_ = 2.0 * M_PI / eta0_;
   nells_ = ells.size();
   H0_ = cosmo->get_H0();
   OmegaMtot_ = cosmo->get_OmegaB() + cosmo->get_OmegaCDM();
@@ -34,11 +35,11 @@ void PowerSpectrum::solve(bool load_data){
   // TODO: Choose the range of k's and the resolution to compute Theta_ell(k)
   //=========================================================================
   // const double eta0 = cosmo->eta_of_x(0.0);
-  const double dk = 2.0 * M_PI / eta0_ / (double)los_samples_per_osc;
-  const int nk = int((k_max - k_min) / dk);
 
-  const double dlogk = 2.0 * M_PI / eta0_ / (double)cell_samples_per_osc;
-  const int nlogk = int((k_max - k_min) / dlogk);
+  // const double dk      = k_stepsize_from_N_osc_samples(los_samples_per_osc);
+  const int nk         = n_k_from_N_osc_samples(los_samples_per_osc);
+  // const double dlogk   = k_stepsize_from_N_osc_samples(cell_samples_per_osc);
+  const int nlogk      = n_k_from_N_osc_samples(cell_samples_per_osc);
 
   Vector k_array = Utils::linspace(k_min, k_max, nk);
   Vector log_k_array = Utils::linspace(log(k_min), log(k_max), nlogk);
@@ -65,8 +66,14 @@ void PowerSpectrum::solve(bool load_data){
   //=========================================================================
   auto cell_TT = solve_for_cell(log_k_array, thetaT_ell_of_k_spline, thetaT_ell_of_k_spline);
   cell_TT_spline.create(ells, cell_TT, "Cell_TT_of_ell");
-  
+}
 
+double PowerSpectrum::k_stepsize_from_N_osc_samples(int samples_per_osc) const{
+  return TWO_PI_over_eta0_ / (double)samples_per_osc;
+}
+
+double PowerSpectrum::n_k_from_N_osc_samples(int samples_per_osc) const{
+  return int((k_max - k_min) / k_stepsize_from_N_osc_samples(samples_per_osc));
 }
 
 //====================================================
@@ -123,10 +130,10 @@ Vector2D PowerSpectrum::line_of_sight_integration_single(
   // const int nells = ells.size();
   const double dx = (x_end - x_start) / (double)n_x;
 
-  Vector x_array = Utils::linspace(x_start, x_end, n_x);
+  Vector x_LOS_array = Utils::linspace(x_start_LOS, x_end, n_x);
 
-  const int n_x_LOS = int((x_end - x_start_LOS) / dx);
-  Vector x_LOS = Utils::linspace(x_start_LOS, x_end, n_x_LOS);
+  // const int n_x_LOS = int((x_end - x_start_LOS) / dx);
+  // Vector x_LOS = Utils::linspace(x_start_LOS, x_end, n_x_LOS);
 
   // std::cout << "nxlos=" << n_x_LOS << std::endl;
   // return result;   
@@ -141,7 +148,6 @@ Vector2D PowerSpectrum::line_of_sight_integration_single(
   // std::cout << "x_0=" << x_LOS[0] << std::endl;
 
 
-  #pragma omp parallel for schedule(dynamic, 1)
   for(size_t ik = 0; ik < k_array.size(); ik++){
 
     //=============================================================================
@@ -151,6 +157,7 @@ Vector2D PowerSpectrum::line_of_sight_integration_single(
     //=============================================================================
     double k = k_array[ik];
    
+    #pragma omp parallel for schedule(dynamic, 1)
     for(int iell=0; iell<nells_; iell++){
       // std::function<double(double)> integrand = [&](double x){
         // return source_function(x, k) * j_ell_splines[iell](k*(eta0 - cosmo->eta_of_x(x)));
@@ -158,7 +165,7 @@ Vector2D PowerSpectrum::line_of_sight_integration_single(
       double integral_sum = 0;
       // double x;  
       double x = x_start_LOS;  
-      for(int ix=0; ix<x_LOS.size(); ix++){
+      for(int ix=0; ix<x_LOS_array.size(); ix++){
         // x = x_LOS[ix];
         integral_sum += source_function(x, k) * j_ell_splines[iell](k*(eta0_ - cosmo->eta_of_x(x)));
         x += dx;
@@ -322,6 +329,17 @@ double PowerSpectrum::get_cell_EE(const double ell) const{
 //====================================================
 
 void PowerSpectrum::output(std::string filename) const{
+  int nk    = n_k_from_N_osc_samples(los_samples_per_osc);
+  int nlogk = n_k_from_N_osc_samples(cell_samples_per_osc);
+  int pos = filename.find(".txt");
+  if (pos != std::string::npos) {
+    std::string file_info;
+    file_info  = "_nx" + std::to_string(n_x);
+    file_info += "_nk" + std::to_string(nk);
+    file_info += "_nlogk" + std::to_string(nlogk);
+    filename.insert(pos, file_info);
+  }
+
   // Output in standard units of muK^2
   std::ofstream fp(filename.c_str());
   const int ellmax = int(ells[ells.size()-1]);
@@ -347,6 +365,12 @@ void PowerSpectrum::output(std::string filename) const{
 
 void PowerSpectrum::outputPS(std::string filename, int nk) const{
   // Output in standard units of muK^2
+  int pos = filename.find(".txt");
+  if (pos != std::string::npos) {
+    std::string file_info  = "_nk" + std::to_string(nk);
+    filename.insert(pos, file_info);
+  }
+
   std::ofstream fp(filename.c_str());
   // const int ellmax = int(ells[ells.size()-1]);
   

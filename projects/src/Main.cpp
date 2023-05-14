@@ -41,7 +41,7 @@ int main(int argc, char **argv){
   // Module I
   //=========================================================================
 
-  m1_output=true;
+  // m1_output=true;
   // supernova=true;
   if(m1_output){
     // Set up and solve the background
@@ -146,12 +146,12 @@ int main(int argc, char **argv){
   }
 
 
-  
+  m4_output=true;
   //=========================================================================
   // Module IV
   //=========================================================================
   if(m4_output){
-    bool source = false;
+    bool source = true;
     // Set up and solve the background
     // Set Neff = 0 in this milestone to ignore neutrinos.
     BackgroundCosmology cosmo(h, OmegaB, OmegaCDM, OmegaK, 0.0, TCMB);
@@ -167,8 +167,8 @@ int main(int argc, char **argv){
     pert.solve(source);
 
     PowerSpectrum power(&cosmo, &rec, &pert, A_s, n_s, kpivot_mpc);
-    // power.solve(false);
-    // power.output("milestone4/data/cellsignoreterms.txt");
+    power.solve(false);
+    power.output("milestone4/data/cells.txt");
     power.outputPS("milestone4/data/matterPS.txt", 1000);
   
   // Remove when module is completed
