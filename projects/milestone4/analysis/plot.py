@@ -126,18 +126,15 @@ def set_ax_info(ax, xlabel, ylabel=False, title=None, legend=True,
 
 
     if ylim is not None:
-        print('yl')
         ax.set_ylim(ylim)
     
     if xlim is not None:
-        print('xl')
         ax.set_xlim(xlim)
 
     if ypad is not None:
         ax.set_ylabel(ylabel,labelpad=ypad)
 
     if yticks is not None:
-        print('yt')
         ax.set_yticks(yticks)
 
 # -----------------------------------------------------------------------------
@@ -190,12 +187,11 @@ def plot_C_ell(x, y,
 
 
 
-def plot_matter_PS(x, y, 
+def plot_matter_PS(x, y, k_eq,
                    fname,  
                    logx=True, logy=True, 
                    xlabel=None, ylabel=None,  
                    xlim=None, ylim=None,  
-                   keq=None, 
                    ypad=None, 
                    figsize=(10,6),  
                    save=True,push=False, temp=False):
@@ -207,13 +203,60 @@ def plot_matter_PS(x, y,
     
     ax.plot(x, y, color='blue')
 
+    if ylim is None:
+        ylim_vline = ax.get_ylim()
+    else:
+        ylim_vline = ax.get_ylim()
+
+    if k_eq is not None:
+        ax.vlines(k_eq.value, *ylim_vline, colors='red', ls='dashed', label=r"$k_\mathrm{eq}$")
 
 
 
     
-    set_ax_info(ax, xlabel, ylabel, legend=False, 
+    set_ax_info(ax, xlabel, ylabel, legend=True, 
                 ylim=ylim, xlim=xlim, ypad=ypad)
 
+    if logy:
+        ax.set_yscale('log')
+
+    if logx:
+        ax.set_xscale('log')
+
+
+
+    save_push(fig, fname, save, push, temp=temp)
+
+
+def plot_Thetas(x, y,
+               ell_values, 
+               fname,
+               logx=True, 
+               logy=True,
+               xlabel=r"$k\eta_0$", 
+               ylabel=None, 
+               xlim=None, 
+               ylim=None, 
+               legendloc='best', 
+               yticks=None, 
+               ypad=None,
+               figsize=(10,6), 
+               save=False,push=False, temp=False):
+
+
+    fig, ax = plt.subplots(figsize=figsize)
+    print(fname)
+
+    for idx, l in enumerate(ell_values):
+        ax.plot(x, y[idx], label=fr"$\ell=${str(l)}")
+
+
+
+
+    
+    set_ax_info(ax, xlabel, ylabel, legend=True, 
+                ylim=ylim, xlim=xlim, yticks=yticks,
+                ypad=ypad)
     if logy:
         ax.set_yscale('log')
 
