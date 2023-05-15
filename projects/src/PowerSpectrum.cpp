@@ -412,38 +412,6 @@ void PowerSpectrum::outputThetas(std::string filename, int nk) const{
 
 }
 
-void PowerSpectrum::outputCellIntegrand(std::string filename, int nk) const{
-
-  int pos = filename.find(".txt");
-
-  if (pos != std::string::npos) {
-    std::string file_info  = "_nk" + std::to_string(nk) + "_nx" + std::to_string(n_x);
-    filename.insert(pos, file_info);
-  }
-
-  std::ofstream fp(filename.c_str());
-
-  auto kvalues = Utils::linspace(k_min, k_max, nk);
-
-  std::string header = "k,ell: ";
-  for(int iell=0; iell<nells_; iell++){
-    header += std::to_string(int(ells[iell])) + " ";
-  }
-  fp << header << "\n";
-
-  auto print_data = [&] (const double k) {
-    fp << k                                     << " ";
-    for(int iell=0; iell<nells_; iell++){
-      fp << get_Theta_squared_over_k(iell, k) << " ";
-    }
-    fp << "\n";
-  };
-
-  std::cout << "Writing file to: " << filename << std::endl;
-  std::for_each(kvalues.begin(), kvalues.end(), print_data);
-  std::cout << "Finished writing to file" << std::endl;
-
-}
 
 
 void PowerSpectrum::outputPS(std::string filename, int nk) const{

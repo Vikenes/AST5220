@@ -160,7 +160,6 @@ class PowerSpectrum {
     // Output Cells in units of l(l+1)/2pi (muK)^2
     void output(std::string filename) const;
     void outputThetas(std::string filename, int nk) const;
-    void outputCellIntegrand(std::string filename, int nk) const;
     void outputPS(std::string filename, int nk) const;
 
 };
