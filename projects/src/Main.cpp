@@ -151,7 +151,12 @@ int main(int argc, char **argv){
   // Module IV
   //=========================================================================
   if(m4_output){
-    bool source = true;
+    bool matter_PS = false;
+    bool source;
+
+    if(matter_PS){source=false;}
+    else{source=true;};
+
     // Set up and solve the background
     // Set Neff = 0 in this milestone to ignore neutrinos.
     BackgroundCosmology cosmo(h, OmegaB, OmegaCDM, OmegaK, 0.0, TCMB);
@@ -163,17 +168,22 @@ int main(int argc, char **argv){
   
     // Solve the perturbations
     Perturbations pert(&cosmo, &rec);
+
     pert.solve(source);
 
     PowerSpectrum power(&cosmo, &rec, &pert, A_s, n_s, kpivot_mpc);
-    power.solve(false);
+    if(!matter_PS){power.solve(false);}
 
     std::string M4_DATA_PATH = "milestone4/data/";
 
-    // power.output(M4_DATA_PATH + "cells.txt");
-    // power.outputPS(M4_DATA_PATH + "matterPS.txt", 1000);
-    power.outputThetas(M4_DATA_PATH + "thetas.txt", 2000);
+    if(matter_PS){
+      power.outputPS(M4_DATA_PATH + "matterPS.txt", 1000);
+    }
   
+    else{
+      power.output(M4_DATA_PATH + "cells.txt");
+      power.outputThetas(M4_DATA_PATH + "thetas.txt", 2000);
+    };
   // Remove when module is completed
   }
   return 0;

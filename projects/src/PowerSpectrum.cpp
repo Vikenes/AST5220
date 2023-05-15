@@ -352,6 +352,20 @@ void PowerSpectrum::output(std::string filename) const{
     filename.insert(pos, file_info);
   }
 
+  if (std::filesystem::exists(filename)) {
+    std::cout << "File " << filename << " already exists." << std::endl;
+    char choice;
+    std::cout << "  Do you want to overwrite the file? (y/n)" << std::endl;
+    std::cin >> choice;
+    if (choice != 'y') {
+      return;
+    } else { };
+
+  } else {
+    std::cout << "File " << filename << " does not exist." << std::endl;
+  }
+  std::cout << "Writing data to: " << filename << std::endl;
+
   // Output in standard units of muK^2
   std::ofstream fp(filename.c_str());
   const int ellmax = int(ells[ells.size()-1]);
@@ -370,9 +384,10 @@ void PowerSpectrum::output(std::string filename) const{
     fp << "\n";
   };
 
-  std::cout << "Writing file to: " << filename << std::endl;
 
   std::for_each(ellvalues.begin(), ellvalues.end(), print_data);
+  std::cout << "Finished writing to file" << std::endl;
+
 }
 
 
@@ -384,6 +399,23 @@ void PowerSpectrum::outputThetas(std::string filename, int nk) const{
     std::string file_info  = "_nk" + std::to_string(nk) + "_nx" + std::to_string(n_x);
     filename.insert(pos, file_info);
   }
+
+  if (std::filesystem::exists(filename)) {
+    std::cout << "File " << filename << " already exists." << std::endl;
+    char choice;
+    std::cout << "  Do you want to overwrite the file? (y/n)" << std::endl;
+    std::cin >> choice;
+    if (choice != 'y') {
+      return;
+    } else { };
+
+  } else {
+    std::cout << "File " << filename << " does not exist." << std::endl;
+  }
+  std::cout << "Writing data to: " << filename << std::endl;
+
+
+
 
   std::ofstream fp(filename.c_str());
 
@@ -406,7 +438,6 @@ void PowerSpectrum::outputThetas(std::string filename, int nk) const{
     fp << "\n";
   };
 
-  std::cout << "Writing file to: " << filename << std::endl;
   std::for_each(k_values.begin(), k_values.end(), print_data);
   std::cout << "Finished writing to file" << std::endl;
 
@@ -421,6 +452,20 @@ void PowerSpectrum::outputPS(std::string filename, int nk) const{
     std::string file_info  = "_nk" + std::to_string(nk);
     filename.insert(pos, file_info);
   }
+
+  if (std::filesystem::exists(filename)) {
+    std::cout << "File " << filename << " already exists." << std::endl;
+    char choice;
+    std::cout << "  Do you want to overwrite the file? (y/n)" << std::endl;
+    std::cin >> choice;
+    if (choice != 'y') {
+      return;
+    } else { };
+
+  } else {
+    std::cout << "File " << filename << " does not exist." << std::endl;
+  }
+  std::cout << "Writing data to: " << filename << std::endl;
 
   std::ofstream fp(filename.c_str());
   
@@ -440,7 +485,6 @@ void PowerSpectrum::outputPS(std::string filename, int nk) const{
 
   double k_eq = get_k_eq();
 
-  std::cout << "Writing file to: " << filename << std::endl;
   fp << k_eq * Mpc_ / h << "\n";
   std::for_each(kvalues.begin(), kvalues.end(), print_data);
 
