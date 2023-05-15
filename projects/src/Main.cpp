@@ -155,7 +155,6 @@ int main(int argc, char **argv){
     // Set up and solve the background
     // Set Neff = 0 in this milestone to ignore neutrinos.
     BackgroundCosmology cosmo(h, OmegaB, OmegaCDM, OmegaK, 0.0, TCMB);
-    // BackgroundCosmology cosmo(0.7, OmegaB, 0.45, OmegaK, 0.0, TCMB);
     cosmo.solve();
 
     // Solve the recombination history
@@ -168,8 +167,13 @@ int main(int argc, char **argv){
 
     PowerSpectrum power(&cosmo, &rec, &pert, A_s, n_s, kpivot_mpc);
     power.solve(false);
-    power.output("milestone4/data/cells.txt");
-    power.outputPS("milestone4/data/matterPS.txt", 1000);
+
+    std::string M4_DATA_PATH = "milestone4/data/";
+
+    // power.output(M4_DATA_PATH + "cells.txt");
+    // power.outputPS(M4_DATA_PATH + "matterPS.txt", 1000);
+    // power.outputThetas(M4_DATA_PATH + "thetas.txt", 1000);
+    // power.outputCellIntegrand(M4_DATA_PATH + "cell_integrand.txt", 1000);
   
   // Remove when module is completed
   }

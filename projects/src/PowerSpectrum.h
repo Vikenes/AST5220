@@ -7,6 +7,7 @@
 #include <utility> 
 #include <fstream> 
 #include <algorithm>
+#include <iomanip>
 #include "Utils.h"
 #include "BackgroundCosmology.h"
 #include "RecombinationHistory.h"
@@ -37,7 +38,7 @@ class PowerSpectrum {
     const int cell_samples_per_osc = 16;
 
     // The x-values we integrate to compute Theta_ell(k) etc. for
-    const int n_x        = 5000;
+    const int n_x        = 500;
     const double x_start = Constants.x_start;
     const double x_end   = Constants.x_end;
     const double x_start_LOS = x_start;// = -11.0;
@@ -70,6 +71,7 @@ class PowerSpectrum {
     double H0_;
     double OmegaMtot_;
     double TWO_PI_over_eta0_;
+    double Mpc_;
 
     //=====================================================================
     // [1] Create bessel function splines needed for the LOS integration
@@ -139,6 +141,9 @@ class PowerSpectrum {
     // Get P(k,x) for a given x in units of (Mpc)^3
     double get_matter_power_spectrum(const double x, const double k_mpc) const;
 
+    double get_k_eq() const;
+    double get_Theta_squared_over_k(const int iell, const double k) const;
+
     double k_stepsize_from_N_osc_samples(int samples_per_osc) const;
     double n_k_from_N_osc_samples(int samples_per_osc) const;
     double integrate_trapezoidal(
@@ -154,6 +159,8 @@ class PowerSpectrum {
 
     // Output Cells in units of l(l+1)/2pi (muK)^2
     void output(std::string filename) const;
+    void outputThetas(std::string filename, int nk) const;
+    void outputCellIntegrand(std::string filename, int nk) const;
     void outputPS(std::string filename, int nk) const;
 
 };

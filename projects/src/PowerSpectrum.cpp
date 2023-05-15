@@ -18,19 +18,20 @@ PowerSpectrum::PowerSpectrum(
   n_s(n_s),
   kpivot_mpc(kpivot_mpc)
 {
-  c_ = Constants.c;
-  eta0_ = cosmo->eta_of_x(0.0);
+  c_                = Constants.c;
+  eta0_             = cosmo->eta_of_x(0.0);
   TWO_PI_over_eta0_ = 2.0 * M_PI / eta0_;
-  nells_ = ells.size();
-  H0_ = cosmo->get_H0();
-  OmegaMtot_ = cosmo->get_OmegaB() + cosmo->get_OmegaCDM();
+  nells_            = ells.size();
+  H0_               = cosmo->get_H0();
+  OmegaMtot_        = cosmo->get_OmegaB() + cosmo->get_OmegaCDM();
+  Mpc_              = Constants.Mpc;
 }
 
 //====================================================
 // Do all the solving
 //====================================================
 void PowerSpectrum::solve(bool load_data){
-
+  
   //=========================================================================
   // TODO: Choose the range of k's and the resolution to compute Theta_ell(k)
   //=========================================================================
@@ -259,7 +260,7 @@ Vector PowerSpectrum::solve_for_cell(
 //====================================================
 
 double PowerSpectrum::primordial_power_spectrum(const double k) const{
-  return A_s * pow( Constants.Mpc * k / kpivot_mpc , n_s - 1.0);
+  return A_s * pow( Mpc_ * k / kpivot_mpc , n_s - 1.0);
 }
 
 //====================================================
@@ -272,12 +273,9 @@ double PowerSpectrum::get_matter_power_spectrum(const double x, const double k_m
   //=============================================================================
   // TODO: Compute the matter power spectrum
   //=============================================================================
-  // double c = Constants.c;
-  double k_SI = k_mpc / Constants.Mpc;
+  double k_SI = k_mpc / Mpc_;
   double Phi = pert->get_Phi(x, k_SI);
-  // double OmegaM_tot = cosmo->get_OmegaB() + cosmo->get_OmegaCDM();
   double a = 1.;
-  // double H0 = cosmo->get_H0();
 
   double Delta_M = c_*c_*k_SI*k_SI * Phi / (3./2. * OmegaMtot_ * H0_*H0_);
   double k_mpc_cubed = k_mpc * k_mpc * k_mpc;
@@ -285,6 +283,20 @@ double PowerSpectrum::get_matter_power_spectrum(const double x, const double k_m
 
   pofk = abs(Delta_M*Delta_M) * P_primordial;
   return pofk;
+}
+
+double PowerSpectrum::get_k_eq() const{
+  Vector x_array = Utils::linspace(x_start, x_end, n_x);
+  double x_eq = cosmo->get_mr_equality(x_array);
+  double a_eq = exp(x_eq);
+  double k_eq = a_eq * cosmo->H_of_x(x_eq) / c_;
+
+  return k_eq;
+}
+
+double PowerSpectrum::get_Theta_squared_over_k(const int iell, const double k) const{
+  double Theta = thetaT_ell_of_k_spline[iell](k);
+  return abs(Theta*Theta) / k; 
 }
 
 
@@ -363,6 +375,77 @@ void PowerSpectrum::output(std::string filename) const{
   std::for_each(ellvalues.begin(), ellvalues.end(), print_data);
 }
 
+
+void PowerSpectrum::outputThetas(std::string filename, int nk) const{
+
+  int pos = filename.find(".txt");
+
+  if (pos != std::string::npos) {
+    std::string file_info  = "_nk" + std::to_string(nk) + "_nx" + std::to_string(n_x);
+    filename.insert(pos, file_info);
+  }
+
+  std::ofstream fp(filename.c_str());
+
+
+  std::string header = "k*eta0, ell= ";
+  for(int iell=0; iell<nells_; iell++){
+    header += std::to_string(int(ells[iell])) + " ";
+  }
+  fp << "eta0= " << eta0_ << "\n";
+  fp << header << "\n";
+
+  auto k_log_values = Utils::linspace(log(k_min), log(k_max), nk);
+  auto k_values = exp(k_log_values);
+
+  auto print_data = [&] (const double k) {
+    fp << k                           << " ";
+    for(int iell=0; iell<nells_; iell++){
+      fp << thetaT_ell_of_k_spline[iell](k) << " ";
+    }
+    fp << "\n";
+  };
+
+  std::cout << "Writing file to: " << filename << std::endl;
+  std::for_each(k_values.begin(), k_values.end(), print_data);
+  std::cout << "Finished writing to file" << std::endl;
+
+}
+
+void PowerSpectrum::outputCellIntegrand(std::string filename, int nk) const{
+
+  int pos = filename.find(".txt");
+
+  if (pos != std::string::npos) {
+    std::string file_info  = "_nk" + std::to_string(nk) + "_nx" + std::to_string(n_x);
+    filename.insert(pos, file_info);
+  }
+
+  std::ofstream fp(filename.c_str());
+
+  auto kvalues = Utils::linspace(k_min, k_max, nk);
+
+  std::string header = "k,ell: ";
+  for(int iell=0; iell<nells_; iell++){
+    header += std::to_string(int(ells[iell])) + " ";
+  }
+  fp << header << "\n";
+
+  auto print_data = [&] (const double k) {
+    fp << k                                     << " ";
+    for(int iell=0; iell<nells_; iell++){
+      fp << get_Theta_squared_over_k(iell, k) << " ";
+    }
+    fp << "\n";
+  };
+
+  std::cout << "Writing file to: " << filename << std::endl;
+  std::for_each(kvalues.begin(), kvalues.end(), print_data);
+  std::cout << "Finished writing to file" << std::endl;
+
+}
+
+
 void PowerSpectrum::outputPS(std::string filename, int nk) const{
   // Output in standard units of muK^2
   int pos = filename.find(".txt");
@@ -372,14 +455,12 @@ void PowerSpectrum::outputPS(std::string filename, int nk) const{
   }
 
   std::ofstream fp(filename.c_str());
-  // const int ellmax = int(ells[ells.size()-1]);
   
-  const double Mpc = Constants.Mpc;
-  auto kvalues = Utils::linspace(k_min*Mpc, k_max*Mpc, nk-1);
-  // auto kvalues = exp(logkvalues);
+  auto kvalues = Utils::linspace(k_min*Mpc_, k_max*Mpc_, nk);
+
   const double h = cosmo->get_h();
   const double knorm = 1.0 / h;
-  const double PSnorm = h*h*h; // / (knorm*knorm*knorm);
+  const double PSnorm = h*h*h; 
 
 
   auto print_data = [&] (const double k) {
@@ -389,8 +470,10 @@ void PowerSpectrum::outputPS(std::string filename, int nk) const{
     fp << "\n";
   };
 
-  std::cout << "Writing file to: " << filename << std::endl;
+  double k_eq = get_k_eq();
 
+  std::cout << "Writing file to: " << filename << std::endl;
+  fp << k_eq * Mpc_ / h << "\n";
   std::for_each(kvalues.begin(), kvalues.end(), print_data);
 
   std::cout << "Finished writing to file" << std::endl;
