@@ -245,7 +245,6 @@ def plot_Thetas(x, y,
 
 
     fig, ax = plt.subplots(figsize=figsize)
-    print(fname)
 
     for idx, l in enumerate(ell_values):
         ax.plot(x, y[idx], label=fr"$\ell=${str(l)}")

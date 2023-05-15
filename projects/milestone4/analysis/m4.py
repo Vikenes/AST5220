@@ -224,13 +224,11 @@ pspec = PowerSpectrum(f1_Cell, f1_MPS, f1_Thetas)
 
 # SAVE=True
 # PUSH=True
-# pspec.plot_Cell()
 # TEMP=True
-# pspec.plot_Cell()
 
-# pspec.comp_Cell(file_compare="thisworks.txt")
-# pspec.plot_matter_power_spectrum()
+pspec.plot_Cell()
+pspec.plot_matter_power_spectrum()
 pspec.plot_Thetas(ells=np.array([2, 4, 7, 10]))
-# pspec.plot_Integrand(ells=np.array([2, 4, 7, 10]))
+pspec.plot_Integrand(ells=np.array([2, 4, 7, 10]))
 
 
