@@ -1,1 +1,41 @@
 \subsection{Theory}\label{ssec:M4:theory}
+
+\subsubsection{Angular power spectrum} \label{sssec:M4:theory:angular_power_spectrum}
+The temperature fluctuations can be expanded in spherical harmonics as \pnote{check summation indices and momentum vector.} 
+\begin{equation} \label{eq:M4:theory:theta_expansion_in_spherical_harmonics}
+    \Theta(\vec{x}, \hat{\vec{p}}, t) = \sum_{\ell=1}^{\infty} \sum_{m=-\ell}^{\ell} a_\lm(\vec{x}, t) Y_\lm(\hat{\vec{p}}), 
+\end{equation}
+where the amplitudes, $a_\lm$, contain all the information about the temperature field, and are to be evaluated at our position in the Universe at $t=t_0$. However, we are unable to make prediction about particular values of these amplitudes, as inflation is a stochastic process. However, we exploit the fact that inflation predicts $\Theta$ to be very close to Gaussian, so each $a_\lm$ is therefore drawn from a normal distribution with zero mean and a variance given as 
+\begin{equation} \label{eq:M4:theory:variance_of_alms}
+    \expval{a_\lm a_\lmp} = \delta_{\ell \ell'} \delta_{m m'} \cl.
+\end{equation} 
+\note{Write something about statistics?}
+
+We follow the approach of \cite[Ch. 9.5]{Dodelson}, leaving out the details of the derivation. We now omit factors of $t$ in the expressions, as we are only concerned with the value at $t=t_0$, and obtain   
+\begin{equation} \label{eq:M4:theory:C_ell_integral_definition}
+    \cl = 4\pi \int \P_\R (k) \abs{\Theta_\ell\code(k)}^2 \,\frac{\dd k}{k},
+\end{equation}
+where we have used $\Theta_\ell(\vec{k})= \Theta_\ell\code(k) \R\ini$, where $\R\ini\propto\Psi$ comes from inflation. This rescaling accounts for the fact that we have set $\Psi=-2/3$ as our initial condition when solving the perturbation ODEs numerically. $\P_\R(k)$ is related to the primordial power spectrum, $P(k)$, via 
+\begin{equation} \label{eq:M4:theory:primordial_power_spectrum_}
+    P(k) = \frac{2\pi^2}{k^3}\P_\R(k),
+\end{equation}
+where $\expval{\R\ini(\vec{k}) \R\ini^*(\vec{k}')}=(2\pi^2)\delta(\vec{k}-\vec{k}') P(k)$. To compute $\cl$, the last thing we need is an expression for $\P_\R(k)$. We get an expression for this from the fact that most inflationary models predict a so-called Harrison-Zel'dovich spectrum \pnote{cite}, where 
+\begin{equation} \label{eq:M4:theory:primordial_power_spectrum}
+    \P_\R(k) = \as \pclosed{\frac{k}{\kp}}^{\ns-1}, 
+\end{equation}
+where $\as$ is the amplitude of \note{something}, $\kp$ is the \note{something} and $\ns$ is the spectral index. \note{Comment about their meaning.} 
+
+Thus, the final expression we want to compute is 
+\begin{equation}
+    \cl = 4\pi \int_0^\infty \as \pclosed{\frac{k}{\kp}}^{\ns-1} \Theta_\ell^2(k) \, \frac{\dd k}{k}.
+\end{equation}
+
+\subsubsection{Matter power spectrum} \label{sssec:M4:theory:matter_power_spectrum}
+From the Fourier components of the matter overdensity field, we can compute the matter power-spectrum
+\begin{equation}
+    P_L(k,x) = \abs{\Delta_M(k,x)}^2,\quad \text{where}\quad \Delta_M(k,x) \equiv \frac{k^2 \Phi(k,x)}{\frac{3}{2}\omn a^{-1} H_0^2}.
+\end{equation}
+Once again, we have to take rescale $\Delta_M$ to account for our choice of initial conditions. Taking the value today, we thus want to compute 
+\begin{equation}
+    \plk = \abs{\Delta_M\code(k)}^2 P(k) = \abs{\Delta_M\code(k)}^2\, \frac{2\pi^2}{k^3}\pclosed{\frac{k}{\kp}}^{\ns-1}.
+\end{equation}
