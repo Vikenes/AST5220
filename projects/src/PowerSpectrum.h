@@ -38,7 +38,7 @@ class PowerSpectrum {
     const int cell_samples_per_osc = 16;
 
     // The x-values we integrate to compute Theta_ell(k) etc. for
-    const int n_x        = 500;
+    const int n_x        = 5000;
     const double x_start = Constants.x_start;
     const double x_end   = Constants.x_end;
     const double x_start_LOS = x_start;// = -11.0;

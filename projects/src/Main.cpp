@@ -172,7 +172,7 @@ int main(int argc, char **argv){
 
     // power.output(M4_DATA_PATH + "cells.txt");
     // power.outputPS(M4_DATA_PATH + "matterPS.txt", 1000);
-    // power.outputThetas(M4_DATA_PATH + "thetas.txt", 1000);
+    power.outputThetas(M4_DATA_PATH + "thetas.txt", 2000);
   
   // Remove when module is completed
   }
