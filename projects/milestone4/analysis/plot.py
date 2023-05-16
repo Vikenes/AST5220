@@ -94,7 +94,7 @@ def save_push(fig, pdf_name, save=True, push=False, show=False, tight=True, temp
 def set_ax_info(ax, xlabel, ylabel=False, title=None, legend=True, 
                 double_legends=[], legendloc='best', legend_size=False,
                 xlim=None, ylim=None, yticks=None,
-                ypad=None):
+                ypad=None, xpad=None):
     """Write title and labels on an axis with the correct fontsizes.
     Args:
         ax (matplotlib.axis): the axis on which to display information
@@ -102,9 +102,9 @@ def set_ax_info(ax, xlabel, ylabel=False, title=None, legend=True,
         xlabel (str): the desired lab on the x-axis
         ylabel (str): the desired lab on the y-axis
     """
-    ax.set_xlabel(xlabel)
+    ax.set_xlabel(xlabel, labelpad=xpad)
     if ylabel != False:
-        ax.set_ylabel(ylabel)
+        ax.set_ylabel(ylabel, labelpad=ypad)
     ax.set_title(title)
     
     # ax.tick_params(axis='both', which='major', labelsize=15)
@@ -131,9 +131,6 @@ def set_ax_info(ax, xlabel, ylabel=False, title=None, legend=True,
     if xlim is not None:
         ax.set_xlim(xlim)
 
-    if ypad is not None:
-        ax.set_ylabel(ylabel,labelpad=ypad)
-
     if yticks is not None:
         ax.set_yticks(yticks)
 
@@ -145,7 +142,9 @@ def set_ax_info(ax, xlabel, ylabel=False, title=None, legend=True,
 
 
 
-def plot_C_ell(x, y,
+def plot_C_ell(ell, C_ell,
+               ell_planck, C_ell_planck,
+               error_planck, 
                fname, 
                logx=True, 
                logy=True,
@@ -157,21 +156,28 @@ def plot_C_ell(x, y,
                legendloc='best', 
                yticks=None, 
                ypad=None,
+               fill=False,
                figsize=(10,6), 
                save=True,push=False, temp=False):
 
 
     fig, ax = plt.subplots(figsize=figsize)
 
+    if fill:
+        y1 = C_ell - C_ell*(2/(2*ell+1))**(1) * 2
+        y2 = C_ell + C_ell*(2/(2*ell+1))**(1) * 2
+        ax.fill_between(ell, y1, y2, color='palegreen', alpha=0.7)
+
+    ax.plot(ell, C_ell, color='blue', label='Prediction')
+    ax.errorbar(ell_planck, C_ell_planck, error_planck, barsabove=True, fmt='o',
+                capthick=1.5, capsize=5, elinewidth=2, color='red', ms=3, 
+                label='Planck 2018')
+
+
+
 
     
-    ax.plot(x, y, color='blue'  )
-
-
-
-
-    
-    set_ax_info(ax, xlabel, ylabel, legend=False, 
+    set_ax_info(ax, xlabel, ylabel, title=fname, legend=True, 
                 ylim=ylim, xlim=xlim, yticks=yticks,
                 ypad=ypad)
     if logy:
@@ -181,13 +187,14 @@ def plot_C_ell(x, y,
         ax.set_xscale('log')
 
 
-
+    
     save_push(fig, fname, save, push, temp=temp)
     
 
 
 
-def plot_matter_PS(x, y, k_eq,
+def plot_matter_PS(k, Pk, k_eq,
+                   galaxy_data, wmap_data,
                    fname,  
                    logx=True, logy=True, 
                    xlabel=None, ylabel=None,  
@@ -199,23 +206,36 @@ def plot_matter_PS(x, y, k_eq,
 
     fig, ax = plt.subplots(figsize=figsize)
 
-
+    k_galaxy, Pk_galaxy, error_galaxy = galaxy_data
+    k_wmap, Pk_wmap, error_wmap = wmap_data
+    # error_wmap = np.abs(error_wmap - Pk_wmap)
     
-    ax.plot(x, y, color='blue')
+    P1, = ax.plot(k, Pk, color='blue', label='Prediction')
+    P2 = ax.errorbar(k_galaxy, Pk_galaxy, error_galaxy, barsabove=True, fmt='o',
+                capthick=1.5, capsize=5, elinewidth=2, color='red', ms=3, 
+                label='SDSS Galaxies (DR7 LRG)')
+    P3 = ax.errorbar(k_wmap, Pk_wmap, error_wmap, barsabove=True, fmt='o',
+                capthick=1.5, capsize=5, elinewidth=2, color='green', ms=3, 
+                label='CMB (WMAP+ACT)')
 
     if ylim is None:
         ylim_vline = ax.get_ylim()
     else:
-        ylim_vline = ax.get_ylim()
+        ylim_vline = ylim
 
     if k_eq is not None:
-        ax.vlines(k_eq.value, *ylim_vline, colors='red', ls='dashed', label=r"$k_\mathrm{eq}$")
+        vl = ax.vlines(k_eq.value, *ylim_vline, colors='black', ls='dashed', label=r"$k_\mathrm{eq}$")
 
+    leg1 = plt.legend(handles=[P1, P2, P3], loc='lower left')
+    leg2 = plt.legend(handles=[vl], loc='lower right')
+
+    ax.add_artist(leg1)
+    ax.add_artist(leg2)
 
 
     
-    set_ax_info(ax, xlabel, ylabel, legend=True, 
-                ylim=ylim, xlim=xlim, ypad=ypad)
+    set_ax_info(ax, xlabel, ylabel, legend=False, 
+                ylim=ylim, xlim=xlim, ypad=ypad, xpad=10)
 
     if logy:
         ax.set_yscale('log')
