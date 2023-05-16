@@ -38,9 +38,10 @@ void PowerSpectrum::solve(bool load_data){
   // const double eta0 = cosmo->eta_of_x(0.0);
 
   // const double dk      = k_stepsize_from_N_osc_samples(los_samples_per_osc);
+  const int nlogk      = n_k_from_N_osc_samples(cell_samples_per_osc);
   const int nk         = n_k_from_N_osc_samples(los_samples_per_osc);
   // const double dlogk   = k_stepsize_from_N_osc_samples(cell_samples_per_osc);
-  const int nlogk      = n_k_from_N_osc_samples(cell_samples_per_osc);
+
 
   Vector k_array = Utils::linspace(k_min, k_max, nk);
   Vector log_k_array = Utils::linspace(log(k_min), log(k_max), nlogk);
@@ -99,7 +100,7 @@ void PowerSpectrum::generate_bessel_function_splines(){
   const double dz = 2.0 * M_PI / (double)bessel_samples_per_osc; 
   const int n_z = (zmax - zmin) / dz;
 
-  #pragma omp parallel for schedule(dynamic, 1)
+  #pragma omp parallel for schedule(static, 1)
   for(size_t i = 0; i < ells.size(); i++){
     const int ell = ells[i];
 
@@ -158,20 +159,21 @@ Vector2D PowerSpectrum::line_of_sight_integration_single(
     //=============================================================================
     double k = k_array[ik];
    
-    #pragma omp parallel for schedule(dynamic, 1)
+    #pragma omp parallel for schedule(guided, 1)
     for(int iell=0; iell<nells_; iell++){
-      // std::function<double(double)> integrand = [&](double x){
-        // return source_function(x, k) * j_ell_splines[iell](k*(eta0 - cosmo->eta_of_x(x)));
-      // };
-      double integral_sum = 0;
+      std::function<double(double)> integrand = [&](double x){
+        return source_function(x, k) * j_ell_splines[iell](k*(eta0_ - cosmo->eta_of_x(x)));
+      };
+      // double integral_sum = 0;
+      
       // double x;  
-      double x = x_start_LOS;  
-      for(int ix=0; ix<x_LOS_array.size(); ix++){
+      // double x = x_start_LOS;  
+      // for(int ix=0; ix<x_LOS_array.size(); ix++){
         // x = x_LOS[ix];
-        integral_sum += source_function(x, k) * j_ell_splines[iell](k*(eta0_ - cosmo->eta_of_x(x)));
-        x += dx;
-      }
-      result[iell][ik] = integral_sum * dx; 
+        // integral_sum += source_function(x, k) * j_ell_splines[iell](k*(eta0_ - cosmo->eta_of_x(x)));
+        // x += dx;
+      // }
+      result[iell][ik] = integrate_trapezoidal(integrand, x_start_LOS, x_end, dx); //integral_sum * dx; 
     }
 
     // Store the result for Source_ell(k) in results[ell][ik]
@@ -371,16 +373,11 @@ void PowerSpectrum::output(std::string filename) const{
   const int ellmax = int(ells[ells.size()-1]);
   auto ellvalues = Utils::linspace(2, ellmax, ellmax-1);
   auto print_data = [&] (const double ell) {
+
     double normfactor  = (ell * (ell+1)) / (2.0 * M_PI) * pow(1e6 * cosmo->get_TCMB(), 2);
-    double normfactorN = (ell * (ell+1)) / (2.0 * M_PI) 
-      * pow(1e6 * cosmo->get_TCMB() *  pow(4.0/11.0, 1.0/3.0), 2);
-    double normfactorL = (ell * (ell+1)) * (ell * (ell+1)) / (2.0 * M_PI);
+
     fp << ell                                 << " ";
-    fp << cell_TT_spline( ell ) * normfactor  << " ";
-    if(Constants.polarization){
-      fp << cell_EE_spline( ell ) * normfactor  << " ";
-      fp << cell_TE_spline( ell ) * normfactor  << " ";
-    }
+    fp << cell_TT_spline(ell) * normfactor  << " ";
     fp << "\n";
   };
 
@@ -391,12 +388,15 @@ void PowerSpectrum::output(std::string filename) const{
 }
 
 
-void PowerSpectrum::outputThetas(std::string filename, int nk) const{
+void PowerSpectrum::outputThetas(std::string filename, int nk_write) const{
+
 
   int pos = filename.find(".txt");
+  int nk = n_k_from_N_osc_samples(los_samples_per_osc);
 
   if (pos != std::string::npos) {
-    std::string file_info  = "_nk" + std::to_string(nk) + "_nx" + std::to_string(n_x);
+    std::string file_info  = "_nx" + std::to_string(n_x)
+                            + "_nk" + std::to_string(nk); 
     filename.insert(pos, file_info);
   }
 
@@ -427,7 +427,7 @@ void PowerSpectrum::outputThetas(std::string filename, int nk) const{
   fp << "eta0= " << eta0_ << "\n";
   fp << header << "\n";
 
-  auto k_log_values = Utils::linspace(log(k_min), log(k_max), nk);
+  auto k_log_values = Utils::linspace(log(k_min), log(k_max), nk_write);
   auto k_values = exp(k_log_values);
 
   auto print_data = [&] (const double k) {
@@ -445,11 +445,11 @@ void PowerSpectrum::outputThetas(std::string filename, int nk) const{
 
 
 
-void PowerSpectrum::outputPS(std::string filename, int nk) const{
+void PowerSpectrum::outputPS(std::string filename, int nk_write) const{
   // Output in standard units of muK^2
   int pos = filename.find(".txt");
   if (pos != std::string::npos) {
-    std::string file_info  = "_nk" + std::to_string(nk);
+    std::string file_info  = "_nk" + std::to_string(n_k_from_N_osc_samples(los_samples_per_osc));
     filename.insert(pos, file_info);
   }
 
@@ -469,7 +469,7 @@ void PowerSpectrum::outputPS(std::string filename, int nk) const{
 
   std::ofstream fp(filename.c_str());
   
-  auto kvalues = Utils::linspace(k_min*Mpc_, k_max*Mpc_, nk);
+  auto kvalues = Utils::linspace(k_min*Mpc_, k_max*Mpc_, nk_write);
 
   const double h = cosmo->get_h();
   const double knorm = 1.0 / h;

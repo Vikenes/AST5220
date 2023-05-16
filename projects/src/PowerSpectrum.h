@@ -29,17 +29,17 @@ class PowerSpectrum {
     double kpivot_mpc = 0.05;
 
     // The k-values we compute Theta_ell(k) etc. for
-    // const int n_k      = 100;
+    // const int nk      = 100;
     const double k_min = Constants.k_min;
     const double k_max = Constants.k_max;
 
-    const int los_samples_per_osc = 8;
-    const int bessel_samples_per_osc = 16;
+    const int los_samples_per_osc = 16;
+    const int bessel_samples_per_osc = 20;
     const int cell_samples_per_osc = 16;
 
     // The x-values we integrate to compute Theta_ell(k) etc. for
-    const int n_x        = 5000;
-    const double x_start = Constants.x_start;
+    const int n_x        = 1500;
+    const double x_start = -15.0;
     const double x_end   = Constants.x_end;
     const double x_start_LOS = x_start;// = -11.0;
 

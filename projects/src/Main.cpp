@@ -168,10 +168,11 @@ int main(int argc, char **argv){
   
     // Solve the perturbations
     Perturbations pert(&cosmo, &rec);
-
     pert.solve(source);
 
+
     PowerSpectrum power(&cosmo, &rec, &pert, A_s, n_s, kpivot_mpc);
+
     if(!matter_PS){power.solve(false);}
 
     std::string M4_DATA_PATH = "milestone4/data/";
@@ -183,6 +184,7 @@ int main(int argc, char **argv){
     else{
       power.output(M4_DATA_PATH + "cells.txt");
       power.outputThetas(M4_DATA_PATH + "thetas.txt", 2000);
+      return 0;
     };
   // Remove when module is completed
   }

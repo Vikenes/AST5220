@@ -346,14 +346,16 @@ void Perturbations::compute_source_functions(){
   //=============================================================================
 
   // Use quadratically distributed k-values
-  Vector k_array(n_k); 
   const double kmin = Constants.k_min;
   const double kmax = Constants.k_max;
-  const double Delta_k = k_max - k_min; 
-  for(int i=0; i<n_k; i++){
-    double i_term = (double)i / (double)(n_k - 1.0);
-    k_array[i] = kmin + Delta_k * i_term*i_term;
-  }  
+
+  Vector log_k_array = Utils::linspace(log(kmin), log(kmax), n_k);
+  Vector k_array = exp(log_k_array); 
+
+  // for(int i=0; i<n_k; i++){
+    // double i_term = (double)i / (double)(n_k - 1.0);
+    // k_array[i] = kmin + Delta_k * i_term*i_term;
+  // }  
   Vector x_array = x_array_full;
 
   // Make storage for the source functions (in 1D array to be able to pass it to the spline)
@@ -361,7 +363,21 @@ void Perturbations::compute_source_functions(){
 
   // Compute source functions
   for(auto ix = 0; ix < x_array.size(); ix++){
+
     const double x = x_array[ix];
+
+    // Fetch cosmo quantities  
+    const double Hp           = cosmo->Hp_of_x(x);
+    const double dHp_dx       = cosmo->dHpdx_of_x(x);
+    const double ddHp_ddx     = cosmo->ddHpddx_of_x(x);
+
+
+    // Fetch rec quantities  
+    const double tau          = rec->tau_of_x(x);
+    const double g_tilde      = rec->g_tilde_of_x(x);
+    const double dgdx_tilde   = rec->dgdx_tilde_of_x(x);
+    const double ddgddx_tilde = rec->ddgddx_tilde_of_x(x);
+
     for(auto ik = 0; ik < k_array.size(); ik++){
       const double k = k_array[ik];
 
@@ -369,20 +385,6 @@ void Perturbations::compute_source_functions(){
       // in a 1D array for the 2D spline routine source(ix,ik) -> S_array[ix + nx * ik]
       const int index = ix + n_x * ik;
 
-      //=============================================================================
-      // TODO: Compute the source functions
-      //=============================================================================
-      // Fetch cosmo quantities  
-      const double Hp           = cosmo->Hp_of_x(x);
-      const double dHp_dx       = cosmo->dHpdx_of_x(x);
-      const double ddHp_ddx     = cosmo->ddHpddx_of_x(x);
-
-
-      // Fetch rec quantities  
-      const double tau          = rec->tau_of_x(x);
-      const double g_tilde      = rec->g_tilde_of_x(x);
-      const double dgdx_tilde   = rec->dgdx_tilde_of_x(x);
-      const double ddgddx_tilde = rec->dgdx_tilde_of_x(x);
 
       // Constants
       const double ck           = c_ * k; 
