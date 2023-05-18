@@ -45,6 +45,7 @@ class Perturbations{
    
     // Splines of source functions (ST for temperature; SE for polarization)
     Spline2D ST_spline{"ST_spline"};
+    std::vector<Spline2D> ST_component_splines;
     
     // Splines of mulipole quantities
     std::vector<Spline2D> Theta_splines;
@@ -93,7 +94,7 @@ class Perturbations{
     //==========================================================
     // [4] Compute source functions from the result
     //==========================================================
-    void compute_source_functions();
+    void compute_source_functions(int term=0);
 
   public:
 
@@ -104,7 +105,7 @@ class Perturbations{
         RecombinationHistory *rec); 
 
     // Do all the solving
-    void solve(bool source=true);
+    void solve(bool source=true, int term=0);
     
     // Print some useful info about the class
     void info() const;
@@ -125,6 +126,8 @@ class Perturbations{
     double compute_Theta2_tc(const double x, const double k, const double Theta1) const;
     double compute_Psi(const double x, const double k, const double Theta2, const double Phi) const;
     double get_Source_T(const double x, const double k) const;
+    double get_Source_T_component(const double x, const double k, const int term) const;
+
 };
 
 #endif

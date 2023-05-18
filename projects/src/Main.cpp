@@ -173,7 +173,7 @@ int main(int argc, char **argv){
     std::string M4_DATA_PATH = "milestone4/data/";
     PowerSpectrum power(&cosmo, &rec, &pert, A_s, n_s, kpivot_mpc);
 
-    if(!matter_PS){power.solve(false);}
+    if(!matter_PS){power.solve();}
 
     if(matter_PS){
       power.outputPS(M4_DATA_PATH + "matterPS.txt", 1000);

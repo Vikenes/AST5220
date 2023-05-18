@@ -30,7 +30,7 @@ PowerSpectrum::PowerSpectrum(
 //====================================================
 // Do all the solving
 //====================================================
-void PowerSpectrum::solve(bool load_data){
+void PowerSpectrum::solve(){
   
   //=========================================================================
   // Range of k's and the resolution to compute Theta_ell(k) and C_ell
@@ -58,6 +58,40 @@ void PowerSpectrum::solve(bool load_data){
   //=========================================================================
   auto cell_TT = solve_for_cell(log_k_array, thetaT_ell_of_k_spline, thetaT_ell_of_k_spline);
   cell_TT_spline.create(ells, cell_TT, "Cell_TT_of_ell");
+}
+
+void PowerSpectrum::solve_components(){
+  
+  //=========================================================================
+  // Range of k's and the resolution to compute Theta_ell(k) and C_ell
+  //=========================================================================
+
+  const int nlogk      = n_k_from_N_osc_samples(cell_samples_per_osc);
+  const int nk         = n_k_from_N_osc_samples(los_samples_per_osc);
+
+  Vector k_array       = Utils::linspace(k_min, k_max, nk);
+  Vector log_k_array   = Utils::linspace(log(k_min), log(k_max), nlogk);
+
+
+  //=========================================================================
+  // Generate_bessel_function_splines
+  //=========================================================================
+  generate_bessel_function_splines();
+
+  //=========================================================================
+  // Line of sight integration to get Theta_ell(k)
+  //=========================================================================
+  for(int i=0; i<5; i++){
+    // pert->sou
+    line_of_sight_integration(k_array);
+
+    //=========================================================================
+    // Integration to get Cell by solving dCell^f/dlogk = Delta(k) * f_ell(k)^2
+    //=========================================================================
+    auto cell_TT = solve_for_cell(log_k_array, thetaT_ell_of_k_spline, thetaT_ell_of_k_spline);
+    cell_TT_spline.create(ells, cell_TT, "Cell_TT_of_ell");
+
+  }
 }
 
 double PowerSpectrum::k_stepsize_from_N_osc_samples(int samples_per_osc) const{

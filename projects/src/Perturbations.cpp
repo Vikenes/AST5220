@@ -24,7 +24,7 @@ Perturbations::Perturbations(
 //====================================================
 // Do all the solving
 //====================================================
-void Perturbations::solve(bool source){
+void Perturbations::solve(bool source, int term){
 
   // Integrate all the perturbation equation and spline the result
   Utils::StartTiming("integrateperturbation");
@@ -35,7 +35,7 @@ void Perturbations::solve(bool source){
   // Compute source functions and spline the result
   if(source){
     Utils::StartTiming("source");
-    compute_source_functions();
+    compute_source_functions(term);
     Utils::EndTiming("source");
   }
 
@@ -339,11 +339,7 @@ std::pair<double,int> Perturbations::get_tight_coupling_time(const double k) con
 // After integrsating the perturbation compute the
 // source function(s)
 //====================================================
-void Perturbations::compute_source_functions(){
-
-  //=============================================================================
-  // TODO: Make the x and k arrays to evaluate over and use to make the splines
-  //=============================================================================
+void Perturbations::compute_source_functions(int term){
 
   // Use quadratically distributed k-values
   const double kmin = Constants.k_min;
@@ -352,14 +348,11 @@ void Perturbations::compute_source_functions(){
   Vector log_k_array = Utils::linspace(log(kmin), log(kmax), n_k);
   Vector k_array = exp(log_k_array); 
 
-  // for(int i=0; i<n_k; i++){
-    // double i_term = (double)i / (double)(n_k - 1.0);
-    // k_array[i] = kmin + Delta_k * i_term*i_term;
-  // }  
   Vector x_array = x_array_full;
 
   // Make storage for the source functions (in 1D array to be able to pass it to the spline)
-  Vector ST_array(k_array.size() * x_array.size());
+  // Vector ST_array(k_array.size() * x_array.size());
+  Vector2D ST_component_array = Vector2D(5, Vector(k_array.size() * x_array.size()));
 
   // Compute source functions
   for(auto ix = 0; ix < x_array.size(); ix++){
@@ -381,13 +374,10 @@ void Perturbations::compute_source_functions(){
     for(auto ik = 0; ik < k_array.size(); ik++){
       const double k = k_array[ik];
 
-      // NB: This is the format the data needs to be stored 
-      // in a 1D array for the 2D spline routine source(ix,ik) -> S_array[ix + nx * ik]
       const int index = ix + n_x * ik;
 
-
       // Constants
-      const double ck           = c_ * k; 
+      const double ck_inv       = 1.0 / (c_ * k); 
 
       // Fetch pert quantities 
       const double Theta0       = get_Theta(x, k, 0);
@@ -402,26 +392,38 @@ void Perturbations::compute_source_functions(){
       const double ddPi_ddx     = Theta_splines[2].deriv_xx(x,k);
 
       // Compute terms in Source function. 
-      const double first_term         = g_tilde * (Theta0 + Psi + Pi/4.0);
-      const double second_term        = exp(-tau) * (dPsi_dx - dPhi_dx);
+      const double SW_term         = g_tilde * (Theta0 + Psi + Pi/4.0);
+      const double ISW_term        = exp(-tau) * (dPsi_dx - dPhi_dx);
       const double d_Hp_gtilde_vb_dx  = dHp_dx * g_tilde * v_b 
                                         + Hp * dgdx_tilde * v_b 
                                         + Hp * g_tilde * dvb_dx;
-      const double third_term         = - d_Hp_gtilde_vb_dx / ck;
 
-      const double fourth_term_1      = g_tilde * Pi * (dHp_dx*dHp_dx + Hp * ddHp_ddx);
-      const double fourth_term_2      = 3.0 * Hp * dHp_dx * (dgdx_tilde*Pi + g_tilde * dPi_dx);
-      const double fourth_term_3      = Hp*Hp * (ddgddx_tilde*Pi + 2.0 * dgdx_tilde * dPi_dx + g_tilde*ddPi_ddx);
-      const double fourth_term        = 3.0 / (4.0 * ck*ck) * (fourth_term_1+fourth_term_2+fourth_term_3);  
+      const double Doppler_term       = - ck_inv * (dHp_dx * g_tilde * v_b
+                                        + Hp * (dgdx_tilde * v_b + g_tilde * dvb_dx));
+
+      const double Quadrupole_term_1      = g_tilde * Pi * (dHp_dx*dHp_dx + Hp * ddHp_ddx);
+      const double Quadrupole_term_2      = 3.0 * Hp * dHp_dx * (dgdx_tilde*Pi + g_tilde * dPi_dx);
+      const double Quadrupole_term_3      = Hp*Hp * (ddgddx_tilde*Pi + 2.0 * dgdx_tilde * dPi_dx + g_tilde*ddPi_ddx);
+      const double Quadrupole_term        = 3.0*ck_inv*ck_inv / 4.0 * (Quadrupole_term_1+Quadrupole_term_2+Quadrupole_term_3);  
 
 
       // Temperatur source
-      ST_array[index] = first_term + second_term + third_term + fourth_term;
+      const double ST_tot = SW_term + ISW_term + Doppler_term + Quadrupole_term; 
+      ST_component_array[0][index] = ST_tot; 
+      ST_component_array[1][index] = SW_term;
+      ST_component_array[2][index] = ISW_term;
+      ST_component_array[3][index] = Doppler_term;
+      ST_component_array[4][index] = Quadrupole_term;
+
+
     }
   }
 
   // Spline the source functions
-  ST_spline.create(x_array, k_array, ST_array, "Source_Temp_x_k");
+  // ST_spline.create(x_array, k_array, ST_component_array[0], "Source_Temp_x_k");
+  for(int i=0; i<5; i++){
+    ST_component_splines[i].create(x_array, k_array, ST_component_array[i]);
+  }
   
 
 }
@@ -640,7 +642,10 @@ double Perturbations::get_Pi(const double x, const double k) const{
   return get_Theta(x,k, 2);
 }
 double Perturbations::get_Source_T(const double x, const double k) const{
-  return ST_spline(x,k);
+  return get_Source_T_component(x,k,0);
+}
+double Perturbations::get_Source_T_component(const double x, const double k, const int term) const{
+  return ST_component_splines[term](x,k);
 }
 double Perturbations::get_Theta(const double x, const double k, const int ell) const{
   return Theta_splines[ell](x,k);

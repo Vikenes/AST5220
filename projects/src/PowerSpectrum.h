@@ -118,6 +118,8 @@ class PowerSpectrum {
     Spline cell_TE_spline{"cell_TE_spline"};
     Spline cell_EE_spline{"cell_EE_spline"};
 
+    std::vector<Spline> cell_TT_component_spline;
+
   public:
 
     // Constructors
@@ -131,7 +133,8 @@ class PowerSpectrum {
         double kpivot_mpc);
     
     // Do all the solving: bessel functions, LOS integration and then compute Cells
-    void solve(bool load_data);
+    void solve();
+    void solve_components();
 
     // The dimensionless primordial power-spectrum Delta = 2pi^2/k^3 P(k)
     double primordial_power_spectrum(const double k) const;
