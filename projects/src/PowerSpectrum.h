@@ -99,9 +99,7 @@ class PowerSpectrum {
         std::function<double(double,double)> &source_function);
     
     // Splines of the reusult of the LOS integration
-    // Theta_ell(k) and ThetaE_ell(k) for polarization
     std::vector<Spline> thetaT_ell_of_k_spline;
-    std::vector<Spline> thetaE_ell_of_k_spline;
     
     //=====================================================================
     // [3] Integrate to get power-spectrum
@@ -157,10 +155,14 @@ class PowerSpectrum {
     double get_cell_TE(const double ell) const;
     double get_cell_EE(const double ell) const;
 
+    void add_file_info(std::string &filename, int nx);
+    void add_file_info(std::string &filename);
+    bool check_existence(std::string filename);
+
     // Output Cells in units of l(l+1)/2pi (muK)^2
-    void output(std::string filename) const;
-    void outputThetas(std::string filename, int nk) const;
-    void outputPS(std::string filename, int nk) const;
+    void output(std::string filename);
+    void outputThetas(std::string filename, int nk);
+    void outputPS(std::string filename, int nk);
 
 };
 

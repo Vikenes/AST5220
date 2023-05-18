@@ -17,11 +17,10 @@ int main(int argc, char **argv){
   double OmegaB      = 0.05;
   double OmegaCDM    = 0.267;
   double OmegaK      = 0.0;
-  double Neff        = 3.046;
+  double Neff        = 3.046; 
   double TCMB        = 2.7255;
 
   // Recombination parameters
-  // double Yp          = 0.245;
   double Yp          = 0.0;
 
 
@@ -168,14 +167,13 @@ int main(int argc, char **argv){
   
     // Solve the perturbations
     Perturbations pert(&cosmo, &rec);
+
     pert.solve(source);
 
-
+    std::string M4_DATA_PATH = "milestone4/data/";
     PowerSpectrum power(&cosmo, &rec, &pert, A_s, n_s, kpivot_mpc);
 
     if(!matter_PS){power.solve(false);}
-
-    std::string M4_DATA_PATH = "milestone4/data/";
 
     if(matter_PS){
       power.outputPS(M4_DATA_PATH + "matterPS.txt", 1000);
@@ -184,11 +182,10 @@ int main(int argc, char **argv){
     else{
       power.output(M4_DATA_PATH + "cells.txt");
       power.outputThetas(M4_DATA_PATH + "thetas.txt", 2000);
-      return 0;
     };
-  // Remove when module is completed
   }
-  return 0;
 
-  // Utils::EndTiming("Everything");
+  Utils::EndTiming("Everything");
+  
+  return 0;
 }

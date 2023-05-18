@@ -33,24 +33,14 @@ PowerSpectrum::PowerSpectrum(
 void PowerSpectrum::solve(bool load_data){
   
   //=========================================================================
-  // TODO: Choose the range of k's and the resolution to compute Theta_ell(k)
+  // Range of k's and the resolution to compute Theta_ell(k) and C_ell
   //=========================================================================
-  // const double eta0 = cosmo->eta_of_x(0.0);
 
-  // const double dk      = k_stepsize_from_N_osc_samples(los_samples_per_osc);
   const int nlogk      = n_k_from_N_osc_samples(cell_samples_per_osc);
   const int nk         = n_k_from_N_osc_samples(los_samples_per_osc);
-  // const double dlogk   = k_stepsize_from_N_osc_samples(cell_samples_per_osc);
 
-
-  Vector k_array = Utils::linspace(k_min, k_max, nk);
-  Vector log_k_array = Utils::linspace(log(k_min), log(k_max), nlogk);
-
-  
-  //=========================================================================
-  // Load data from previous run.
-  // Mainly for testing purposes to avoid long simulations. 
-  //=========================================================================
+  Vector k_array       = Utils::linspace(k_min, k_max, nk);
+  Vector log_k_array   = Utils::linspace(log(k_min), log(k_max), nlogk);
 
 
   //=========================================================================
@@ -134,26 +124,10 @@ Vector2D PowerSpectrum::line_of_sight_integration_single(
 
   Vector x_LOS_array = Utils::linspace(x_start_LOS, x_end, n_x);
 
-  // const int n_x_LOS = int((x_end - x_start_LOS) / dx);
-  // Vector x_LOS = Utils::linspace(x_start_LOS, x_end, n_x_LOS);
-
-  // std::cout << "nxlos=" << n_x_LOS << std::endl;
-  // return result;   
-  // Vector x_LOS;
-  // for(int ix=0; ix<n_x; ix++){
-  //   double x_ = x_array[ix];
-  //   if(rec->g_tilde_of_x(x_) > 1e-5 || x_ > -4.){
-  //     x_LOS.push_back(x_);
-  //   }
-  // }
-  // std::cout << "N=" << x_LOS.size() << std::endl;
-  // std::cout << "x_0=" << x_LOS[0] << std::endl;
-
 
   for(size_t ik = 0; ik < k_array.size(); ik++){
 
     //=============================================================================
-    // TODO: Implement to solve for the general line of sight integral 
     // F_ell(k) = Int dx jell(k(eta-eta0)) * S(x,k) for all the ell values for the 
     // given value of k
     //=============================================================================
@@ -219,7 +193,6 @@ void PowerSpectrum::line_of_sight_integration(Vector & k_array){
 
 
 //====================================================
-// Compute Cell (could be TT or TE or EE) 
 // Cell = Int_0^inf 4 * pi * P(k) f_ell g_ell dk/k
 //====================================================
 Vector PowerSpectrum::solve_for_cell(
@@ -260,7 +233,6 @@ Vector PowerSpectrum::solve_for_cell(
 //====================================================
 // The primordial power-spectrum
 //====================================================
-
 double PowerSpectrum::primordial_power_spectrum(const double k) const{
   return A_s * pow( Mpc_ * k / kpivot_mpc , n_s - 1.0);
 }
@@ -268,12 +240,11 @@ double PowerSpectrum::primordial_power_spectrum(const double k) const{
 //====================================================
 // P(k) in units of (Mpc)^3
 //====================================================
-
 double PowerSpectrum::get_matter_power_spectrum(const double x, const double k_mpc) const{
   double pofk = 0.0;
 
   //=============================================================================
-  // TODO: Compute the matter power spectrum
+  // Compute the matter power spectrum
   //=============================================================================
   double k_SI = k_mpc / Mpc_;
   double Phi = pert->get_Phi(x, k_SI);
@@ -338,35 +309,62 @@ double PowerSpectrum::get_cell_EE(const double ell) const{
   return cell_EE_spline(ell);
 }
 
-//====================================================
-// Output the cells to file
-//====================================================
-
-void PowerSpectrum::output(std::string filename) const{ 
+void PowerSpectrum::add_file_info(std::string &filename, int nx){
   int nk    = n_k_from_N_osc_samples(los_samples_per_osc);
   int nlogk = n_k_from_N_osc_samples(cell_samples_per_osc);
   int pos = filename.find(".txt");
   if (pos != std::string::npos) {
     std::string file_info;
-    file_info  = "_nx" + std::to_string(n_x);
+    file_info  = "_nx" + std::to_string(nx);
     file_info += "_nk" + std::to_string(nk);
     file_info += "_nlogk" + std::to_string(nlogk);
     filename.insert(pos, file_info);
-  }
+  };
+}
 
+void PowerSpectrum::add_file_info(std::string &filename){
+  int nk    = n_k_from_N_osc_samples(los_samples_per_osc);
+  int nlogk = n_k_from_N_osc_samples(cell_samples_per_osc);
+  int pos = filename.find(".txt");
+  if (pos != std::string::npos) {
+    std::string file_info;
+    file_info += "_nk" + std::to_string(nk);
+    file_info += "_nlogk" + std::to_string(nlogk);
+    filename.insert(pos, file_info);
+  };
+}
+
+bool PowerSpectrum::check_existence(std::string filename){
   if (std::filesystem::exists(filename)) {
     std::cout << "File " << filename << " already exists." << std::endl;
     char choice;
     std::cout << "  Do you want to overwrite the file? (y/n)" << std::endl;
     std::cin >> choice;
-    if (choice != 'y') {
-      return;
-    } else { };
+    
+    if (choice != 'y') { return false; } 
+    else { return true; };
+  } 
+  
+  else { return true; }
+  
+}
 
-  } else {
-    std::cout << "File " << filename << " does not exist." << std::endl;
+//====================================================
+// Output the cells to file
+//====================================================
+void PowerSpectrum::output(std::string filename){ 
+
+  // Add run-parameters to filename 
+  add_file_info(filename, n_x); 
+
+  // Check if file exists. Prompt user to overwrite existing file. 
+  bool write_to_file = check_existence(filename);
+  if(write_to_file){
+    std::cout << "Writing data to: " << filename << std::endl;
   }
-  std::cout << "Writing data to: " << filename << std::endl;
+  else { return; }
+
+  exit(0);
 
   // Output in standard units of muK^2
   std::ofstream fp(filename.c_str());
@@ -387,45 +385,25 @@ void PowerSpectrum::output(std::string filename) const{
 
 }
 
+void PowerSpectrum::outputThetas(std::string filename, int nk_write){
 
-void PowerSpectrum::outputThetas(std::string filename, int nk_write) const{
+  // Add run-parameters to filename 
+  add_file_info(filename); 
 
-
-  int pos = filename.find(".txt");
-  int nk = n_k_from_N_osc_samples(los_samples_per_osc);
-
-  if (pos != std::string::npos) {
-    std::string file_info  = "_nx" + std::to_string(n_x)
-                            + "_nk" + std::to_string(nk); 
-    filename.insert(pos, file_info);
+  // Check if file exists. Prompt user to overwrite existing file. 
+  bool write_to_file = check_existence(filename);
+  if(write_to_file){
+    std::cout << "Writing data to: " << filename << std::endl;
   }
-
-  if (std::filesystem::exists(filename)) {
-    std::cout << "File " << filename << " already exists." << std::endl;
-    char choice;
-    std::cout << "  Do you want to overwrite the file? (y/n)" << std::endl;
-    std::cin >> choice;
-    if (choice != 'y') {
-      return;
-    } else { };
-
-  } else {
-    std::cout << "File " << filename << " does not exist." << std::endl;
-  }
-  std::cout << "Writing data to: " << filename << std::endl;
-
-
-
+  else { return; }
 
   std::ofstream fp(filename.c_str());
-
 
   std::string header = "k*eta0, ell= ";
   for(int iell=0; iell<nells_; iell++){
     header += std::to_string(int(ells[iell])) + " ";
   }
-  fp << "eta0= " << eta0_ << "\n";
-  fp << header << "\n";
+  fp << "eta0= " << eta0_ << "\n" << header << "\n";
 
   auto k_log_values = Utils::linspace(log(k_min), log(k_max), nk_write);
   auto k_values = exp(k_log_values);
@@ -444,29 +422,19 @@ void PowerSpectrum::outputThetas(std::string filename, int nk_write) const{
 }
 
 
+void PowerSpectrum::outputPS(std::string filename, int nk_write) {
 
-void PowerSpectrum::outputPS(std::string filename, int nk_write) const{
-  // Output in standard units of muK^2
-  int pos = filename.find(".txt");
-  if (pos != std::string::npos) {
-    std::string file_info  = "_nk" + std::to_string(n_k_from_N_osc_samples(los_samples_per_osc));
-    filename.insert(pos, file_info);
+  // Add run-parameters to filename 
+  add_file_info(filename); 
+
+  // Check if file exists. Prompt user to overwrite existing file. 
+  bool write_to_file = check_existence(filename);
+  if(write_to_file){
+    std::cout << "Writing data to: " << filename << std::endl;
   }
-
-  if (std::filesystem::exists(filename)) {
-    std::cout << "File " << filename << " already exists." << std::endl;
-    char choice;
-    std::cout << "  Do you want to overwrite the file? (y/n)" << std::endl;
-    std::cin >> choice;
-    if (choice != 'y') {
-      return;
-    } else { };
-
-  } else {
-    std::cout << "File " << filename << " does not exist." << std::endl;
-  }
-  std::cout << "Writing data to: " << filename << std::endl;
-
+  else { return; }
+  
+  exit(0);
   std::ofstream fp(filename.c_str());
   
   auto kvalues = Utils::linspace(k_min*Mpc_, k_max*Mpc_, nk_write);
