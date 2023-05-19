@@ -211,13 +211,14 @@ class PowerSpectrum:
 fname_Cell="cells_components_nx1500_nk10886_nlogk10886.txt"
 fname_MPS="matterPS_nk1000.txt"
 fname_Thetas="thetas_nx1500_nk10886_nlogk10886.txt"
+
 fname_planck = "planck_cell_low.txt"
 fname_galaxy_survey = "reid_DR7.txt"
 fname_wmap = "wmap_act.txt"
 
 pspec = PowerSpectrum(fname_Cell, fname_MPS, fname_Thetas)
 
-# SAVE=True
+SAVE=True
 # PUSH=True
 # TEMP=True
 
