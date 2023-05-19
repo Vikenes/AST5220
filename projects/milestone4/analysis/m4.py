@@ -206,76 +206,12 @@ class PowerSpectrum:
                          save=SAVE, temp=TEMP, push=PUSH)
 
 
-    def plot_source_function(self, xlim=XLIM, ylim=None, no=0, fname=None):
-        # plot.K_FIGNAMES = self.k_fnames
-        # if hasattr(self, 'source'):
-            # pass
-        # else:
-            # self.load_source_func()
-        
-        if no == 0:
-            if fname is None:
-                fname = "S_alone"
-            plot.plot_source_function(self.x, self.S_tilde,
-                                      k_legends=self.k_labels,
-                                      ylabel=r"$\tilde{S}$",
-                                      fname=fname,
-                                      xlim=xlim,ylim=ylim,
-                                      save=SAVE, push=PUSH, temp=TEMP)
-
-        if no == 1:
-            if fname is None:
-                fname = "S_j5"
-            plot.plot_source_function(self.x, self.S_tilde_j5, 
-                                      k_legends=self.k_labels,
-                                      ylabel=r"$\tilde{S} j_5 $",
-                                      fname=fname,
-                                      xlim=xlim,ylim=ylim,
-                                      save=SAVE, push=PUSH, temp=TEMP)
-
-        elif no == 2:
-            if fname is None:
-                fname = "S_j50"
-            plot.plot_source_function(self.x, self.S_tilde_j50, 
-                                      k_legends=self.k_labels,
-                                      ylabel=r"$\tilde{S} j_{50} $",
-                                      fname=fname,
-                                      xlim=xlim,ylim=ylim,
-                                      save=SAVE, push=PUSH, temp=TEMP)
-            # plt.title(r"$\tilde{S}(k,x) j_{50}$")
-            # plt.plot(self.x, self.S_tilde_j50[2])
-            # plt.xlim(xlim)
-            # plt.ylim(ylim)
-            # plt.show()
-        elif no == 3:
-            if fname is None:
-                fname = "S_j500"
-            plot.plot_source_function(self.x, self.S_tilde_j500, 
-                                      k_legends=self.k_labels,
-                                      ylabel=r"$\tilde{S} j_{500} $",
-                                      fname=fname,
-                                      xlim=xlim,ylim=ylim,
-                                      save=SAVE, push=PUSH, temp=TEMP)
-            # plt.title(r"$\tilde{S}(k,x) j_{500}$")
-            # plt.plot(self.x, self.S_tilde_j500[2])
-            # plt.xlim(xlim)
-            # plt.ylim(ylim)
-            # plt.show()
-        else:
-            pass     
-
    
 
-# pspec = PowerSpectrum(f1="thisworks.txt", f2="cellspar.txt", f3="cellsnewx.txt")
-# pspec = PowerSpectrum(f1_Cell="cells.txt", f1_MPS="matterPS.txt")#, f3="cellsignoreterms.txt")
-# fname_Cell="cells_nx5000_nk5443_nlogk10886.txt" 
-# fname_Cell="external/cells_nx1500_nk10886_nlogk10886.txt"
-fname_Cell="cells_components_nx150_nk2721_nlogk2721.txt"
+fname_Cell="cells_components_nx1500_nk10886_nlogk10886.txt"
 fname_MPS="matterPS_nk1000.txt"
-# fname_Thetas="thetas_nk2000_nx5000.txt"
-fname_Thetas="external/thetas_nk3000_nx5000.txt"
+fname_Thetas="thetas_nx1500_nk10886_nlogk10886.txt"
 fname_planck = "planck_cell_low.txt"
-# fname_planck = "COM_PowerSpect_CMB-TT-binned_R3.01.txt"
 fname_galaxy_survey = "reid_DR7.txt"
 fname_wmap = "wmap_act.txt"
 
@@ -286,8 +222,8 @@ pspec = PowerSpectrum(fname_Cell, fname_MPS, fname_Thetas)
 # TEMP=True
 
 pspec.plot_Cell_components(fname_planck)
-# pspec.plot_matter_power_spectrum(fname_galaxy_survey, fname_wmap)
-# pspec.plot_Thetas(ells=np.array([6, 100, 200]))
-# pspec.plot_Integrand(ells=np.array([2, 4, 7, 10]))
+pspec.plot_matter_power_spectrum(fname_galaxy_survey, fname_wmap)
+pspec.plot_Thetas(ells=np.array([6, 100, 200]))
+pspec.plot_Integrand(ells=np.array([2, 4, 7, 10]))
 
 

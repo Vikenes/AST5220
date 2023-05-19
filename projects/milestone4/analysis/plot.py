@@ -220,16 +220,16 @@ def plot_C_ell_components(ell, C_ell, C_ell_components,
 
     ISW, SW, Doppler, Quadrupole = C_ell_components
 
+    C_planck = ax.errorbar(ell_planck, C_ell_planck, error_planck, barsabove=True, fmt='o',
+                capthick=1.5, capsize=5, elinewidth=2, color='gold', ms=3, alpha=1,
+                label='Planck 2018')
+
     Ctot, = ax.plot(ell, C_ell, color='blue', label='Prediction')
     C1, = ax.plot(ell, ISW        , ls='dashed', color='green' , label="ISW")
-    C2, = ax.plot(ell, SW         , ls='dashed', color='orange', label="SW")
+    C2, = ax.plot(ell, SW         , ls='dashed', color='red', label="SW")
     C3, = ax.plot(ell, Doppler    , ls='dashed', color='black' , label="Doppler")
     C4, = ax.plot(ell, Quadrupole , ls='dashed', color='purple', label="Quadrupole")
 
-
-    C_planck = ax.errorbar(ell_planck, C_ell_planck, error_planck, barsabove=True, fmt='o',
-                capthick=1.5, capsize=5, elinewidth=2, color='red', ms=3, 
-                label='Planck 2018')
 
 
     leg1 = plt.legend(handles=[Ctot, C_planck], loc='upper right')
