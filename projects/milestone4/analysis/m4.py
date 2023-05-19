@@ -42,15 +42,10 @@ class PowerSpectrum:
         
 
     def load_Cell(self):
-        self.figname_Cell       = self.fname_Cell[self.fname_Cell.index("_")+1:].strip(".txt")
         C_ell_data              = np.loadtxt(DATA_PATH + self.fname_Cell, unpack=True)
         self.ell                = C_ell_data[0]
         self.C_ell              = C_ell_data[1]
         self.C_ell_components   = C_ell_data[2:] 
-        # self.ISW                = C_ell_data[2]
-        # self.SW                 = C_ell_data[3]
-        # self.Doppler            = C_ell_data[4]
-        # self.Quadrupole         = C_ell_data[5]
 
     def load_planck_C_ell(self, fname):
         CMB_planck = np.loadtxt(COMPARISON_PATH + fname, unpack=True)
@@ -65,7 +60,6 @@ class PowerSpectrum:
 
 
     def load_matter_PS(self):
-        self.figname_matterPS   = self.fname_MPS[self.fname_MPS.index("_")+1:].strip(".txt")
         self.k_h_Mpc, self.Pk   = np.loadtxt(DATA_PATH + self.fname_MPS, skiprows=1, unpack=True)
         self.k_eq               = np.loadtxt(DATA_PATH + self.fname_MPS, max_rows=1) * u.h / u.Mpc 
 
@@ -75,7 +69,6 @@ class PowerSpectrum:
 
 
     def load_Thetas(self):
-        self.figname_Thetas       = self.fname_Thetas[self.fname_Thetas.index("_")+1:].strip(".txt")
         self.Thetas_loaded = True 
         file = DATA_PATH+self.fname_Thetas
         Nells   = len(np.loadtxt(file, skiprows=2, max_rows=1))
@@ -99,23 +92,8 @@ class PowerSpectrum:
 
         self.load_Cell()
         ylabel = r"$\ell(\ell+1)C_\ell/2\pi$"
-        figname = "C_ell_compared_" + self.figname_Cell
+        figname = self.fname_Cell
         plot.plot_C_ell(self.ell, self.C_ell,
-                        ell_planck, C_ell_planck,
-                        error_planck,
-                        fname=figname,
-                        ylabel=ylabel, ypad=10,
-                        logy=False, fill=True,
-                        save=SAVE, temp=TEMP, push=PUSH)
-        
-
-    def plot_Cell_components(self, fname_planck):
-        ell_planck, C_ell_planck, error_planck = self.load_planck_C_ell(fname_planck)
-
-        self.load_Cell()
-        ylabel = r"$\ell(\ell+1)C_\ell/2\pi$"
-        figname = "C_ell_compared_" + self.figname_Cell
-        plot.plot_C_ell_components(self.ell, self.C_ell, self.C_ell_components,
                         ell_planck, C_ell_planck,
                         error_planck,
                         fname=figname,
@@ -131,6 +109,22 @@ class PowerSpectrum:
                         ylabel=ylabel, ypad=10,
                         save=SAVE, temp=TEMP, push=PUSH)
 
+    def plot_Cell_components(self, fname_planck):
+        ell_planck, C_ell_planck, error_planck = self.load_planck_C_ell(fname_planck)
+
+        self.load_Cell()
+        ylabel = r"$\ell(\ell+1)C_\ell/2\pi$"
+        figname = self.fname_Cell.strip(".txt")
+        plot.plot_C_ell_components(self.ell, self.C_ell, self.C_ell_components,
+                        ell_planck, C_ell_planck,
+                        error_planck,
+                        fname=figname,
+                        ylabel=ylabel, ypad=10,
+                        logy=False, fill=True,
+                        save=SAVE, temp=TEMP, push=PUSH)
+        
+
+
 
 
     def plot_matter_power_spectrum(self, fname_galaxy_survey, fname_wmap):
@@ -142,7 +136,7 @@ class PowerSpectrum:
 
         ylabel = r"$P(k)\quad[(\mathrm{Mpc/h})^3]$"
         xlabel = r"$k \quad [\mathrm{h/Mpc}]$"
-        fname = "Matter_PS_compared_" + self.figname_matterPS
+        fname = self.fname_MPS.strip(".txt")
         plot.plot_matter_PS(self.k_h_Mpc, self.Pk, self.k_eq,
                             galaxy_data,
                             wmap_data,
@@ -172,7 +166,7 @@ class PowerSpectrum:
             for l in ells:
                 ell_string += "_" + str(l)
 
-        figname = "Theta_" + self.figname_Thetas + ell_string
+        figname = self.fname_Thetas.split(".txt")[0] + ell_string
         ylabel=r"$\Theta_\ell(k)$"
 
 
@@ -199,7 +193,7 @@ class PowerSpectrum:
             for l in ells:
                 ell_string += "_" + str(l)
 
-        figname = "Theta_squared_over_k_" + self.figname_Thetas + ell_string
+        figname = "integrand_" + self.fname_Thetas.split(".txt")[0] + ell_string
         ylabel=r"$|\Theta_\ell(k)|^2 / k \quad[\mathrm{Mpc}]$"
         plot.plot_Thetas(self.k_eta0, integrands, ells, fname=figname,
                          ylabel=ylabel, logy=False, logx=False, ypad=10, xlim=[5e-1, 1e2],
