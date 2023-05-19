@@ -41,7 +41,7 @@ class PowerSpectrum {
     const int n_x        = 1500;
     const double x_start = -15.0;
     const double x_end   = Constants.x_end;
-    const double x_start_LOS = x_start;// = -11.0;
+    const double x_start_LOS = x_start;
 
     
     // The ells's we will compute Theta_ell and Cell for
