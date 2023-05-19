@@ -43,7 +43,14 @@ class PowerSpectrum:
 
     def load_Cell(self):
         self.figname_Cell       = self.fname_Cell[self.fname_Cell.index("_")+1:].strip(".txt")
-        self.ell, self.C_ell    = np.loadtxt(DATA_PATH + self.fname_Cell, unpack=True)
+        C_ell_data              = np.loadtxt(DATA_PATH + self.fname_Cell, unpack=True)
+        self.ell                = C_ell_data[0]
+        self.C_ell              = C_ell_data[1]
+        self.C_ell_components   = C_ell_data[2:] 
+        # self.ISW                = C_ell_data[2]
+        # self.SW                 = C_ell_data[3]
+        # self.Doppler            = C_ell_data[4]
+        # self.Quadrupole         = C_ell_data[5]
 
     def load_planck_C_ell(self, fname):
         CMB_planck = np.loadtxt(COMPARISON_PATH + fname, unpack=True)
@@ -94,6 +101,21 @@ class PowerSpectrum:
         ylabel = r"$\ell(\ell+1)C_\ell/2\pi$"
         figname = "C_ell_compared_" + self.figname_Cell
         plot.plot_C_ell(self.ell, self.C_ell,
+                        ell_planck, C_ell_planck,
+                        error_planck,
+                        fname=figname,
+                        ylabel=ylabel, ypad=10,
+                        logy=False, fill=True,
+                        save=SAVE, temp=TEMP, push=PUSH)
+        
+
+    def plot_Cell_components(self, fname_planck):
+        ell_planck, C_ell_planck, error_planck = self.load_planck_C_ell(fname_planck)
+
+        self.load_Cell()
+        ylabel = r"$\ell(\ell+1)C_\ell/2\pi$"
+        figname = "C_ell_compared_" + self.figname_Cell
+        plot.plot_C_ell_components(self.ell, self.C_ell, self.C_ell_components,
                         ell_planck, C_ell_planck,
                         error_planck,
                         fname=figname,
@@ -247,7 +269,8 @@ class PowerSpectrum:
 # pspec = PowerSpectrum(f1="thisworks.txt", f2="cellspar.txt", f3="cellsnewx.txt")
 # pspec = PowerSpectrum(f1_Cell="cells.txt", f1_MPS="matterPS.txt")#, f3="cellsignoreterms.txt")
 # fname_Cell="cells_nx5000_nk5443_nlogk10886.txt" 
-fname_Cell="external/cells_nx1500_nk10886_nlogk10886.txt"
+# fname_Cell="external/cells_nx1500_nk10886_nlogk10886.txt"
+fname_Cell="cells_components_nx150_nk2721_nlogk2721.txt"
 fname_MPS="matterPS_nk1000.txt"
 # fname_Thetas="thetas_nk2000_nx5000.txt"
 fname_Thetas="external/thetas_nk3000_nx5000.txt"
@@ -262,7 +285,7 @@ pspec = PowerSpectrum(fname_Cell, fname_MPS, fname_Thetas)
 # PUSH=True
 # TEMP=True
 
-pspec.plot_Cell(fname_planck)
+pspec.plot_Cell_components(fname_planck)
 # pspec.plot_matter_power_spectrum(fname_galaxy_survey, fname_wmap)
 # pspec.plot_Thetas(ells=np.array([6, 100, 200]))
 # pspec.plot_Integrand(ells=np.array([2, 4, 7, 10]))

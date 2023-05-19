@@ -177,7 +177,7 @@ def plot_C_ell(ell, C_ell,
 
 
     
-    set_ax_info(ax, xlabel, ylabel, title=fname, legend=True, 
+    set_ax_info(ax, xlabel, ylabel, legend=True, 
                 ylim=ylim, xlim=xlim, yticks=yticks,
                 ypad=ypad)
     if logy:
@@ -191,7 +191,65 @@ def plot_C_ell(ell, C_ell,
     save_push(fig, fname, save, push, temp=temp)
     
 
+def plot_C_ell_components(ell, C_ell, C_ell_components,
+                          ell_planck, C_ell_planck,
+                          error_planck, 
+                          fname, 
+                          logx=True, 
+                          logy=True,
+                          xlabel=r"$\ell$", 
+                          keq=None,
+                          ylabel=None, 
+                          xlim=None, 
+                          ylim=None, 
+                          legendloc='best', 
+                          yticks=None, 
+                          ypad=None,
+                          fill=False,
+                          figsize=(10,6), 
+                          save=True,push=False, temp=False):
 
+
+    fig, ax = plt.subplots(figsize=figsize)
+
+    if fill:
+        # y1 = C_ell - C_ell*(2/(2*ell+1))**(1) * 2
+        # y2 = C_ell + C_ell*(2/(2*ell+1))**(1) * 2
+        # ax.fill_between(ell, y1, y2, color='palegreen', alpha=0.7)
+        pass
+
+    ISW, SW, Doppler, Quadrupole = C_ell_components
+
+    Ctot, = ax.plot(ell, C_ell, color='blue', label='Prediction')
+    C1, = ax.plot(ell, ISW        , ls='dashed', color='green' , label="ISW")
+    C2, = ax.plot(ell, SW         , ls='dashed', color='orange', label="SW")
+    C3, = ax.plot(ell, Doppler    , ls='dashed', color='black' , label="Doppler")
+    C4, = ax.plot(ell, Quadrupole , ls='dashed', color='purple', label="Quadrupole")
+
+
+    C_planck = ax.errorbar(ell_planck, C_ell_planck, error_planck, barsabove=True, fmt='o',
+                capthick=1.5, capsize=5, elinewidth=2, color='red', ms=3, 
+                label='Planck 2018')
+
+
+    leg1 = plt.legend(handles=[Ctot, C_planck], loc='upper right')
+    leg2 = plt.legend(handles=[C1, C2, C3, C4], loc='upper left')
+
+    ax.add_artist(leg1)
+    ax.add_artist(leg2)
+
+    set_ax_info(ax, xlabel, ylabel, legend=False, 
+                ylim=ylim, xlim=xlim, yticks=yticks,
+                ypad=ypad)
+    if logy:
+        ax.set_yscale('log')
+
+    if logx:
+        ax.set_xscale('log')
+
+
+    
+    save_push(fig, fname, save, push, temp=temp)
 
 def plot_matter_PS(k, Pk, k_eq,
                    galaxy_data, wmap_data,
