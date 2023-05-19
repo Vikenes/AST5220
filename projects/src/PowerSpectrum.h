@@ -54,16 +54,6 @@ class PowerSpectrum {
         1400, 1450, 1500, 1550, 1600, 1650, 1700, 1750, 1800, 1850, 
         1900, 1950, 2000};
    
-    // For initial testing 
-    // Vector ells{ 
-    //     2,    5,    10,     20,   
-    //     35,   50,   100,    160,  
-    //     225,  300,  400,    550, 
-    //     700,  850,  1000,   1200, 
-    //     1400, 1550, 1700,   1850, 
-    //     2000};
-
-
     // Constants being used throughout 
     double c_;
     double eta0_;
