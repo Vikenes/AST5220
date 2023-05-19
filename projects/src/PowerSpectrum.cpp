@@ -81,26 +81,33 @@ void PowerSpectrum::solve_components(){
   //=========================================================================
   // Line of sight integration to get Theta_ell(k)
   //=========================================================================
+  cell_TT_component_spline = std::vector<Spline>(5);
   for(int i=0; i<5; i++){
+    std::string name = "Cell_term_" + std::to_string(i);
+    Utils::StartTiming(name);
+
+    std::function<double(double,double)> source_function_T_component = [&](double x, double k){
+      return pert->get_Source_T_component(x,k,i);
+    };
+
     // pert->sou
-    line_of_sight_integration(k_array);
+    Vector2D thetaT_ell_of_k_comp = line_of_sight_integration_single(k_array, source_function_T_component);
+    thetaT_ell_of_k_comp_spline = std::vector<Spline>(nells_);
+
+    for(int iell=0; iell<nells_; iell++){
+      thetaT_ell_of_k_comp_spline[iell].create(k_array, thetaT_ell_of_k_comp[iell]);
+    }
 
     //=========================================================================
     // Integration to get Cell by solving dCell^f/dlogk = Delta(k) * f_ell(k)^2
     //=========================================================================
-    auto cell_TT = solve_for_cell(log_k_array, thetaT_ell_of_k_spline, thetaT_ell_of_k_spline);
-    cell_TT_spline.create(ells, cell_TT, "Cell_TT_of_ell");
+    auto cell_TT_comp = solve_for_cell(log_k_array, thetaT_ell_of_k_comp_spline, thetaT_ell_of_k_comp_spline);
+    cell_TT_component_spline[i].create(ells, cell_TT_comp);
+    Utils::EndTiming(name);
 
   }
 }
 
-double PowerSpectrum::k_stepsize_from_N_osc_samples(int samples_per_osc) const{
-  return TWO_PI_over_eta0_ / (double)samples_per_osc;
-}
-
-double PowerSpectrum::n_k_from_N_osc_samples(int samples_per_osc) const{
-  return int((k_max - k_min) / k_stepsize_from_N_osc_samples(samples_per_osc));
-}
 
 //====================================================
 // Generate splines of j_ell(z) needed for LOS integration
@@ -330,18 +337,33 @@ double PowerSpectrum::integrate_trapezoidal(
 }
 
 
+
+double PowerSpectrum::k_stepsize_from_N_osc_samples(int samples_per_osc) const{
+  return TWO_PI_over_eta0_ / (double)samples_per_osc;
+}
+
+double PowerSpectrum::n_k_from_N_osc_samples(int samples_per_osc) const{
+  return int((k_max - k_min) / k_stepsize_from_N_osc_samples(samples_per_osc));
+}
+
 //====================================================
 // Get methods
 //====================================================
 double PowerSpectrum::get_cell_TT(const double ell) const{
   return cell_TT_spline(ell);
 }
+
+double PowerSpectrum::get_cell_TT_component(const double ell, const int term) const{
+  return cell_TT_component_spline[term](ell);
+}
+
 double PowerSpectrum::get_cell_TE(const double ell) const{
   return cell_TE_spline(ell);
 }
 double PowerSpectrum::get_cell_EE(const double ell) const{
   return cell_EE_spline(ell);
 }
+
 
 void PowerSpectrum::add_file_info(std::string &filename, int nx){
   int nk    = n_k_from_N_osc_samples(los_samples_per_osc);
@@ -398,8 +420,6 @@ void PowerSpectrum::output(std::string filename){
   }
   else { return; }
 
-  exit(0);
-
   // Output in standard units of muK^2
   std::ofstream fp(filename.c_str());
   const int ellmax = int(ells[ells.size()-1]);
@@ -416,8 +436,43 @@ void PowerSpectrum::output(std::string filename){
 
   std::for_each(ellvalues.begin(), ellvalues.end(), print_data);
   std::cout << "Finished writing to file" << std::endl;
-
 }
+
+void PowerSpectrum::output_Cell_components(std::string filename){ 
+
+  // Add run-parameters to filename 
+  add_file_info(filename, n_x); 
+
+  // Check if file exists. Prompt user to overwrite existing file. 
+  bool write_to_file = check_existence(filename);
+  if(write_to_file){
+    std::cout << "Writing data to: " << filename << std::endl;
+  }
+  else { return; }
+
+  // Output in standard units of muK^2
+  std::ofstream fp(filename.c_str());
+
+  const int ellmax = int(ells[ells.size()-1]);
+  auto ellvalues = Utils::linspace(2, ellmax, ellmax-1);
+  auto print_data = [&] (const double ell) {
+
+    double normfactor  = (ell * (ell+1)) / (2.0 * M_PI) * pow(1e6 * cosmo->get_TCMB(), 2);
+
+    fp << ell                                          << " ";
+    fp << get_cell_TT_component(ell, 0) * normfactor   << " ";
+    fp << get_cell_TT_component(ell, 1) * normfactor   << " ";
+    fp << get_cell_TT_component(ell, 2) * normfactor   << " ";
+    fp << get_cell_TT_component(ell, 3) * normfactor   << " ";
+    fp << get_cell_TT_component(ell, 4) * normfactor   << " ";
+    fp << "\n";
+  };
+
+
+  std::for_each(ellvalues.begin(), ellvalues.end(), print_data);
+  std::cout << "Finished writing to file" << std::endl;
+}
+
 
 void PowerSpectrum::outputThetas(std::string filename, int nk_write){
 

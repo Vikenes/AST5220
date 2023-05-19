@@ -6,7 +6,7 @@
 #include "SupernovaFitting.h"
 
 int main(int argc, char **argv){
-  // Utils::StartTiming("Everything");
+  Utils::StartTiming("Everything");
 
   //=========================================================================
   // Parameters
@@ -150,6 +150,7 @@ int main(int argc, char **argv){
   // Module IV
   //=========================================================================
   if(m4_output){
+    bool components = true;
     bool matter_PS = false;
     bool source;
 
@@ -172,17 +173,26 @@ int main(int argc, char **argv){
 
     std::string M4_DATA_PATH = "milestone4/data/";
     PowerSpectrum power(&cosmo, &rec, &pert, A_s, n_s, kpivot_mpc);
-
-    if(!matter_PS){power.solve();}
-
-    if(matter_PS){
-      power.outputPS(M4_DATA_PATH + "matterPS.txt", 1000);
+    // return 0;
+    if(components){
+      // Solve Cell for single terms in source function 
+      power.solve_components();
+      power.output_Cell_components(M4_DATA_PATH + "cells_components.txt");
     }
-  
+
     else{
+      // Solve Cell if we're not writing the matter power spectrum.
+      if(matter_PS){
+        power.outputPS(M4_DATA_PATH + "matterPS.txt", 1000);
+      }
+      
+      else{
+      power.solve();
       power.output(M4_DATA_PATH + "cells.txt");
       power.outputThetas(M4_DATA_PATH + "thetas.txt", 2000);
+      };
     };
+  
   }
 
   Utils::EndTiming("Everything");

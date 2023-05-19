@@ -353,6 +353,7 @@ void Perturbations::compute_source_functions(int term){
   // Make storage for the source functions (in 1D array to be able to pass it to the spline)
   // Vector ST_array(k_array.size() * x_array.size());
   Vector2D ST_component_array = Vector2D(5, Vector(k_array.size() * x_array.size()));
+  ST_component_splines = std::vector<Spline2D>(5);
 
   // Compute source functions
   for(auto ix = 0; ix < x_array.size(); ix++){

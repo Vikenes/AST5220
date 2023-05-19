@@ -33,12 +33,12 @@ class PowerSpectrum {
     const double k_min = Constants.k_min;
     const double k_max = Constants.k_max;
 
-    const int los_samples_per_osc = 16;
+    const int los_samples_per_osc = 4;
     const int bessel_samples_per_osc = 20;
-    const int cell_samples_per_osc = 16;
+    const int cell_samples_per_osc = 4;
 
     // The x-values we integrate to compute Theta_ell(k) etc. for
-    const int n_x        = 1500;
+    const int n_x        = 150;
     const double x_start = -15.0;
     const double x_end   = Constants.x_end;
     const double x_start_LOS = x_start;// = -11.0;
@@ -100,6 +100,8 @@ class PowerSpectrum {
     
     // Splines of the reusult of the LOS integration
     std::vector<Spline> thetaT_ell_of_k_spline;
+    std::vector<Spline> thetaT_ell_of_k_comp_spline;
+    
     
     //=====================================================================
     // [3] Integrate to get power-spectrum
@@ -155,6 +157,7 @@ class PowerSpectrum {
 
     // Get the quantities we have computed
     double get_cell_TT(const double ell) const;
+    double get_cell_TT_component(const double ell, const int term) const;
     double get_cell_TE(const double ell) const;
     double get_cell_EE(const double ell) const;
 
@@ -164,6 +167,7 @@ class PowerSpectrum {
 
     // Output Cells in units of l(l+1)/2pi (muK)^2
     void output(std::string filename);
+    void output_Cell_components(std::string filename);
     void outputThetas(std::string filename, int nk);
     void outputPS(std::string filename, int nk);
 
