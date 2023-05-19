@@ -477,7 +477,7 @@ void PowerSpectrum::output_Cell_components(std::string filename){
 void PowerSpectrum::outputThetas(std::string filename, int nk_write){
 
   // Add run-parameters to filename 
-  add_file_info(filename); 
+  add_file_info(filename, n_x); 
 
   // Check if file exists. Prompt user to overwrite existing file. 
   bool write_to_file = check_existence(filename);
