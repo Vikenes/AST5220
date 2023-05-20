@@ -19,10 +19,6 @@ Next, we need to determine when the tight coupling approximation is valid. We us
 
 \subsubsection{Integration of ODEs} \label{sssec:M3:implementations:integration_details}
 
-When solving the perturbation ODEs we integrate across $x$ for each mode $k$. We choose $N_k=100$ logarithmically spaced values of $k\in[k_\mathrm{min},\,k_\mathrm{max}]$, where $k_\mathrm{min}=5\cdot10^{-5}/\mathrm{Mpc}$ and $k_\mathrm{max}=0.3/\mathrm{Mpc}$. 
+When solving the perturbation ODEs we integrate across $x$ for each mode $k$. We choose $N_k=200$ logarithmically spaced values of $k\in[k_\mathrm{min},\,k_\mathrm{max}]$, where $k_\mathrm{min}=5\cdot10^{-5}/\mathrm{Mpc}$ and $k_\mathrm{max}=0.3/\mathrm{Mpc}$. For the photon multipoles, we set $\ell_\mathrm{max}=7$.
 
-Once the ODEs have been solved for all combinations of $x$ and $k$, we spline the results of all perturbation quantities, except for $\Theta_\ell$ for $\ell>2$. Using these results we compute the source function similarly, but now with a quadratic distribution of $k$'s  
-\begin{equation} \label{eq:M3:implementations:k_distribution_for_source_function}
-    k_i = k_\mathrm{min} + (k_\mathrm{max} - k_\mathrm{min})(i/N_k)^2,
-\end{equation}
-where $k_\mathrm{min},\,k_\mathrm{max}$ and $N_k$ are the same as before.
+Once the ODEs have been solved for all combinations of $x$ and $k$, we make splines of the integrated perturbation quantities, except for $\Theta_\ell$ for $\ell>2$, as this will be solved using the LOS integration. 

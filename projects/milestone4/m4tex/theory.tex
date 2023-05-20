@@ -39,3 +39,18 @@ Once again, we have to take rescale $\Delta_M$ to account for our choice of init
 \begin{equation}
     \plk = \abs{\Delta_M\code(k)}^2 P(k) = \abs{\Delta_M\code(k)}^2\, \frac{2\pi^2}{k^3}\pclosed{\frac{k}{\kp}}^{\ns-1}.
 \end{equation}
+
+
+\subsubsection{Line-of-sight integration}\label{sssec:M4:theory:line_of_sight_integration}
+As mentioned in \secref{sssec:M3:theory:perturbation_equations}, we compute higher order multipoles from the LOS approach. 
+\begin{equation} \label{eq:M4:theory:Theta_ell_LOS_integration}
+    \Theta_\ell(k,x=0) = \int_{-\infty}^0 \tilde{S}(k,x) j_\ell [k(\eta_0 - \eta(x))]\,\dd x, 
+\end{equation}
+where $\tilde{S}(k,x)$ is the source function, which is given by 
+\begin{equation} \label{eq:M4:theory:source_function_LOS}
+    \begin{split}
+        \tilde{S}(k,x) =& \g \bclosed{\Theta_0 + \Psi + \frac{1}{4} \Pi} + e^{-\tau}\bclosed{\Psi' - \Phi'} \\
+        & - \frac{1}{k}\dv{x}(\H \g \vb) + \frac{3}{4k^2}\dv{x}\bclosed{\H \dv{x}(\H\g\Pi)}.
+    \end{split}
+\end{equation}
+Since we have $\Pi=\Theta_2$, the highest photon multipole required to compute any multipole $\Theta_\ell$ from \Eqref{eq:M4:theory:Theta_ell_LOS_integration} is $\Theta_2$. Thus, the number of multipoles we have to compute from the coupled ODEs in \Eqref{eq:M3:theory:perturbation_ODEs} is governed by the value of $\ell_\mathrm{max}$ which ensures sufficient accuracy in $\Theta_2$. 
