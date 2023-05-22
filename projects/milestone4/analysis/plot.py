@@ -93,7 +93,7 @@ def save_push(fig, pdf_name, save=True, push=False, show=False, tight=True, temp
 
 def set_ax_info(ax, xlabel, ylabel=False, title=None, legend=True, 
                 double_legends=[], legendloc='best', legend_size=False,
-                xlim=None, ylim=None, yticks=None,
+                xlim=None, ylim=None, yticks=None, xticks=None,
                 ypad=None, xpad=None):
     """Write title and labels on an axis with the correct fontsizes.
     Args:
@@ -134,6 +134,9 @@ def set_ax_info(ax, xlabel, ylabel=False, title=None, legend=True,
     if yticks is not None:
         ax.set_yticks(yticks)
 
+    if xticks is not None:
+        ax.set_xticks(xticks)
+
 # -----------------------------------------------------------------------------
 #   General plot code above
 #   XXX
@@ -155,6 +158,7 @@ def plot_C_ell(ell, C_ell,
                ylim=None, 
                legendloc='best', 
                yticks=None, 
+               xticks=None,
                ypad=None,
                fill=False,
                figsize=(10,6), 
@@ -163,14 +167,21 @@ def plot_C_ell(ell, C_ell,
 
     fig, ax = plt.subplots(figsize=figsize)
 
+    
     if fill:
-        y1 = C_ell - C_ell*(2/(2*ell+1))**(1) * 2
-        y2 = C_ell + C_ell*(2/(2*ell+1))**(1) * 2
-        ax.fill_between(ell, y1, y2, color='palegreen', alpha=0.7)
+        T0 = 2.7255
+        normfactor = ell*(ell+1)/(2*np.pi) #* (1e6*T0)**2 
+        C_ell_true = C_ell / normfactor 
+        y1 = C_ell - C_ell_true*(2/(2*ell+1))**(1/2) 
+        y2 = C_ell + C_ell_true*(2/(2*ell+1))**(1/2) 
+        ax.fill_between(ell, y1, y2, color='palegreen', alpha=1)
+        # plt.xscale('log')
+        # plt.show()
+        
 
     ax.plot(ell, C_ell, color='blue', label='Prediction')
-    ax.errorbar(ell_planck, C_ell_planck, error_planck, barsabove=True, fmt='o',
-                capthick=1.5, capsize=5, elinewidth=2, color='red', ms=3, 
+    ax.errorbar(ell_planck, C_ell_planck, error_planck, barsabove=True, fmt='x',
+                capthick=1.5, capsize=3, elinewidth=1, color='red', ms=5, 
                 label='Planck 2018')
 
 
@@ -179,12 +190,17 @@ def plot_C_ell(ell, C_ell,
     
     set_ax_info(ax, xlabel, ylabel, legend=True, 
                 ylim=ylim, xlim=xlim, yticks=yticks,
-                ypad=ypad)
+                ypad=ypad, legendloc='upper left')
     if logy:
         ax.set_yscale('log')
 
     if logx:
         ax.set_xscale('log')
+    
+    if xticks is not None:
+        ticklabels=[f"${tick}$" for tick in xticks]
+        ax.set_xticks(xticks)
+        ax.set_xticklabels(ticklabels)
 
 
     
@@ -204,6 +220,7 @@ def plot_C_ell_components(ell, C_ell, C_ell_components,
                           ylim=None, 
                           legendloc='best', 
                           yticks=None, 
+                          xticks=None,
                           ypad=None,
                           fill=False,
                           figsize=(10,6), 
@@ -212,41 +229,46 @@ def plot_C_ell_components(ell, C_ell, C_ell_components,
 
     fig, ax = plt.subplots(figsize=figsize)
 
-    if fill:
-        # y1 = C_ell - C_ell*(2/(2*ell+1))**(1) * 2
-        # y2 = C_ell + C_ell*(2/(2*ell+1))**(1) * 2
-        # ax.fill_between(ell, y1, y2, color='palegreen', alpha=0.7)
-        pass
 
-    ISW, SW, Doppler, Quadrupole = C_ell_components
+        
 
-    C_planck = ax.errorbar(ell_planck, C_ell_planck, error_planck, barsabove=True, fmt='o',
-                capthick=1.5, capsize=5, elinewidth=2, color='gold', ms=3, alpha=1,
-                label='Planck 2018')
+    SW, ISW, Doppler, Quadrupole = C_ell_components
 
-    Ctot, = ax.plot(ell, C_ell, color='blue', label='Prediction')
-    C1, = ax.plot(ell, ISW        , ls='dashed', color='green' , label="ISW")
-    C2, = ax.plot(ell, SW         , ls='dashed', color='red', label="SW")
-    C3, = ax.plot(ell, Doppler    , ls='dashed', color='black' , label="Doppler")
-    C4, = ax.plot(ell, Quadrupole , ls='dashed', color='purple', label="Quadrupole")
+    # C_planck = ax.errorbar(ell_planck, C_ell_planck, error_planck, barsabove=True, fmt='o',
+    #             capthick=1.5, capsize=5, elinewidth=2, color='gold', ms=3, alpha=1,
+    #             label='Planck 2018')
+    scale_1 = 1 
+    scale_2 = 1 
+    scale_3 = 1 
+    scale_4 = 1 
+    Ctot, = ax.plot(ell, C_ell, ls='dashed', color='blue', alpha=0.7, label='Prediction')
+    C1, = ax.plot(ell, SW * scale_1         , ls='solid', color='red', label="SW")
+    C2, = ax.plot(ell, ISW * scale_2        , ls='solid', color='green' , label="ISW")
+    C3, = ax.plot(ell, Doppler * scale_3    , ls='solid', color='black' , label="Doppler")
+    C4, = ax.plot(ell, Quadrupole * scale_4 , ls='solid', color='purple', label="Quadrupole")
 
 
 
-    leg1 = plt.legend(handles=[Ctot, C_planck], loc='upper right')
+    leg1 = plt.legend(handles=[Ctot], loc='upper right')
     leg2 = plt.legend(handles=[C1, C2, C3, C4], loc='upper left')
 
     ax.add_artist(leg1)
     ax.add_artist(leg2)
 
     set_ax_info(ax, xlabel, ylabel, legend=False, 
-                ylim=ylim, xlim=xlim, yticks=yticks,
+                ylim=ylim, xlim=xlim, 
+                yticks=yticks,
                 ypad=ypad)
     if logy:
         ax.set_yscale('log')
 
     if logx:
         ax.set_xscale('log')
-
+    
+    if xticks is not None:
+        ticklabels=[f"${tick}$" for tick in xticks]
+        ax.set_xticks(xticks)
+        ax.set_xticklabels(ticklabels)
 
     
     save_push(fig, fname, save, push, temp=temp)

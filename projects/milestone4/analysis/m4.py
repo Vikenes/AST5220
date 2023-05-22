@@ -52,6 +52,9 @@ class PowerSpectrum:
         ell_planck = CMB_planck[0]
         C_ell_planck = CMB_planck[1]
         error_planck = CMB_planck[2:4]
+        error_planck = np.flip(error_planck, axis=0)
+        # print(error_planck)
+        # exit()
         return ell_planck, C_ell_planck, error_planck
     
     def load_Pk_external(self, fname):
@@ -87,18 +90,21 @@ class PowerSpectrum:
          
 
 
-    def plot_Cell(self, fname_planck):
+    def plot_Cell(self, fname_planck, fill=False):
         ell_planck, C_ell_planck, error_planck = self.load_planck_C_ell(fname_planck)
 
         self.load_Cell()
-        ylabel = r"$\ell(\ell+1)C_\ell/2\pi$"
-        figname = self.fname_Cell
+        ylabel = r"$\ell(\ell+1)C_\ell/2\pi\:[\mathrm{\mu K^2}]$"
+        figname_split = self.fname_Cell.split("components_")
+        figname = figname_split[0] + figname_split[1].strip(".txt")
+        xticks=[10,100,1000]
         plot.plot_C_ell(self.ell, self.C_ell,
                         ell_planck, C_ell_planck,
                         error_planck,
                         fname=figname,
                         ylabel=ylabel, ypad=10,
-                        logy=False, fill=True,
+                        xticks=xticks,
+                        logy=False, fill=fill,
                         save=SAVE, temp=TEMP, push=PUSH)
         
 
@@ -106,21 +112,22 @@ class PowerSpectrum:
         ell_compare, C_ell_compare = np.loadtxt(DATA_PATH + file_compare, unpack=True) 
         ylabel = r"$\ell(\ell+1)C_\ell/2\pi$"
         plot.comp_C_ell(self.ell, self.C_ell - C_ell_compare,
-                        ylabel=ylabel, ypad=10,
+                        ylabel=ylabel, ypad=10, fill=True,
                         save=SAVE, temp=TEMP, push=PUSH)
 
     def plot_Cell_components(self, fname_planck):
         ell_planck, C_ell_planck, error_planck = self.load_planck_C_ell(fname_planck)
 
         self.load_Cell()
-        ylabel = r"$\ell(\ell+1)C_\ell/2\pi$"
+        ylabel = r"$\ell(\ell+1)C_\ell/2\pi \:[\mathrm{\mu K^2}]$"
         figname = self.fname_Cell.strip(".txt")
+        xticks=[10,100,1000]
         plot.plot_C_ell_components(self.ell, self.C_ell, self.C_ell_components,
                         ell_planck, C_ell_planck,
                         error_planck,
                         fname=figname,
                         ylabel=ylabel, ypad=10,
-                        logy=False, fill=True,
+                        logy=False, fill=True, xticks=xticks,
                         save=SAVE, temp=TEMP, push=PUSH)
         
 
@@ -214,11 +221,12 @@ pspec = PowerSpectrum(fname_Cell, fname_MPS, fname_Thetas)
 
 SAVE=True
 # PUSH=True
-# TEMP=True
+TEMP=True
 
+pspec.plot_Cell(fname_planck)
 pspec.plot_Cell_components(fname_planck)
-pspec.plot_matter_power_spectrum(fname_galaxy_survey, fname_wmap)
-pspec.plot_Thetas(ells=np.array([6, 100, 200]))
-pspec.plot_Integrand(ells=np.array([2, 4, 7, 10]))
+#pspec.plot_matter_power_spectrum(fname_galaxy_survey, fname_wmap)
+#pspec.plot_Thetas(ells=np.array([6, 100, 200]))
+#pspec.plot_Integrand(ells=np.array([2, 4, 7, 10]))
 
 
