@@ -26,20 +26,19 @@ where $\expval{\R\ini(\vec{k}) \R\ini^*(\vec{k}')}=(2\pi^2)\delta(\vec{k}-\vec{k
 where $\as$ is the amplitude of \note{something}, $\kp$ is the \note{something} and $\ns$ is the spectral index. \note{Comment about their meaning.} 
 
 Thus, the final expression we want to compute is 
-\begin{equation}
+\begin{equation} \label{eq:M4:theory:CMB_power_spectrum}
     \cl = 4\pi \int_0^\infty \as \pclosed{\frac{k}{\kp}}^{\ns-1} \Theta_\ell^2(k) \, \frac{\dd k}{k}.
 \end{equation}
 
 \subsubsection{Matter power spectrum} \label{sssec:M4:theory:matter_power_spectrum}
 From the Fourier components of the matter overdensity field, we can compute the matter power-spectrum
-\begin{equation}
+\begin{equation} \label{eq:M4:theory:MatterPS_of_x_k}
     P_L(k,x) = \abs{\Delta_M(k,x)}^2,\quad \text{where}\quad \Delta_M(k,x) \equiv \frac{k^2 \Phi(k,x)}{\frac{3}{2}\omn a^{-1} H_0^2}.
 \end{equation}
 Once again, we have to take rescale $\Delta_M$ to account for our choice of initial conditions. Taking the value today, we thus want to compute 
-\begin{equation}
+\begin{equation} \label{eq:M4:theory:MatterPS_code_today}
     \plk = \abs{\Delta_M\code(k)}^2 P(k) = \abs{\Delta_M\code(k)}^2\, \frac{2\pi^2}{k^3}\pclosed{\frac{k}{\kp}}^{\ns-1}.
 \end{equation}
-
 
 \subsubsection{Line-of-sight integration}\label{sssec:M4:theory:line_of_sight_integration}
 As mentioned in \secref{sssec:M3:theory:perturbation_equations}, we compute higher order multipoles from the LOS approach. 
@@ -61,3 +60,11 @@ The ISW represents the fact that gravitational potentials may change in time as 
 
 The third term in \Eqref{eq:M4:theory:source_function_LOS} is effectively a dipole term, since $\vb\sim\vg$ at early times. From our discussion of the evolution of the monopole and dipole, in \figref{fig:M3:results:deltas} and \ref{fig:M3:results:vels}, we can expect the dipole term to contribute on scales that had entered the horizon before decoupling, as the larger modes don't oscillate until they enter the horizon, which occurs when $\g\approx0$. The final term is a quadrupole term, and is related to the angular dependence of Thompson scattering. However, as we will see in \secref{ssec:M4:results}, this term gives a very small contribution.
 
+If we ignore the ISW contribution, at very small scales we have $\Thl\approx (\Thn + \Psi)\ini j_\ell(k\eta_0)$. Substituting $x=k\eta_0$, the integral in \Eqref{eq:M4:theory:CMB_power_spectrum} for $\ns=1$ becomes 
+\begin{equation} \label{eq:M4:theory:C_ell_SW_plateau_integral}
+    \begin{split}
+        \cl &= 4\pi \as \abs{(\Thn+\Psi)\ini}^2 \frac{1}{(\kp \eta_0)^{\ns-1}} \int_0^\infty \dd\, x j_\ell^2(x) x^{\ns-2}, \\
+        \implies& \frac{\ell(\ell+1)}{2\pi}\cl = \as \abs{(\Thn+\Psi)\ini}^2 = \text{constant}.   
+    \end{split}
+\end{equation}
+When plotting the CMB power spectrum, we will plot the RHS of \Eqref{eq:M4:theory:C_ell_SW_plateau_integral} against $\ell$ in units of $\mathrm{\mu K^2}$. We have $\ns=0.965<1$, so we have $\ell(\ell+1)\cl\propto \ell^{\ns-1}$, which will induces a small tilt at low $\ell$. The ISW will also result in a further deviation from a constant value. 
