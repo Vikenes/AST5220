@@ -22,7 +22,7 @@ where $\pl(\mu)$ are Legendre polynomials. The first three multipoles are the mo
 
 We denote density perturbations of CDM and baryons as $\dcdm$ and $\db$, and their velocity perturbations as $\vcdm$ and $\vb$. From the perturbed Einstein equations one can show that $\dg=4\Theta_0$ and $\vg=-3\Theta_1$ for the photons. 
 
-\subsubsection{Perturbation equations}
+\subsubsection{Perturbation equations} \label{sssec:M3:theory:perturbation_equations}
 The system of ODEs we will solve for the evolution of the perturbed quantities are given in \cite[Eq. (22)]{callin}, where we neglect neutrinos and polarization and set $\Theta_P=\mathcal{N}=0$.   
 \begin{subequations} \label{eq:M3:theory:perturbation_ODEs}
     \begin{align}
@@ -42,11 +42,9 @@ The system of ODEs we will solve for the evolution of the perturbed quantities a
         \Psi &= -\Phi - \frac{12H_0^2}{k^2 a^2} \ogn \Theta_2. \label{eq:M3:theory:perturbation_ODEs_Psi}
     \end{align}
 \end{subequations}
-We have $\Pi=\Theta_2$ due to $\Theta_P=0$, and have written $\Pi$ for clarity. 
+We have $\Pi=\Theta_2$ due to $\Theta_P=0$, and have written $\Pi$ for clarity. The equation for $\Psi$ is an algebraic equation, and its value is inserted in the other equations. Noting that $\Phi'$ is the only derivative of a perturbed quantity found on the RHS of Eqs. \eqref{eq:M3:theory:perturbation_ODEs}, we solve for it first, and insert this value into the other equations. 
 
-The expression for $\Theta_\ell'$ is recursive, and we thus need to truncate the series at some point. Truncating the series by setting $\Theta_{\ell_\mathrm{max}}=0$ would lead to numerical errors propagating down to $\Theta_2$. \Eqref{eq:M3:theory:perturbation_ODEs_Theta_ell_max} comes from assuming $\Theta_\ell(k,\eta)\sim j_\ell(k\eta)$ at high $\ell$, where $j_\ell(k\eta)$ is the spherical Bessel function, and using the recurrence relation for $j_\ell$ \citep[see][Eq. (46)-(49)]{callin}. 
-
-The equation for $\Psi$ is an algebraic equation, and its value is inserted in the other equations. Noting that $\Phi'$ is the only derivative of a perturbed quantity found on the RHS of Eqs. \eqref{eq:M3:theory:perturbation_ODEs}, we solve for it first, and insert this value into the other equations. 
+In \secref{sec:M4} we discuss the main topic of this report, which is to compute the power spectrum, $C_\ell$, which involves integrating over $\Theta_\ell$. Since we are interested in probing the power spectrum at scales where $\ell>1000$ \pnote{Mention how $\ell$ relates to scale}, we need a vast number of photon multipoles. From the ODE, we see that $\Theta_\ell'$ is recursive, and computing $\Theta_\ell$ directly from the ODEs will thus require us to solve thousands of ODEs. This is a highly tedious and computationally expensive process. However, as we will explain in \secref{sssec:M4:theory:line_of_sight_integration}, by exploiting the line-of-sight (LOS) integration technique \cite{LOS_integration}, we can compute any order of $\Theta_\ell$ for $\ell>2$ from $\Theta_0$ and $\Theta_2$. Thus, we only need to use the ODEs to accurately compute $\Theta_0$ and $\Theta_2$. For this, we need to truncate the series at some point. Truncating the series by setting $\Theta_{\ell_\mathrm{max}}=0$ would lead to numerical errors propagating down to $\Theta_2$. \Eqref{eq:M3:theory:perturbation_ODEs_Theta_ell_max} comes from assuming $\Theta_\ell(k,\eta)\sim j_\ell(k\eta)$ at high $\ell$, where $j_\ell(k\eta)$ is the spherical Bessel function, and using the recurrence relation for $j_\ell$ \citep[see][Eq. (46)-(49)]{callin}. By an appropriate choice of $\ell_\mathrm{max}$, we greatly reduce the number of ODEs needed to accurately compute $C_\ell$. 
 
 At early times, photons and electrons are tightly coupled, and $\tau$ is therefore very high. In this regime, \Eqref{eq:M3:theory:perturbation_ODEs} becomes numerically unstable, so we have to resort to approximations, which we discuss in the next section.   
 
@@ -71,19 +69,6 @@ Initially, $\tau$ is very large, so photons and baryons behave as a single fluid
 \end{subequations}
 These are the expressions we will use to compute the multipoles during tight coupling. Note that we $\Theta_1\simeq-\vb/3$ in this regime. To avoid numerical instability when multiplying this with $\tau'$ in \Eqref{eq:M3:theory:perturbation_ODEs_Theta1} we derive a modified expression for $\Theta_1'$ and $\vb'$ in \secref{sssec:M3:implementations:tight_coupling_regime}. Furthermore, we discuss in that section how we determine when to stop using the tight coupling approximation. 
 
-\subsubsection{Line-of-sight integration}\label{sssec:M3:theory:line_of_sight_integration}
-From \Eqref{eq:M3:theory:perturbation_ODEs_Theta_ell} we see that we have to solve a huge system of ODEs if we want to probe the CMB to scales around $\ell\sim1000$. However, by exploiting the LOS-integration technique \cite{LOS_integration}, $\Theta_\ell$ can be obtained from computing the integral 
-\begin{equation} \label{eq:M3:theory:Theta_ell_LOS_integration}
-    \Theta_\ell(k,x=0) = \int_{-\infty}^0 \tilde{S}(k,x) j_\ell [k(\eta_0 - \eta(x))]\,\dd x, 
-\end{equation}
-where $\tilde{S}(k,x)$ is the source function, which is given by 
-\begin{equation} \label{eq:M3:theory:source_function_LOS}
-    \begin{split}
-        \tilde{S}(k,x) =& \g \bclosed{\Theta_0 + \Psi + \frac{1}{4} \Pi} + e^{-\tau}\bclosed{\Psi' - \Phi'} \\
-        & - \frac{1}{k}\dv{x}(\H \g \vb) + \frac{3}{4k^2}\dv{x}\bclosed{\H \dv{x}(\H\g\Pi)}.
-    \end{split}
-\end{equation}
-Since we have $\Pi=\Theta_2$, the highest photon multipole required to compute any multipole $\Theta_\ell$ from \Eqref{eq:M3:theory:Theta_ell_LOS_integration} is $\Theta_2$. Thus, the number of multipoles we have to compute from the coupled ODEs in \Eqref{eq:M3:theory:perturbation_ODEs} is governed by the value of $\ell_\mathrm{max}$ which ensures sufficient accuracy in $\Theta_2$. 
 
 
 

@@ -150,7 +150,8 @@ int main(int argc, char **argv){
   // Module IV
   //=========================================================================
   if(m4_output){
-    bool components = true;
+    std::string M4_DATA_PATH = "milestone4/data/";
+    bool components = false;
     bool matter_PS = false;
     bool source;
 
@@ -168,12 +169,11 @@ int main(int argc, char **argv){
   
     // Solve the perturbations
     Perturbations pert(&cosmo, &rec);
-
     pert.solve(source);
 
-    std::string M4_DATA_PATH = "milestone4/data/";
+
     PowerSpectrum power(&cosmo, &rec, &pert, A_s, n_s, kpivot_mpc);
-    // return 0;
+
     if(components){
       // Solve Cell for single terms in source function 
       power.solve_components();
@@ -189,7 +189,7 @@ int main(int argc, char **argv){
       
       else{
       power.solve();
-      power.output(M4_DATA_PATH + "cells.txt");
+      // power.output(M4_DATA_PATH + "cells.txt");
       power.outputThetas(M4_DATA_PATH + "thetas.txt", 2000);
       };
     };

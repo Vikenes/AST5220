@@ -5,6 +5,7 @@
 # Course material 
 material/
 projects/cmb
+projects/calculator.py
 
 ### C++ ###
 # Prerequisites
