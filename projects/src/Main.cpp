@@ -178,6 +178,7 @@ int main(int argc, char **argv){
       // Solve Cell for single terms in source function 
       power.solve_components();
       power.output_Cell_components(M4_DATA_PATH + "cells_components.txt");
+      power.outputThetas(M4_DATA_PATH + "thetas.txt", 5000);
     }
 
     else{
