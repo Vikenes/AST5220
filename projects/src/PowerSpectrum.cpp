@@ -81,9 +81,13 @@ void PowerSpectrum::solve_components(){
   //=========================================================================
   // Line of sight integration to get Theta_ell(k)
   //=========================================================================
+
+  std::vector<std::string> source_terms_names = {"Total", "SW", "ISW", "Doppler", "Quadrupole"};
+
+  thetaT_ell_of_k_spline = std::vector<Spline>(nells_);
   cell_TT_component_spline = std::vector<Spline>(5);
   for(int i=0; i<5; i++){
-    std::string name = "Cell_term_" + std::to_string(i);
+    std::string name = "Cell_term_" + source_terms_names[i];
     Utils::StartTiming(name);
 
     std::function<double(double,double)> source_function_T_component = [&](double x, double k){
@@ -96,6 +100,10 @@ void PowerSpectrum::solve_components(){
 
     for(int iell=0; iell<nells_; iell++){
       thetaT_ell_of_k_comp_spline[iell].create(k_array, thetaT_ell_of_k_comp[iell]);
+    }
+
+    if(i==0){
+      thetaT_ell_of_k_spline = thetaT_ell_of_k_comp_spline;
     }
 
     //=========================================================================
@@ -179,15 +187,7 @@ Vector2D PowerSpectrum::line_of_sight_integration_single(
       std::function<double(double)> integrand = [&](double x){
         return source_function(x, k) * j_ell_splines[iell](k*(eta0_ - cosmo->eta_of_x(x)));
       };
-      // double integral_sum = 0;
-      
-      // double x;  
-      // double x = x_start_LOS;  
-      // for(int ix=0; ix<x_LOS_array.size(); ix++){
-        // x = x_LOS[ix];
-        // integral_sum += source_function(x, k) * j_ell_splines[iell](k*(eta0_ - cosmo->eta_of_x(x)));
-        // x += dx;
-      // }
+
       result[iell][ik] = integrate_trapezoidal(integrand, x_start_LOS, x_end, dx); //integral_sum * dx; 
     }
 
