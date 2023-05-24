@@ -73,7 +73,7 @@ def save_push(fig, pdf_name, save=True, push=False, show=False, tight=True, temp
 
     file = fig_path + fig_name
 
-
+    print(fig_name)
     if save:
         print(f'Saving plot: {fig_name}')
         if not temp:
@@ -162,7 +162,7 @@ def plot_C_ell(ell, C_ell,
                xticks=None,
                ypad=None,
                fill=False,
-               figsize=(10,6), 
+               figsize=(12,7), 
                save=True,push=False, temp=False):
 
 
@@ -178,18 +178,15 @@ def plot_C_ell(ell, C_ell,
         ax.fill_between(ell, y1, y2, color='palegreen', alpha=1)
 
 
-    if peaks is None:
-        cl_color = "blue"
-    else:
-        cl_color = "black"
+    cl_color = "black"
     cl, = ax.plot(ell, C_ell, color=cl_color, label='Prediction')
     
     if planck is not None:
         ell_planck, C_ell_planck, error_planck = planck
         err = ax.errorbar(ell_planck, C_ell_planck, error_planck, barsabove=True, fmt='x',
-                    capthick=1.5, capsize=3, elinewidth=1, color='red', ms=5, 
+                    capthick=1.5, capsize=3, elinewidth=1, color='green', ms=5, 
                     label='Planck 2018')
-        leg1 = plt.legend(handles=[cl, err], loc='upper left')
+        leg1 = plt.legend(handles=[cl, err], loc=(0.0435,0.55))
         ax.add_artist(leg1)
 
 
@@ -201,25 +198,20 @@ def plot_C_ell(ell, C_ell,
                 
     if peaks is not None:
         # Draw vlines at peaks 
-        peak_handles = []
+        handles = []
         ls_ = ['--', '-.', ':']
-        for idx, peak in enumerate(peaks):
-            label = rf"$\ell = {{{peak:.0f}}} $"
-            line = ax.vlines(peak, *ylim, ls=ls_[idx], colors='red', label=label)
-            peak_handles.append(line)
+        for i, peak in enumerate(peaks):
+            peak = peaks[i]
+            plabel = rf"$\ell = {{{peak:.0f}}} $"
+            pline = ax.vlines(peak  , *ylim, ls=ls_[i], colors='red', label=plabel)
+            handles.append(pline)
 
-        leg_peaks = plt.legend(handles=peak_handles, loc='upper left')
-        ax.add_artist(leg_peaks)
-
-    if troughs is not None:
-        # Draw vlines at troughs 
-        trough_handles = []
         for idx, trough in enumerate(troughs):
             label = rf"$\ell = {{{trough:.0f}}} $"
             line = ax.vlines(trough, *ylim, ls=ls_[idx], colors='blue', label=label)
-            trough_handles.append(line)
+            handles.append(line)
 
-        leg_troughs = plt.legend(handles=trough_handles, loc='center left')
+        leg_troughs = plt.legend(handles=handles, ncols=2, loc='upper left', columnspacing=0.8)
         ax.add_artist(leg_troughs)
 
 
@@ -253,7 +245,7 @@ def plot_C_ell_components(ell, C_ell, C_ell_components,
                           xticks=None,
                           ypad=None,
                           fill=False,
-                          figsize=(10,6), 
+                          figsize=(12,7), 
                           save=True,push=False, temp=False):
 
 
@@ -402,7 +394,7 @@ def subplot_Theta0(x, y,
                save=False,push=False, temp=False):
 
 
-    fig, ax = plt.subplots(nrows=2, ncols=1, figsize=figsize, sharex=True,
+    fig, ax = plt.subplots(nrows=2, ncols=1, figsize=figsize, sharex=True,sharey=True,
                            gridspec_kw={'hspace': 0})
 
 
@@ -432,19 +424,16 @@ def subplot_Theta0(x, y,
     for idx, Theta0 in enumerate(y):
         label = rf"$k = {{{ell_values[idx]:.0f}}}/\eta_0 $"
         line, = ax[aaxx[idx]].plot(x, Theta0, color=cs[idx], ls=ls[idx],  label=label)
-        # line2, = ax.plot(x, Theta0, color=color, ls=ls[idx],  label=label)
 
         lines.append(line)
 
-    # leg1 = ax[0].legend(handles=[fill], loc="lower right")
-    leg2 = ax[0].legend(handles=lines[0:3], loc="lower left", ncol=3)
-    # ax[0].add_artist(leg1)
-    # ax.add_artist(leg1)
+    leg1 = ax[0].legend(handles=[fill], loc="upper left")
+    leg2 = ax[0].legend(handles=lines[0:3], loc=legendloc, ncol=3)
+
+    ax[0].add_artist(leg1)
     ax[0].add_artist(leg2)
 
-    leg1 = ax[1].legend(handles=[fill], loc="upper right")
-    leg3 = ax[1].legend(handles=lines[3:], loc="lower left", ncol=3)
-    ax[1].add_artist(leg1)
+    leg3 = ax[1].legend(handles=lines[3:], loc=legendloc, ncol=3)
 
 
     ax[1].add_artist(leg3)
@@ -464,14 +453,9 @@ def subplot_Theta0(x, y,
 
     yticks = ax[1].get_yticklabels()
     yticks[-1].set_visible(False)
-    ax[0].set_title(ylabel)
-    # fig.text(0.02, 0.55, 
-            #  ylabel, 
-            #  va='center', 
-            #  ha='center', 
-            #  rotation='vertical', 
-            #  fontsize=plt.rcParams['axes.labelsize'])
 
+
+    fig.supylabel(ylabel, x=0.05)
     save_push(fig, fname, save, push, temp=temp)
 
 

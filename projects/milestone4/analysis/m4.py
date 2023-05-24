@@ -107,6 +107,7 @@ class PowerSpectrum:
                 ell_troughs = (ell_troughs/self.eta0).to(u.Mpc**(-1))    
             return ell_peaks, ell_troughs
 
+
     def plot_Theta0_at_peaks(self, npeaks=3):
         ell_peaks = self.find_C_ell_extrema()[0][:npeaks]
 
@@ -156,8 +157,8 @@ class PowerSpectrum:
         
         plot.subplot_Theta0(x, Theta0, ell_values=ell,
                             fname="Theta0_at_peaks_and_troughs", x_dec=x_dec,
-                            ylabel=ylabel, ylim=[-1.5, 1.5],
-                            xlim=[-10, -5], color='red', ypad=10,
+                            ylabel=ylabel, ylim=[-0.9, 2.1], legendloc='upper left',
+                            xlim=[-11, -5], color='red', ypad=10,
                             save=SAVE, push=PUSH, temp=TEMP)
 
 
@@ -194,17 +195,20 @@ class PowerSpectrum:
         peaks = peaks[:n_extrema]
         troughs = troughs[:n_extrema]
 
+        planck = self.load_planck_C_ell(fname_planck)
+
+
         ylabel = r"$\ell(\ell+1)C_\ell/2\pi\:[\mathrm{\mu K^2}]$"
         figname_split = self.fname_Cell.split("components_")
-        figname = figname_split[0] + figname_split[1].strip(".txt")
+        figname = "peaks_and_troughs_" + figname_split[0] + figname_split[1].strip(".txt")
 
 
         plot.plot_C_ell(self.ell, self.C_ell,
-                        planck=None,
+                        planck=planck,
                         fname=figname,
                         ylabel=ylabel, ypad=10,
                         logx=True,
-                        xlim=[10,1500], 
+                        # xlim=[11,1500], 
                         logy=False, fill=False, 
                         peaks=peaks, troughs=troughs,
                         save=SAVE, temp=TEMP, push=PUSH)
@@ -317,38 +321,28 @@ pspec = PowerSpectrum(fname_Cell, fname_MPS, fname_Thetas)
 # TEMP=True
 
 ### CMB power spectrum 
-pspec.plot_Cell(fname_planck, logx=True)
+# pspec.plot_Cell(fname_planck, logx=True)
 pspec.plot_Cell_extrema(3)
-pspec.plot_Cell_components()
+# pspec.plot_Cell_components()
+pspec.plot_Theta0_at_peaks_and_troughs()
 # TEMP=True 
-
 ### Matter power spectrum 
-pspec.plot_matter_power_spectrum(fname_galaxy_survey, fname_wmap)
+# pspec.plot_matter_power_spectrum(fname_galaxy_survey, fname_wmap)
 
 
 
 ### Thetas 
-# peaks, troughs = pspec.find_C_ell_extrema(in_units_of_k=True)
-# pspec.output_local_extrema_as_k()
-pspec.plot_Theta0_at_peaks()
-pspec.plot_Theta0_at_troughs()
-pspec.plot_Theta0_at_peaks_and_troughs()
+# pspec.plot_Theta0_at_peaks()
+# pspec.plot_Theta0_at_troughs()
 
 
-# peaks = peaks[0:4]
-# troughs = troughs[0:4]
-# print(peaks)
-# print(troughs)
-
-# pspec.plot_Thetas(ells=peaks, xlim=[np.min(peaks)-5, np.max(peaks)+5])
-# pspec.plot_Thetas(ells=troughs, xlim=[np.min(troughs)-5, np.max(troughs)+5])
-pspec.plot_Thetas(ells=[2, 4, 10, 50], xlim=[1e0, 5e2])
+# pspec.plot_Thetas(ells=[2, 4, 10, 50], xlim=[1e0, 5e2])
 # pspec.plot_Thetas(ells=[1000, 2000], xlim=[9e2, 2.5e3])
 
 
 ### Integrand 
 # pspec.plot_Integrand(ells=np.array([2, 5, 10]), xlim=[1, 200])
-pspec.plot_Integrand(ells=np.array([2, 10, 50, 100]), xlim=[1,5e2])
+# pspec.plot_Integrand(ells=np.array([2, 10, 50, 100]), xlim=[1,5e2])
 
 
 
