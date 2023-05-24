@@ -112,6 +112,8 @@ class Perturbations{
 
     // Output info to file
     void output(const double k, const std::string filename) const;
+    void outputTheta0(const Vector &k_arr, const std::string filename) const;
+
 
     // Get the quantities we have integrated
     double get_delta_cdm(const double x, const double k) const;

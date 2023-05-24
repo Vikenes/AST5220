@@ -715,3 +715,23 @@ void Perturbations::output(const double k, const std::string filename) const{
   std::for_each(x_array.begin(), x_array.end(), print_data);
 }
 
+void Perturbations::outputTheta0(const Vector &k_arr, const std::string filename) const{
+  std::ofstream fp(filename.c_str());
+  const int npts = 5000;
+  
+  auto x_array = Utils::linspace(x_start, x_end, npts);
+  auto print_data = [&] (const double x) {
+    fp << x                  << " ";
+    for(int ik=0; ik<k_arr.size(); ik++){
+      fp << get_Theta(x,k_arr[ik],0)   << " ";
+    }
+    // fp << get_Theta(x,k,1)   << " ";
+    fp << "\n";
+  };
+
+  std::cout << "Saving n=" << npts << " data points to '" << filename << "'" << std::endl;
+
+  double tc_time = rec->get_x_at_decoupling_tau();
+  fp << "rec " << tc_time << "\n";
+  std::for_each(x_array.begin(), x_array.end(), print_data);
+}

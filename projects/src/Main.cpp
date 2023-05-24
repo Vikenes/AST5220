@@ -33,7 +33,13 @@ int main(int argc, char **argv){
   bool supernova = false;
   bool m2_output = false;
   bool m3_output = false;
+  bool m3_theta0 = false;
   bool m4_output = false;
+
+  std::string M4_DATA_PATH = "milestone4/data/";
+  std::string M3_DATA_PATH = "milestone3/data/";
+
+
 
 
   //=========================================================================
@@ -144,13 +150,69 @@ int main(int argc, char **argv){
     pert.output(kvalue, "milestone3/data/perturbations_k0.3.txt");
   }
 
+  m3_theta0 = true;
+  if(m3_theta0){
+    // Read data from file
+    std::string k_peaks   = M4_DATA_PATH + "k_ell_peaks.txt";
+    std::string k_troughs = M4_DATA_PATH + "k_ell_troughs.txt";
+
+
+    auto read_data = [&](std::string filename, std::vector<double> &k_arr){
+      // std::vector<double> k_arr;
+      std::string header;
+      std::ifstream fp(filename.c_str());
+      if(!fp)
+        throw std::runtime_error("Error: cannot open file " + filename);
+      std::cout << "Reading k values from file:\n";
+      while(1){
+        // Read line by line
+        double k;
+        // std::cout << k << std::endl;
+        fp >> k;
+        if(fp.eof()) break;
+        k_arr.push_back(k / Constants.Mpc);
+      }
+    };
+
+    std::vector<double> k_peaks_arr;
+    std::vector<double> k_troughs_arr;
+    read_data(k_troughs, k_troughs_arr);
+    read_data(k_peaks, k_peaks_arr);
+
+    
+    // Set up and solve the background
+    // Set Neff = 0 in this milestone to ignore neutrinos.
+    BackgroundCosmology cosmo(h, OmegaB, OmegaCDM, OmegaK, 0.0, TCMB);
+    cosmo.solve();
+
+    // Solve the recombination history
+    RecombinationHistory rec(&cosmo, Yp);
+    rec.solve();
+  
+    // Solve the perturbations
+    Perturbations pert(&cosmo, &rec);
+    pert.solve(false);
+    // pert.info();
+    
+    // Output perturbation quantities
+
+    // double kvalue = 0.001 / Constants.Mpc;
+    pert.outputTheta0(k_peaks_arr, M4_DATA_PATH + "Theta0_of_x_at_peaks.txt");
+    pert.outputTheta0(k_troughs_arr, M4_DATA_PATH + "Theta0_of_x_at_troughs.txt");
+
+    // kvalue = 0.03 / Constants.Mpc;
+    // pert.output(kvalue, "milestone3/data/perturbations_k0.03.txt");
+
+    // kvalue = 0.3 / Constants.Mpc;
+    // pert.output(kvalue, "milestone3/data/perturbations_k0.3.txt");
+    return 0;
+  }
 
   m4_output=true;
   //=========================================================================
   // Module IV
   //=========================================================================
   if(m4_output){
-    std::string M4_DATA_PATH = "milestone4/data/";
     bool components = false;
     bool matter_PS = false;
     bool source;
