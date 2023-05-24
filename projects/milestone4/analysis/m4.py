@@ -38,65 +38,57 @@ class PowerSpectrum:
         self.fname_MPS      = fname_MPS
         self.fname_Thetas   = fname_Thetas
 
-        self.Thetas_loaded = False
-        self.C_ell_loaded  = False 
-        
-
-    def load_Cell(self):
-        self.C_ell_loaded = True 
-
+        ### Load CMB power spectrum  
         C_ell_data              = np.loadtxt(DATA_PATH + self.fname_Cell, unpack=True)
         self.ell                = C_ell_data[0]
-        self.C_ell              = C_ell_data[1]
-        self.C_ell_components   = C_ell_data[2:] 
+        self.C_ell              = C_ell_data[1]  
+        self.C_ell_components   = C_ell_data[2:] # C_ell from individual terms in source func.  
+
+        ### Load Matter power spectrum 
+        self.k_h_Mpc, self.Pk   = np.loadtxt(DATA_PATH + self.fname_MPS, skiprows=1, unpack=True)
+        self.k_eq               = np.loadtxt(DATA_PATH + self.fname_MPS, max_rows=1) * u.h / u.Mpc 
+        self.k_h_Mpc *= u.h / u.Mpc
+        
+        ### Load photon multipoles 
+        
+        # Number of ells used to store Theta_ell
+        Nells   = len(np.loadtxt(DATA_PATH + fname_Thetas, skiprows=2, max_rows=1))
+        cols    = np.arange(1, Nells)
+
+        # ell's corresponding to theta_ell values  
+        self.ell_list = np.loadtxt(DATA_PATH + fname_Thetas, skiprows=1, max_rows=1,usecols=np.arange(2,Nells+1), dtype=int)
+
+        # Horizon today, and the dimless quantity k*eta0
+        self.eta0   = np.loadtxt(DATA_PATH + fname_Thetas, skiprows=0, usecols=1, max_rows=1) * u.m
+        k           = np.loadtxt(DATA_PATH + fname_Thetas, skiprows=2, usecols=0) / u.m
+        self.k_eta0 = k*self.eta0
+
+        # Theta_ell, and the integrand Theta_ell^2 / k
+        self.Thetas = np.loadtxt(DATA_PATH + fname_Thetas, skiprows=2, usecols=cols, unpack=True)
+        self.Theta_squared_over_k = (np.abs(self.Thetas)**2 / k).to(u.Mpc)
+
+
+
 
     def load_planck_C_ell(self, fname):
+        # Load CMB power spectrum from planck obs 
         CMB_planck = np.loadtxt(COMPARISON_PATH + fname, unpack=True)
         ell_planck = CMB_planck[0]
         C_ell_planck = CMB_planck[1]
         error_planck = CMB_planck[2:4]
         error_planck = np.flip(error_planck, axis=0)
-        # print(error_planck)
-        # exit()
         return ell_planck, C_ell_planck, error_planck
     
     def load_Pk_external(self, fname):
+        # Load matter power spectrum from external file 
         data = np.loadtxt(COMPARISON_PATH + fname, unpack=True)
         return data 
 
 
-    def load_matter_PS(self):
-        self.k_h_Mpc, self.Pk   = np.loadtxt(DATA_PATH + self.fname_MPS, skiprows=1, unpack=True)
-        self.k_eq               = np.loadtxt(DATA_PATH + self.fname_MPS, max_rows=1) * u.h / u.Mpc 
-
-        self.k_h_Mpc *= u.h / u.Mpc
-
-
-
-
-    def load_Thetas(self):
-        self.Thetas_loaded = True 
-        file = DATA_PATH+self.fname_Thetas
-        Nells   = len(np.loadtxt(file, skiprows=2, max_rows=1))
-        cols    = np.arange(1, Nells)
-
-        self.ell_list = np.loadtxt(file, skiprows=1, max_rows=1, usecols=np.arange(2,Nells+1), dtype=int)
-
-
-        self.eta0   = np.loadtxt(file, skiprows=0, usecols=1, max_rows=1) * u.m
-        k           = np.loadtxt(file, skiprows=2, usecols=0) / u.m
-        self.k_eta0 = k*self.eta0
-
-        self.Thetas = np.loadtxt(file, skiprows=2, usecols=cols, unpack=True)
-
-        self.Theta_squared_over_k = (np.abs(self.Thetas)**2 / k).to(u.Mpc)
-         
 
 
 
     def find_C_ell_extrema(self, find_closest_theta_ell=False, in_units_of_k=False):
-        if not self.C_ell_loaded:
-            self.load_Cell()
 
         peaks = np.array(find_peaks(self.C_ell)[0])
         troughs = np.array(find_peaks(-self.C_ell)[0][1:])
@@ -111,18 +103,12 @@ class PowerSpectrum:
             return ell_peaks_closest, ell_troughs_closest
         else:
             if in_units_of_k:
-                if not self.Thetas_loaded:
-                    self.load_Thetas()
-                # print(self.eta0);exit()
-                # print();exit()
                 ell_peaks = (ell_peaks/self.eta0).to(u.Mpc**(-1)) 
                 ell_troughs = (ell_troughs/self.eta0).to(u.Mpc**(-1))    
             return ell_peaks, ell_troughs
 
     def plot_Theta0_at_peaks(self, npeaks=3):
-        k_peaks_fname = DATA_PATH + "k_ell_peaks.txt"
         ell_peaks = self.find_C_ell_extrema()[0][:npeaks]
-        k_peaks= self.find_C_ell_extrema(in_units_of_k=True)[0]
 
         data = np.loadtxt(DATA_PATH + "Theta0_of_x_at_peaks.txt", skiprows=1, unpack=True)
         x_dec = np.loadtxt(DATA_PATH + "Theta0_of_x_at_peaks.txt", max_rows=1, usecols=1)
@@ -176,8 +162,6 @@ class PowerSpectrum:
 
 
     def find_nearest_theta_ell_from_ell_list(self, ell_list):
-        if not self.Thetas_loaded:
-            self.load_Thetas()
 
         ell_closest = []
         for ell in ell_list:
@@ -187,8 +171,6 @@ class PowerSpectrum:
 
 
     def plot_Cell(self, fname_planck, logx=True, fill=False, n_extrema=0):
-        if not self.C_ell_loaded:
-            self.load_Cell()
 
         planck = self.load_planck_C_ell(fname_planck)
 
@@ -196,8 +178,6 @@ class PowerSpectrum:
         figname_split = self.fname_Cell.split("components_")
         figname = figname_split[0] + figname_split[1].strip(".txt")
         xticks=[10,100,1000]
-
-        # peaks, troughs = self.find_C_ell_extrema()
 
         plot.plot_C_ell(self.ell, self.C_ell,
                         planck=planck,
@@ -209,8 +189,6 @@ class PowerSpectrum:
         
 
     def plot_Cell_extrema(self, n_extrema=0):
-        if not self.C_ell_loaded:
-            self.load_Cell()
 
         peaks, troughs = self.find_C_ell_extrema()
         peaks = peaks[:n_extrema]
@@ -231,25 +209,15 @@ class PowerSpectrum:
                         peaks=peaks, troughs=troughs,
                         save=SAVE, temp=TEMP, push=PUSH)
 
-    def comp_Cell(self, file_compare):
-        ell_compare, C_ell_compare = np.loadtxt(DATA_PATH + file_compare, unpack=True) 
-        ylabel = r"$\ell(\ell+1)C_\ell/2\pi$"
-        plot.comp_C_ell(self.ell, self.C_ell - C_ell_compare,
-                        ylabel=ylabel, ypad=10, fill=True,
-                        save=SAVE, temp=TEMP, push=PUSH)
 
-    def plot_Cell_components(self, fname_planck):
-        if not self.C_ell_loaded:
-            self.load_Cell()
 
-        ell_planck, C_ell_planck, error_planck = self.load_planck_C_ell(fname_planck)
+    def plot_Cell_components(self):
+
 
         ylabel = r"$\ell(\ell+1)C_\ell/2\pi \:[\mathrm{\mu K^2}]$"
         figname = self.fname_Cell.strip(".txt")
         xticks=[10,100,1000]
         plot.plot_C_ell_components(self.ell, self.C_ell, self.C_ell_components,
-                        ell_planck, C_ell_planck,
-                        error_planck,
                         fname=figname,
                         ylabel=ylabel, ypad=10,
                         logy=False, fill=True, xticks=xticks,
@@ -264,8 +232,6 @@ class PowerSpectrum:
         galaxy_data = self.load_Pk_external(fname_galaxy_survey)
         wmap_data = self.load_Pk_external(fname_wmap)
         wmap_data[2] = np.abs(wmap_data[1] - wmap_data[2])
-
-        self.load_matter_PS()
 
         ylabel = r"$P(k)\quad[(\mathrm{Mpc/h})^3]$"
         xlabel = r"$k \quad [\mathrm{h/Mpc}]$"
@@ -282,9 +248,6 @@ class PowerSpectrum:
 
 
     def plot_Thetas(self, ells=np.array([]), xlim=[5e-1,5e2]):
-        if not self.Thetas_loaded:
-            self.load_Thetas() 
-        # print(self.ell_list)
 
         res = np.in1d(ells, self.ell_list)
         if not res.all():
@@ -310,8 +273,7 @@ class PowerSpectrum:
         
 
     def plot_Integrand(self, ells=np.array([]), xlim=[5e-1,5e2]):
-        if not self.Thetas_loaded:
-            self.load_Thetas() 
+
         res = np.in1d(ells, self.ell_list)
         if not res.all():
             invalid = ells[res==False] 
@@ -355,15 +317,13 @@ pspec = PowerSpectrum(fname_Cell, fname_MPS, fname_Thetas)
 # TEMP=True
 
 ### CMB power spectrum 
-# pspec.plot_Cell(fname_planck, logx=False)
-# pspec.plot_Cell_extrema(3)
-# pspec.plot_Cell_components(fname_planck)
+pspec.plot_Cell(fname_planck, logx=True)
+pspec.plot_Cell_extrema(3)
+pspec.plot_Cell_components()
 # TEMP=True 
-# pspec.plot_Cell(fname_planck, logx=True)
-# pspec.plot_Cell_components(fname_planck)
 
 ### Matter power spectrum 
-#pspec.plot_matter_power_spectrum(fname_galaxy_survey, fname_wmap)
+pspec.plot_matter_power_spectrum(fname_galaxy_survey, fname_wmap)
 
 
 
@@ -382,13 +342,13 @@ pspec.plot_Theta0_at_peaks_and_troughs()
 
 # pspec.plot_Thetas(ells=peaks, xlim=[np.min(peaks)-5, np.max(peaks)+5])
 # pspec.plot_Thetas(ells=troughs, xlim=[np.min(troughs)-5, np.max(troughs)+5])
-# pspec.plot_Thetas(ells=[2, 4, 10, 50], xlim=[1e0, 5e2])
+pspec.plot_Thetas(ells=[2, 4, 10, 50], xlim=[1e0, 5e2])
 # pspec.plot_Thetas(ells=[1000, 2000], xlim=[9e2, 2.5e3])
 
 
 ### Integrand 
 # pspec.plot_Integrand(ells=np.array([2, 5, 10]), xlim=[1, 200])
-# pspec.plot_Integrand(ells=np.array([2, 10, 50, 100]), xlim=[1,5e2])
+pspec.plot_Integrand(ells=np.array([2, 10, 50, 100]), xlim=[1,5e2])
 
 
 

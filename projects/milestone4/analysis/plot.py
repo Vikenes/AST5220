@@ -176,9 +176,8 @@ def plot_C_ell(ell, C_ell,
         y1 = C_ell - C_ell *(2/(ell*(ell+1)))**(1/2) 
         y2 = C_ell + C_ell *(2/(ell*(ell+1)))**(1/2) 
         ax.fill_between(ell, y1, y2, color='palegreen', alpha=1)
-        # plt.xscale('log')
-        # plt.show()
-        
+
+
     if peaks is None:
         cl_color = "blue"
     else:
@@ -201,29 +200,19 @@ def plot_C_ell(ell, C_ell,
                 ypad=ypad, legendloc='upper left')
                 
     if peaks is not None:
-        # n = len(peaks) + len(troughs)
-        # new_colors = [plt.get_cmap('jet')(1. * i/n) for i in range(n)] 
-        # custom_cycler = (cycler(color=palettes.tue_plot))
-        # ax.set_prop_cycle(custom_cycler)
-
+        # Draw vlines at peaks 
         peak_handles = []
-        
         ls_ = ['--', '-.', ':']
-        # labels = [rf"$\ell = {{{peak:.0f}}} $" for peak in peaks]
         for idx, peak in enumerate(peaks):
             label = rf"$\ell = {{{peak:.0f}}} $"
             line = ax.vlines(peak, *ylim, ls=ls_[idx], colors='red', label=label)
             peak_handles.append(line)
 
-        # print(lines.get_label())
-        # exit()
-        # handles = [l for l in line]
-
         leg_peaks = plt.legend(handles=peak_handles, loc='upper left')
         ax.add_artist(leg_peaks)
 
     if troughs is not None:
-
+        # Draw vlines at troughs 
         trough_handles = []
         for idx, trough in enumerate(troughs):
             label = rf"$\ell = {{{trough:.0f}}} $"
@@ -251,8 +240,6 @@ def plot_C_ell(ell, C_ell,
     
 
 def plot_C_ell_components(ell, C_ell, C_ell_components,
-                          ell_planck, C_ell_planck,
-                          error_planck, 
                           fname, 
                           logx=True, 
                           logy=True,
@@ -272,14 +259,8 @@ def plot_C_ell_components(ell, C_ell, C_ell_components,
 
     fig, ax = plt.subplots(figsize=figsize)
 
-
-        
-
     SW, ISW, Doppler, Quadrupole = C_ell_components
 
-    # C_planck = ax.errorbar(ell_planck, C_ell_planck, error_planck, barsabove=True, fmt='o',
-    #             capthick=1.5, capsize=5, elinewidth=2, color='gold', ms=3, alpha=1,
-    #             label='Planck 2018')
     scale_1 = 1 
     scale_2 = 1 
     scale_3 = 1 
@@ -289,8 +270,6 @@ def plot_C_ell_components(ell, C_ell, C_ell_components,
     C1, = ax.plot(ell, SW * scale_1         , ls='solid', color='green', label="SW")
     C2, = ax.plot(ell, ISW * scale_2        , ls='solid', color='red' , label="ISW")
     C3, = ax.plot(ell, Doppler * scale_3    , ls='solid', color='black' , label="Doppler")
-
-
 
     leg1 = plt.legend(handles=[Ctot], loc='upper right')
     leg2 = plt.legend(handles=[C1, C2, C3, C4], loc='upper left')
@@ -331,7 +310,6 @@ def plot_matter_PS(k, Pk, k_eq,
 
     k_galaxy, Pk_galaxy, error_galaxy = galaxy_data
     k_wmap, Pk_wmap, error_wmap = wmap_data
-    # error_wmap = np.abs(error_wmap - Pk_wmap)
     
     P1, = ax.plot(k, Pk, color='blue', label='Prediction')
     P2 = ax.errorbar(k_galaxy, Pk_galaxy, error_galaxy, barsabove=True, fmt='o',
@@ -392,10 +370,6 @@ def plot_Thetas(x, y,
     for idx, l in enumerate(ell_values):
         ax.plot(x, y[idx], lw=1, label=fr"$\ell=${str(l)}")
 
-
-
-
-    
     set_ax_info(ax, xlabel, ylabel, legend=True, 
                 ylim=ylim, xlim=xlim, yticks=yticks,
                 ypad=ypad)
@@ -560,37 +534,8 @@ def plot_Theta0(x, y,
     save_push(fig, fname, save, push, temp=temp)
 
 
-def comp_C_ell(x, y,
-               xlabel=r"$\ell$", 
-               keq=None,
-               ylabel=None, 
-               xlim=None, 
-               ylim=None, 
-               legendloc='best', 
-               yticks=None, 
-               ypad=None,
-               figsize=(10,6), 
-               save=True,push=False, temp=False):
 
 
-    fig, ax = plt.subplots(figsize=figsize)
-
-
-    
-    ax.plot(x, y, color='blue'  )
-
-
-
-
-    
-    set_ax_info(ax, xlabel, ylabel, legend=False, 
-                ylim=ylim, xlim=xlim, yticks=yticks,
-                ypad=ypad)
-
-
-
-    # save_push(fig, pdf_name=None, save=save, push=push, temp=temp)
-    plt.show()
 
 if __name__=='__main__':
     pass 
