@@ -1,37 +1,53 @@
 \subsection{Results}\label{ssec:M4:results}
 
-\subsubsection{Photon multipoles} \label{sssec:M4:results:photons_multipoles}
-\begin{figure}[ht!]
-    \includefig{integrand_thetas\pspecresolution\ellintegrand}
-    \caption{Integrand.}
-    \label{fig:M4:results:integrand_thetas}
-\end{figure}
-
-
-\begin{figure}[ht!]
-    \includefig{thetas\pspecresolution\ellthetas}
-    \caption{Thetas. }
-    \label{fig:M4:results:thetas}
-\end{figure}
 
 \subsubsection{CMB power spectrum} \label{sssec:M4:results:angular_power_spectrum}
-The angular power spectrum is shown in \figref{fig:M4:results:cells}. We also include data from \cite{Planck2020} for low $\ell$ values. At higher $\ell$, neutrinos, helium and reionization becomes important, and the predicted value of $\cl$ would deviate from that of observations \pnote{Write about how/why these things affect it.} We plot the CMB power spectrum   
+The angular power spectrum is shown in \figref{fig:M4:results:peaks_and_troughs_cells}. We also include data from \cite{Planck2020} for low $\ell$ values. At higher $\ell$, neutrinos, helium and reionization becomes important, and the predicted value of $\cl$ would deviate from that of observations \pnote{Write about how/why these things affect it.} To understand the physics behind the CMB power spectrum, we have also drawn vertical lines showing the peaks (red) and the troughs (blue) in the spectrum. 
+
+The peaks we observe in the power spectrum are a result of the oscillations of the photon baryon plasma. When photons decouple from baryons, the state of the mode when it decoupled affects the temperature of the photons we observe today. For modes where the oscillation is at a maximum value we obtain the peaks seen the power spectrum. 
+
+ As we saw when we studied the perturbations, the size of the modes affects its oscillatory behaviour.  
+
 \begin{figure}[ht!]
-    \includefig{cells\pspecresolution}
-    \caption{Angular power spectrum.}
-    \label{fig:M4:results:cells}
+    \includefig{peaks_and_troughs_cells\pspecresolution}
+    \caption{The predicted CMB power spectrum (black) compared with data from Planck at large scales. \note{Fix y-label. Should indicate $\tcmb$}}
+    \label{fig:M4:results:peaks_and_troughs_cells}
 \end{figure}
 
+We plot $\Thn$ as a function of $x$ for modes of size $k=\lp/\eta_0$ and $k=\lt/\eta_0$, shown in \figref{fig:M4:results:theta0_at_peaks_and_troughs}, where we also highlight the approximate value of $x\rec$. We see that the three modes correspond well with the peaks of the power spectrum. Similarly, we see that the troughs coincide with modes that are phase shifted with respect to the peaks, and roughly at their minima.     
+
+\begin{figure}[ht!]
+    \includefig{Theta0_at_peaks_and_troughs}
+    \caption{Computed monopoles for of scale $k=\ell/\eta_0$ for different values of $\ell$. The upper panel are $\ell$ values where the power spectrum peaks, and the lower panel are the $\ell$ values of the power spectrum troughs.}
+    \label{fig:M4:results:theta0_at_peaks_and_troughs}
+\end{figure}
 
 \begin{figure}[ht!]
     \includefig{cells_components\pspecresolution}
-    \caption{Angular power spectrum.}
+    \caption{The total angular power spectrum (dashed blue curve), compared to power spectra computed from individual terms in \Eqref{eq:M4:theory:source_function_LOS}. For each term in the figure, the remaining terms in \Eqref{eq:M4:theory:source_function_LOS} have been set to zero.}
     \label{fig:M4:results:cells_components}
 \end{figure}
 
 \subsubsection{Matter power spectrum} \label{sssec:M4:results:matter_power_spectrum}
 \begin{figure}[ht!]
     \includefig{matterPS_nk1000}
-    \caption{Matter power spectrum.}
+    \caption{Computed matter power spectrum (solid blue curve), compared with observational data from \note{cite}. The equality scale, $\keq$, is marked as the vertical black line.}
     \label{fig:M4:results:matterPS_nk1000}
+\end{figure}
+
+
+
+
+\subsubsection{Photon multipoles} \label{sssec:M4:results:photons_multipoles}
+\begin{figure}[ht!]
+    \includefig{integrand_thetas\pspecresolution\ellintegrand}
+    \caption{The term involved in the integrand of \Eqref{eq:M4:theory:CMB_power_spectrum}, for different values of $\ell$. Note that we scale each integrand by $\ell(\ell+1)$, just as we did for $\cl$. This is done to see each of the terms simultaneously.}
+    \label{fig:M4:results:integrand_thetas}
+\end{figure}
+
+
+\begin{figure}[ht!]
+    \includefig{thetas\pspecresolution\ellthetas}
+    \caption{The transfer function from \Eqref{eq:M4:theory:Theta_ell_LOS_integration} plotted for different values of $\ell$.}
+    \label{fig:M4:results:thetas}
 \end{figure}
