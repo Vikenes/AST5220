@@ -73,7 +73,6 @@ def save_push(fig, pdf_name, save=True, push=False, show=False, tight=True, temp
 
     file = fig_path + fig_name
 
-    print(fig_name)
     if save:
         print(f'Saving plot: {fig_name}')
         if not temp:
