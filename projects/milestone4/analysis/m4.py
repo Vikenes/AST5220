@@ -377,8 +377,8 @@ pspec = PowerSpectrum(fname_Cell, fname_MPS, fname_Thetas)
 # pspec.plot_Cell_components()
 # pspec.plot_Theta0_at_peaks_and_troughs()
 
-pspec.plot_Psi_at_peaks_and_troughs()
-pspec.plot_Psi_plus_Theta0_at_peaks_and_troughs()
+# pspec.plot_Psi_at_peaks_and_troughs()
+# pspec.plot_Psi_plus_Theta0_at_peaks_and_troughs()
 
 ### Matter power spectrum 
 # pspec.plot_matter_power_spectrum(fname_galaxy_survey, fname_wmap)
