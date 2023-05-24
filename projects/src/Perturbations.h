@@ -6,6 +6,7 @@
 #include <vector>
 #include <fstream>
 #include <algorithm>
+#include <filesystem>
 #include "Utils.h"
 #include "BackgroundCosmology.h"
 #include "RecombinationHistory.h"
@@ -111,8 +112,10 @@ class Perturbations{
     void info() const;
 
     // Output info to file
+    bool check_existence(std::string filename);
     void output(const double k, const std::string filename) const;
-    void outputTheta0(const Vector &k_arr, const std::string filename) const;
+    void outputTheta0(const Vector &k_arr, std::string filename);
+    void outputPsi(const Vector &k_arr, std::string filename);
 
 
     // Get the quantities we have integrated

@@ -195,16 +195,11 @@ int main(int argc, char **argv){
     // pert.info();
     
     // Output perturbation quantities
-
-    // double kvalue = 0.001 / Constants.Mpc;
     pert.outputTheta0(k_peaks_arr, M4_DATA_PATH + "Theta0_of_x_at_peaks.txt");
     pert.outputTheta0(k_troughs_arr, M4_DATA_PATH + "Theta0_of_x_at_troughs.txt");
 
-    // kvalue = 0.03 / Constants.Mpc;
-    // pert.output(kvalue, "milestone3/data/perturbations_k0.03.txt");
-
-    // kvalue = 0.3 / Constants.Mpc;
-    // pert.output(kvalue, "milestone3/data/perturbations_k0.3.txt");
+    pert.outputPsi(k_peaks_arr, M4_DATA_PATH + "Psi_of_x_at_peaks.txt");
+    pert.outputPsi(k_troughs_arr, M4_DATA_PATH + "Psi_of_x_at_troughs.txt");
     return 0;
   }
 

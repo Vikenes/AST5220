@@ -70,6 +70,7 @@ class PowerSpectrum:
 
 
 
+
     def load_planck_C_ell(self, fname):
         # Load CMB power spectrum from planck obs 
         CMB_planck = np.loadtxt(COMPARISON_PATH + fname, unpack=True)
@@ -162,6 +163,56 @@ class PowerSpectrum:
                             save=SAVE, push=PUSH, temp=TEMP)
 
 
+    def plot_Psi_at_peaks_and_troughs(self, npeaks=3, ntroughs=3):
+        ell_peaks, ell_troughs = self.find_C_ell_extrema()
+        
+        x_dec           = np.loadtxt(DATA_PATH + "Theta0_of_x_at_peaks.txt", max_rows=1, usecols=1)
+
+        data_peaks      = np.loadtxt(DATA_PATH + "Psi_of_x_at_peaks.txt", skiprows=0, unpack=True)
+        data_troughs    = np.loadtxt(DATA_PATH + "Psi_of_x_at_troughs.txt", skiprows=0, unpack=True)
+        x               = data_peaks[0]
+        Psi_peaks    = data_peaks[1:npeaks+1]
+        Psi_troughs  = data_troughs[1:ntroughs+1]
+
+        Psi          = np.concatenate((Psi_peaks, Psi_troughs), axis=0)
+        ell             = np.concatenate((ell_peaks[:npeaks], ell_troughs[:ntroughs]))
+        ylabel          = r"$\Psi(k,x)$"
+        
+        plot.subplot_Theta0(x, Psi, ell_values=ell,
+                            fname="Psi_at_peaks_and_troughs", x_dec=x_dec,
+                            ylabel=ylabel, ylim=[-0.8, 0.2], legendloc='upper left',
+                            xlim=[-11, -5], color='red', ypad=10, figsize=(15,10),
+                            save=SAVE, push=PUSH, temp=TEMP)
+
+    def plot_Psi_plus_Theta0_at_peaks_and_troughs(self, npeaks=3, ntroughs=3):
+        ell_peaks, ell_troughs = self.find_C_ell_extrema()
+        
+        x_dec           = np.loadtxt(DATA_PATH + "Theta0_of_x_at_peaks.txt", max_rows=1, usecols=1)
+
+        Tdata_peaks      = np.loadtxt(DATA_PATH + "Theta0_of_x_at_peaks.txt", skiprows=1, unpack=True)
+        Tdata_troughs    = np.loadtxt(DATA_PATH + "Theta0_of_x_at_troughs.txt", skiprows=1, unpack=True)
+        x               = Tdata_peaks[0]
+        Theta0_peaks    = Tdata_peaks[1:npeaks+1]
+        Theta0_troughs  = Tdata_troughs[1:ntroughs+1]
+
+        Theta0          = np.concatenate((Theta0_peaks, Theta0_troughs), axis=0)
+
+        data_peaks      = np.loadtxt(DATA_PATH + "Psi_of_x_at_peaks.txt", skiprows=0, unpack=True)
+        data_troughs    = np.loadtxt(DATA_PATH + "Psi_of_x_at_troughs.txt", skiprows=0, unpack=True)
+        Psi_peaks    = data_peaks[1:npeaks+1]
+        Psi_troughs  = data_troughs[1:ntroughs+1]
+
+        Psi          = np.concatenate((Psi_peaks, Psi_troughs), axis=0)
+        Psi_plus_Theta0 = Psi + Theta0
+
+        ell             = np.concatenate((ell_peaks[:npeaks], ell_troughs[:ntroughs]))
+        ylabel          = r"$\Psi(k,x)$"
+        
+        plot.subplot_Theta0(x, Psi_plus_Theta0, ell_values=ell,
+                            fname="Psi_at_peaks_and_troughs", x_dec=x_dec,
+                            ylabel=ylabel, ylim=[-0.8, 0.9], legendloc='upper left',
+                            xlim=[-11, -5], color='red', ypad=10, figsize=(15,10),
+                            save=SAVE, push=PUSH, temp=TEMP)
     def find_nearest_theta_ell_from_ell_list(self, ell_list):
 
         ell_closest = []
@@ -322,10 +373,13 @@ pspec = PowerSpectrum(fname_Cell, fname_MPS, fname_Thetas)
 
 ### CMB power spectrum 
 # pspec.plot_Cell(fname_planck, logx=True)
-pspec.plot_Cell_extrema(3)
+# pspec.plot_Cell_extrema(3)
 # pspec.plot_Cell_components()
-pspec.plot_Theta0_at_peaks_and_troughs()
-# TEMP=True 
+# pspec.plot_Theta0_at_peaks_and_troughs()
+
+pspec.plot_Psi_at_peaks_and_troughs()
+pspec.plot_Psi_plus_Theta0_at_peaks_and_troughs()
+
 ### Matter power spectrum 
 # pspec.plot_matter_power_spectrum(fname_galaxy_survey, fname_wmap)
 

@@ -677,6 +677,21 @@ void Perturbations::info() const{
   std::cout << "n_k:     " << n_k              << std::endl;
 }
 
+bool Perturbations::check_existence(std::string filename){
+  if (std::filesystem::exists(filename)) {
+    std::cout << "File " << filename << " already exists." << std::endl;
+    char choice;
+    std::cout << "  Do you want to overwrite the file? (y/n)" << std::endl;
+    std::cin >> choice;
+    
+    if (choice != 'y') { return false; } 
+    else { return true; };
+  } 
+  
+  else { return true; }
+  
+}
+
 //====================================================
 // Output some results to file for a given value of k
 //====================================================
@@ -715,7 +730,13 @@ void Perturbations::output(const double k, const std::string filename) const{
   std::for_each(x_array.begin(), x_array.end(), print_data);
 }
 
-void Perturbations::outputTheta0(const Vector &k_arr, const std::string filename) const{
+void Perturbations::outputTheta0(const Vector &k_arr, std::string filename){
+  bool write_to_file = check_existence(filename);
+  if(write_to_file){
+    std::cout << "Writing data to: " << filename << std::endl;
+  }
+  else { return; }
+  
   std::ofstream fp(filename.c_str());
   const int npts = 5000;
   
@@ -725,13 +746,32 @@ void Perturbations::outputTheta0(const Vector &k_arr, const std::string filename
     for(int ik=0; ik<k_arr.size(); ik++){
       fp << get_Theta(x,k_arr[ik],0)   << " ";
     }
-    // fp << get_Theta(x,k,1)   << " ";
     fp << "\n";
   };
 
-  std::cout << "Saving n=" << npts << " data points to '" << filename << "'" << std::endl;
-
   double tc_time = rec->get_x_at_decoupling_tau();
   fp << "rec " << tc_time << "\n";
+  std::for_each(x_array.begin(), x_array.end(), print_data);
+}
+
+void Perturbations::outputPsi(const Vector &k_arr, std::string filename){
+    bool write_to_file = check_existence(filename);
+  if(write_to_file){
+    std::cout << "Writing data to: " << filename << std::endl;
+  }
+  else { return; }
+
+  std::ofstream fp(filename.c_str());
+  const int npts = 5000;
+  
+  auto x_array = Utils::linspace(x_start, x_end, npts);
+  auto print_data = [&] (const double x) {
+    fp << x                  << " ";
+    for(int ik=0; ik<k_arr.size(); ik++){
+      fp << get_Psi(x,k_arr[ik])   << " ";
+    }
+    fp << "\n";
+  };
+
   std::for_each(x_array.begin(), x_array.end(), print_data);
 }
