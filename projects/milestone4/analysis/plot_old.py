@@ -526,7 +526,8 @@ def plot_Theta0(x, y,
         y0 = np.min(y) - 0.5
         y1 = np.max(y) + 0.5
         ylim = [y0, y1]
-        ax.set_ylim(ylim)
+        ax[0].set_ylim(ylim)
+        ax[1].set_ylim(ylim)
 
 
     x_dec_fill_low = x_dec-0.1
@@ -544,7 +545,7 @@ def plot_Theta0(x, y,
 
         lines.append(line)
 
-    leg1 = ax.legend(handles=[fill], loc="upper right")
+    leg1 = ax.legend(handles=[fill], loc="lower right")
     leg2 = ax.legend(handles=lines, loc="lower left", ncol=3)
 
     ax.add_artist(leg1)
