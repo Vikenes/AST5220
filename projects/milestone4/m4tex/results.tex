@@ -6,11 +6,8 @@ The angular power spectrum is shown in \figref{fig:M4:results:peaks_and_troughs_
 
 The peaks we observe in the power spectrum are a result of the oscillations of the photon baryon plasma. When photons decouple from baryons, modes at different scales will be in different states. If the plasma is fully compressed upon recombination, the photons have to escape from deep potential wells, and will therefore be redshifted. Similarly, if a mode is fully decompressed when recombination happens, the photons can escape without much energy loss. Since $\cl$ depends on the absolute value of the photons multipoles, both of these cases will result in a peak of the power spectrum. The troughs therefore correspond to modes for which the temperature perturbation is approximately zero.  
 
-As seen in \secref{ssec:M3:results}, the size of the modes strongly affect their behaviour before decoupling. Small scale modes will undergo several oscillations before recombination occurs. The number of oscillations a mode undergoes before decoupling decreases for larger scale modes, and for modes larger than the horizon during recombination, we expect no oscillations to take place. Thus, the peak at $\ell=205$ corresponds to a mode that just began to oscillate, with recombination taking place when it was at its maximum. For $\ell<205$, the modes as gradually less compressed, until we reach scales of modes that had not entered the horizon before decoupling.  
+As seen in \secref{ssec:M3:results}, the size of the modes strongly affect their behaviour before decoupling. Small scale modes will undergo several oscillations before recombination occurs. The number of oscillations a mode undergoes before decoupling decreases for larger scale modes, and for modes larger than the horizon during recombination, we expect no oscillations to take place. Thus, the peak at $\ell=205$ corresponds to a mode that just began to oscillate, with recombination taking place when it was at its maximum. As $\ell$ is decreased from $205$, the modes are gradually less compressed, until we reach scales of modes that had not entered the horizon before decoupling. 
 
-For modes where the oscillation is at a maximum value we obtain the peaks seen the power spectrum. 
-
- As we saw when we studied the perturbations, the size of the modes affects its oscillatory behaviour.  
 
 \begin{figure}[ht!]
     \includefig{peaks_and_troughs_cells\pspecresolution}
@@ -18,13 +15,15 @@ For modes where the oscillation is at a maximum value we obtain the peaks seen t
     \label{fig:M4:results:peaks_and_troughs_cells}
 \end{figure}
 
-We plot $\Thn$ as a function of $x$ for modes of size $k=\lp/\eta_0$ and $k=\lt/\eta_0$, shown in \figref{fig:M4:results:theta0_at_peaks_and_troughs}, where we also highlight the approximate value of $x\rec$. We see that the three modes correspond well with the peaks of the power spectrum. Similarly, we see that the troughs coincide with modes that are phase shifted with respect to the peaks, and roughly at their minima.     
-
-\begin{figure}[ht!]
+To see that the peaks and troughs in \figref{fig:M4:results:peaks_and_troughs_cells} actually correspond to modes where $\Thn$ is at extrema, we plot $\Thn(k,x)$ as a function of $x$ for $k=\lp/\etan$ and $k=\lt/\etan$, shown in \figref{fig:M4:results:theta0_at_peaks_and_troughs}. We also mark the region of $x\sim x\rec$. \note{Comment on why recombination isn't instantaneous.} As evident from the figure, the first three peaks of $\cl$ correspond to modes on scales that are at maxima. The troughs occur at scales that are essentially zero deviation from the initial temperature perturbation. Modes with wavenumber $k\sim\lt/\etan$ give roughly zero contribution to the power spectrum, but there are many modes of different wavenumbers with a non-zero contribution, resulting in the troughs we see in the power spectrum, and not $C_{\lt}=0$. Another important feature, is that the maxima of $\Thn(x)$ in the upper panel of \figref{fig:M4:results:theta0_at_peaks_and_troughs} don't occur at $x=x\rec$. In general, inhomogeneities on scale $k$ contributes to $\cl$ at slightly lower value of $\ell$ than $\ell=k\eta_0$. One reason for this, is that $\jell(x)$ peaks when $\ell$ is slightly smaller than $x$. 
+\begin{figure}[ht!] 
     \includefig{Theta0_at_peaks_and_troughs}
     \caption{Computed monopoles for of scale $k=\ell/\eta_0$ for different values of $\ell$. The upper panel are $\ell$ values where the power spectrum peaks, and the lower panel are the $\ell$ values of the power spectrum troughs.}
     \label{fig:M4:results:theta0_at_peaks_and_troughs}
 \end{figure}
+The next prominent feature in \figref{fig:M4:results:peaks_and_troughs_cells} are the damping of the peaks at small scales. During tight coupling, photons and baryons do not behave exactly as one fluid. In reality, photons travel a certain distance between scattering events, essentially performing random walks. With a comoving mean free path, $\mfp$   
+
+As previously discussed, recombination is not an instantaneous event, 
 
 \begin{figure}[ht!]
     \includefig{cells_components\pspecresolution}
