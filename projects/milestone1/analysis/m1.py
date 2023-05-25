@@ -327,13 +327,16 @@ class ExpansionHistory:
 
 Cosmology = ExpansionHistory("cosmology_new.txt")
 
-# Cosmology.plot_eta_H_over_c()
-# Cosmology.plot_dH_ddH_over_H()
-# Cosmology.plot_Hp()
-# Cosmology.plot_eta_t()
-# Cosmology.plot_omegas()
-# Cosmology.plot_dL(fname_dL_fitted="bestfit_dL.txt", fname_dL_planck="planck_dL.txt")
-# Cosmology.plot_supernova_fit_omegas()
-# Cosmology.plot_supernova_fit_H0_pdf()
+# SAVE = True 
+# TEMP = True 
+
+Cosmology.plot_eta_H_over_c()
+Cosmology.plot_dH_ddH_over_H()
+Cosmology.plot_Hp()
+Cosmology.plot_eta_t()
+Cosmology.plot_omegas()
+Cosmology.plot_dL(fname_dL_fitted="bestfit_dL.txt", fname_dL_planck="planck_dL.txt")
+Cosmology.plot_supernova_fit_omegas()
+Cosmology.plot_supernova_fit_H0_pdf()
 # Cosmology.make_table()
 
