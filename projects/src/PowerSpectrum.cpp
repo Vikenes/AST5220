@@ -514,7 +514,12 @@ void PowerSpectrum::outputThetas(std::string filename, int nk_write){
 void PowerSpectrum::outputPS(std::string filename, int nk_write) {
 
   // Add run-parameters to filename 
-  add_file_info(filename); 
+  int pos = filename.find(".txt");
+  if (pos != std::string::npos) {
+    std::string file_info;
+    file_info += "_nk" + std::to_string(nk_write);
+    filename.insert(pos, file_info);
+  };
 
   // Check if file exists. Prompt user to overwrite existing file. 
   bool write_to_file = check_existence(filename);
@@ -522,8 +527,6 @@ void PowerSpectrum::outputPS(std::string filename, int nk_write) {
     std::cout << "Writing data to: " << filename << std::endl;
   }
   else { return; }
-  
-  exit(0);
   std::ofstream fp(filename.c_str());
   
   auto kvalues = Utils::linspace(k_min*Mpc_, k_max*Mpc_, nk_write);
