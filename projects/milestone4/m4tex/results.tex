@@ -24,12 +24,18 @@ The next prominent feature in \figref{fig:M4:results:peaks_and_troughs_cells} ar
 \begin{equation}
     \lambda_D = \mfp \sqrt{N} = 1 / \sqrt{n_e \sigma_T H},
 \end{equation}
-On scales smaller than $\ld$, scattering has the effect of smoothing the temperature fluctuations, since photons diffuse over such a region, causing the region to have a single mean temperature. In phase space, this corresponds to a damping on small scales $k_D\gtrsim 2\pi/\ld$.
+On scales smaller than $\ld$, scattering has the effect of smoothing the temperature fluctuations, since photons diffuse over such a region, causing the region to have a single mean temperature. In phase space, this corresponds to a damping on small scales $k_D\gtrsim 2\pi/\ld$. Although recombination is not an instantaneous process, it does occur relatively fast. There will be some random walks undertaken by photons as they decouple, but they will very rapidly start streaming in straight lines as $\ne$ eventually becomes very small. Larger angular scales, are not affected by diffusion of photons over small regions, as it statistically gives the same effect in several directions, and not affecting modes much larger than the diffusion scale itself. 
+
+Diffusion explains the damping at large $\ell$, but not the fact that the first peak is much bigger than the other two. The reason for this, is that the first peak correspond to a mode which compresses just before recombination. The mode enters the horizon during the radiation dominated era, and will shortly decay. As it compresses one time, the potential decays shortly after. Thus, the escaping photons are less redshifted, and we see a net increase in $\cl$ near this angular scale \note{Check all of the above}.
+
+We note that the third peak is higher than the second peak, as opposed to the other peaks, which are all lowered at higher $\ell$. 
 
 \subsubsection{Contribution from individual components} \label{sssec:M4:results:contribution_from_individual_components}
 In \figref{fig:M4:results:cells_components}, we plot the power spectrum obtained from the four individual terms in \Eqref{eq:M4:theory:source_function_LOS}. Note that the quadrupole term is non-zero. It can be seen on a logarithmic scale, but since it has a negligible contribution to the power spectrum, compared to the other terms, it has been omitted to better understand how the other terms contribute to the power spectrum.     
 
-The SW term is the dominant contribution to $\cl$, which justifies the choice of considering this term only for the discussion in \secref{sssec:M4:results:angular_power_spectrum}, as it contains all the features relevant for those discussions.      
+The SW term is the dominant contribution to $\cl$, which justifies the choice of considering this term only for the discussion in \secref{sssec:M4:results:angular_power_spectrum}, as it contains all the features relevant for those discussions. 
+
+After the SW effect, the Doppler term is contributing the most to $\cl$. On the largest scales, modes have not entered the horizon before decoupling, resulting in decreasing contribution from this term at the largest scales, as $\Theta_1\simeq0$ here. For the photon baryon plasma, the perturbations, in Fourier space, behaved as waves propagating, with a phase shifted velocity.    
 \begin{figure}[ht!]
     \includefig{cells_components\pspecresolution}
     \caption{The total angular power spectrum (dashed blue curve), compared to power spectra computed from individual terms in \Eqref{eq:M4:theory:source_function_LOS}. For each term in the figure, the remaining terms in \Eqref{eq:M4:theory:source_function_LOS} have been set to zero.}
