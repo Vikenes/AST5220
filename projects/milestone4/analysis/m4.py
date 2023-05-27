@@ -22,15 +22,12 @@ global SAVE
 global PUSH
 global TEMP
 global XLIM
-global MREQ
-global TCEND 
+global XTICKS
 SAVE        = False 
 PUSH        = False
 TEMP        = False 
 XLIM        = [-14.5, 0]
-MREQ        = True 
-TCEND       = False 
-
+XTICKS = [2, 10, 50, 100, 500, 1000, 2000]
 class PowerSpectrum:
     def __init__(self, fname_Cell, fname_MPS, fname_Thetas):
         
@@ -153,6 +150,8 @@ class PowerSpectrum:
         Theta0_troughs  = data_troughs[1:ntroughs+1]
 
         Theta0          = np.concatenate((Theta0_peaks, Theta0_troughs), axis=0)
+        # Theta0 -= Theta0[0,0]
+        # print(Theta0[:,0]);exit()
         ell             = np.concatenate((ell_peaks[:npeaks], ell_troughs[:ntroughs]))
         ylabel          = r"$\Theta_0(k,x)$"
         
@@ -213,6 +212,8 @@ class PowerSpectrum:
                             ylabel=ylabel, ylim=[-0.8, 0.9], legendloc='upper left',
                             xlim=[-11, -5], color='red', ypad=10, figsize=(15,10),
                             save=SAVE, push=PUSH, temp=TEMP)
+        
+
     def find_nearest_theta_ell_from_ell_list(self, ell_list):
 
         ell_closest = []
@@ -226,16 +227,15 @@ class PowerSpectrum:
 
         planck = self.load_planck_C_ell(fname_planck)
 
-        ylabel = r"$\ell(\ell+1)C_\ell/2\pi\:[\mathrm{\mu K^2}]$"
+        ylabel = r"$\ell(\ell+1)C_\ell/2\pi\:(10^6 T_\mathrm{CMB0})^2$"
         figname_split = self.fname_Cell.split("components_")
         figname = figname_split[0] + figname_split[1].strip(".txt")
-        xticks=[10,100,1000]
 
         plot.plot_C_ell(self.ell, self.C_ell,
                         planck=planck,
                         fname=figname,
                         ylabel=ylabel, ypad=10,
-                        xticks=xticks, logx=True,
+                        xticks=XTICKS, logx=True,
                         logy=False, fill=fill, 
                         save=SAVE, temp=TEMP, push=PUSH)
         
@@ -249,7 +249,8 @@ class PowerSpectrum:
         planck = self.load_planck_C_ell(fname_planck)
 
 
-        ylabel = r"$\ell(\ell+1)C_\ell/2\pi\:[\mathrm{\mu K^2}]$"
+        # ylabel = r"$\ell(\ell+1)C_\ell/2\pi\:[\mathrm{\mu K^2}]$"
+        ylabel = r"$\ell(\ell+1)C_\ell/2\pi\:\cdot (10^6\, T_\mathrm{CMB0})^2$"
         figname_split = self.fname_Cell.split("components_")
         figname = "peaks_and_troughs_" + figname_split[0] + figname_split[1].strip(".txt")
 
@@ -259,7 +260,7 @@ class PowerSpectrum:
                         fname=figname,
                         ylabel=ylabel, ypad=10,
                         logx=True,
-                        # xlim=[11,1500], 
+                        xticks=XTICKS, 
                         logy=False, fill=False, 
                         peaks=peaks, troughs=troughs,
                         save=SAVE, temp=TEMP, push=PUSH)
@@ -269,13 +270,14 @@ class PowerSpectrum:
     def plot_Cell_components(self):
 
 
-        ylabel = r"$\ell(\ell+1)C_\ell/2\pi \:[\mathrm{\mu K^2}]$"
+        ylabel = r"$\ell(\ell+1)C_\ell/2\pi\:\cdot (10^6\, T_\mathrm{CMB0})^2$"
+
         figname = self.fname_Cell.strip(".txt")
-        xticks=[10,100,1000]
+        
         plot.plot_C_ell_components(self.ell, self.C_ell, self.C_ell_components,
                         fname=figname,
                         ylabel=ylabel, ypad=10,
-                        logy=False, fill=True, xticks=xticks,
+                        logy=False, fill=True, xticks=XTICKS,
                         logx=True,
                         save=SAVE, temp=TEMP, push=PUSH)
         
@@ -284,16 +286,22 @@ class PowerSpectrum:
 
 
     def plot_matter_power_spectrum(self, fname_galaxy_survey, fname_wmap):
+        fname_MPS_with_Neff = "matterPS_Neff_nk2000.txt"
+        _, Pk_Neff   = np.loadtxt(DATA_PATH + fname_MPS_with_Neff, skiprows=1, unpack=True)
+        k_eq_Neff = np.loadtxt(DATA_PATH + fname_MPS_with_Neff, max_rows=1) * u.h / u.Mpc 
+
+
         galaxy_data = self.load_Pk_external(fname_galaxy_survey)
         wmap_data = self.load_Pk_external(fname_wmap)
         wmap_data[2] = np.abs(wmap_data[1] - wmap_data[2])
 
-        ylabel = r"$P(k)\quad[(\mathrm{Mpc/h})^3]$"
+        ylabel = r"$P_L(k)\quad[(\mathrm{Mpc/h})^3]$"
         xlabel = r"$k \quad [\mathrm{h/Mpc}]$"
         fname = self.fname_MPS.strip(".txt")
         plot.plot_matter_PS(self.k_h_Mpc, self.Pk, self.k_eq,
                             galaxy_data,
                             wmap_data,
+                            Pk_Neff=Pk_Neff, k_eq_Neff=k_eq_Neff,
                             fname=fname,
                             ylabel=ylabel, 
                             xlabel=xlabel, 
@@ -360,16 +368,16 @@ fname_Cell="cells_components_nx2000_nk21773_nlogk21773.txt"
 fname_Thetas="thetas_nx2000_nk21773_nlogk21773.txt"
 
 
-fname_MPS="matterPS_nk1000.txt"
+fname_MPS="matterPS_nk2000.txt"
 fname_planck = "planck_cell_low.txt"
 fname_galaxy_survey = "reid_DR7.txt"
 fname_wmap = "wmap_act.txt"
 
 pspec = PowerSpectrum(fname_Cell, fname_MPS, fname_Thetas)
 
-# SAVE=True
-# PUSH=True
-# TEMP=True
+SAVE=True
+PUSH=True
+TEMP=True
 
 ### CMB power spectrum 
 # pspec.plot_Cell(fname_planck, logx=True)
@@ -381,7 +389,7 @@ pspec = PowerSpectrum(fname_Cell, fname_MPS, fname_Thetas)
 # pspec.plot_Psi_plus_Theta0_at_peaks_and_troughs()
 
 ### Matter power spectrum 
-# pspec.plot_matter_power_spectrum(fname_galaxy_survey, fname_wmap)
+pspec.plot_matter_power_spectrum(fname_galaxy_survey, fname_wmap)
 
 
 

@@ -150,7 +150,6 @@ int main(int argc, char **argv){
     pert.output(kvalue, "milestone3/data/perturbations_k0.3.txt");
   }
 
-  m3_theta0 = true;
   if(m3_theta0){
     // Read data from file
     std::string k_peaks   = M4_DATA_PATH + "k_ell_peaks.txt";
@@ -209,10 +208,12 @@ int main(int argc, char **argv){
   //=========================================================================
   if(m4_output){
     bool components = false;
-    bool matter_PS = false;
+    bool matter_PS = true;
     bool source;
 
-    if(matter_PS){source=false;}
+    if(matter_PS){
+      source=false;
+      components=false;}
     else{source=true;};
 
     // Set up and solve the background
@@ -223,7 +224,7 @@ int main(int argc, char **argv){
     // Solve the recombination history
     RecombinationHistory rec(&cosmo, Yp);
     rec.solve();
-  
+
     // Solve the perturbations
     Perturbations pert(&cosmo, &rec);
     pert.solve(source);
@@ -241,7 +242,12 @@ int main(int argc, char **argv){
     else{
       // Solve Cell if we're not writing the matter power spectrum.
       if(matter_PS){
-        power.outputPS(M4_DATA_PATH + "matterPS.txt", 1000);
+        std::string PS_name = "matterPS";
+        if(cosmo.get_Neff()!=0){
+          PS_name += "_Neff";
+        }
+        std::string fname = PS_name + ".txt";
+        power.outputPS(M4_DATA_PATH + fname, 2000);
       }
       
       else{

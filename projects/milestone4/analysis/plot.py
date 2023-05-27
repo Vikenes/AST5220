@@ -256,7 +256,9 @@ def plot_C_ell_components(ell, C_ell, C_ell_components,
     scale_2 = 1 
     scale_3 = 1 
     scale_4 = 1 
-    C4, = ax.plot(ell, Quadrupole * scale_4 , ls='solid', alpha=1, lw=1, color='purple', label="Quadrupole")
+    sum_terms = SW + ISW + Doppler + Quadrupole
+    # C4, = ax.plot(ell, Quadrupole * scale_4 , ls='solid', alpha=1, lw=1, color='purple', label="Quadrupole")
+    C4, = ax.plot(ell, sum_terms * scale_4 , ls='solid', alpha=1, lw=1, color='purple', label="Quadrupole")
     Ctot, = ax.plot(ell, C_ell, ls='dashed', color='blue', alpha=0.7, label='Prediction')
     C1, = ax.plot(ell, SW * scale_1         , ls='solid', color='green', label="SW")
     C2, = ax.plot(ell, ISW * scale_2        , ls='solid', color='red' , label="ISW")
@@ -288,12 +290,15 @@ def plot_C_ell_components(ell, C_ell, C_ell_components,
 
 def plot_matter_PS(k, Pk, k_eq,
                    galaxy_data, wmap_data,
-                   fname,  
+                   fname, 
+                   Pk_Neff=None, 
+                   k_eq_Neff=None,
                    logx=True, logy=True, 
                    xlabel=None, ylabel=None,  
                    xlim=None, ylim=None,  
                    ypad=None, 
-                   figsize=(10,6),  
+                   figsize=(12,8),  
+                   xticks=None,
                    save=True,push=False, temp=False):
 
 
@@ -307,8 +312,16 @@ def plot_matter_PS(k, Pk, k_eq,
                 capthick=1.5, capsize=5, elinewidth=2, color='red', ms=3, 
                 label='SDSS Galaxies (DR7 LRG)')
     P3 = ax.errorbar(k_wmap, Pk_wmap, error_wmap, barsabove=True, fmt='o',
-                capthick=1.5, capsize=5, elinewidth=2, color='green', ms=3, 
+                capthick=1.5, capsize=5, elinewidth=2, color='orange', ms=3, 
                 label='CMB (WMAP+ACT)')
+
+    PS_handle = [P1, P2, P3]
+    
+    if Pk_Neff is not None:
+        P4, = ax.plot(k, Pk_Neff, color='green', ls='--', label=r'$\mathcal{N}_\mathrm{eff}=3.046$')
+        PS_handle.append(P4)
+        fname += "Neff"
+
 
     if ylim is None:
         ylim_vline = ax.get_ylim()
@@ -317,9 +330,13 @@ def plot_matter_PS(k, Pk, k_eq,
 
     if k_eq is not None:
         vl = ax.vlines(k_eq.value, *ylim_vline, colors='black', ls='dashed', label=r"$k_\mathrm{eq}$")
+        vl_handle = [vl]
+    if k_eq_Neff is not None:
+        vl_Neff = ax.vlines(k_eq_Neff.value, *ylim_vline, colors='green', ls='dotted', label=r"$k_\mathrm{eq},\,\mathcal{N}\mathrm{eff})3.046$")
+        vl_handle.append(vl_Neff)
 
-    leg1 = plt.legend(handles=[P1, P2, P3], loc='lower left')
-    leg2 = plt.legend(handles=[vl], loc='lower right')
+    leg1 = plt.legend(handles=PS_handle, loc='upper left')#(0.1,0.01))
+    leg2 = plt.legend(handles=vl_handle, loc='lower right')
 
     ax.add_artist(leg1)
     ax.add_artist(leg2)
@@ -334,8 +351,11 @@ def plot_matter_PS(k, Pk, k_eq,
 
     if logx:
         ax.set_xscale('log')
-
-
+    ax.axis('equal')
+    if xticks is not None:
+        ticklabels=[f"${tick}$" for tick in xticks]
+        ax.set_xticks(xticks)
+        ax.set_xticklabels(ticklabels)
 
     save_push(fig, fname, save, push, temp=temp)
 

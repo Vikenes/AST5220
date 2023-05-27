@@ -333,13 +333,12 @@ double BackgroundCosmology::get_mr_equality(Vector x_array) const{
   Spline Delta_Omega_MR_spline;
   Delta_Omega_MR_spline.create(x_array, Delta_Omega_MR, "MR_EQ_spline");
   double MR_eq = 0.0;
-  auto x_range = std::pair<double,double>(x_start, x_end);
+  auto x_range = std::pair<double,double>(x_array[0], x_array[nx_mr_eq-1]);
   
   double x_mr_eq = Utils::binary_search_for_value(
     Delta_Omega_MR_spline, 
     MR_eq, 
     x_range);
-
   return x_mr_eq;
 }
 

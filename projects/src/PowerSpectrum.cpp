@@ -512,7 +512,7 @@ void PowerSpectrum::outputThetas(std::string filename, int nk_write){
 
 
 void PowerSpectrum::outputPS(std::string filename, int nk_write) {
-
+  
   // Add run-parameters to filename 
   int pos = filename.find(".txt");
   if (pos != std::string::npos) {
