@@ -33,12 +33,21 @@ Thus, the final expression we want to compute is
 \subsubsection{Matter power spectrum} \label{sssec:M4:theory:matter_power_spectrum}
 From the Fourier components of the matter overdensity field, we can compute the matter power-spectrum
 \begin{equation} \label{eq:M4:theory:MatterPS_of_x_k}
-    P_L(k,x) = \abs{\Delta_M(k,x)}^2,\quad \text{where}\quad \Delta_M(k,x) \equiv \frac{k^2 \Phi(k,x)}{\frac{3}{2}\omn a^{-1} H_0^2}.
+    P_L(k,x) = \abs{\Delta_M(k,x)}^2,\quad \text{where}\quad \Delta_M(k,x) \equiv \frac{k^2 \Phi(k,x)}{\frac{3}{2}\omn e^{-x} H_0^2}.
 \end{equation}
 Once again, we have to take rescale $\Delta_M$ to account for our choice of initial conditions. Taking the value today, we thus want to compute 
 \begin{equation} \label{eq:M4:theory:MatterPS_code_today}
-    \plk = \abs{\Delta_M\code(k)}^2 P(k) = \abs{\Delta_M\code(k)}^2\, \frac{2\pi^2}{k^3}\pclosed{\frac{k}{\kp}}^{\ns-1}.
+    \plk = \abs{\Delta_M\code(k)}^2 P(k) = \abs{\Delta_M\code(k)}^2\, \frac{2\pi^2}{k^3} \as \pclosed{\frac{k}{\kp}}^{\ns-1}.
 \end{equation}
+The shape of $\plk$ is naturally divided into three regions. On small scales, modes enter the horizon during radiation domination, where the growth of perturbations is suppressed due to photon pressure. On larger scales, modes entering the horizon in the matter dominated era, or later, are not affected by this suppression. In between these two regimes, we expect there to be a scale $\keq$, where $\plk$ peaks. This equality scale is $\keq\equiv\H(x_\mathrm{eq})$. From \citeauthor{Baumann} (Ch. 5.2.3), we find the asymptotic behaviour of $\plk$ as
+\begin{equation} \label{eq:M4:theory:matter_power_spectrum_asymptotic_scaling}
+    \plk \propto \begin{cases}
+        k^{\ns}     ,&\quad k<\keq, \\
+        k^{-3},&\quad k>\keq, 
+    \end{cases}
+\end{equation}  
+which encodes the physical differences of how different modes grow.   
+
 
 \subsubsection{Line-of-sight integration}\label{sssec:M4:theory:line_of_sight_integration}
 As mentioned in \secref{sssec:M3:theory:perturbation_equations}, we compute higher order multipoles from the LOS approach. 
@@ -63,7 +72,12 @@ The main physical idea behind the LOS approach, is that light observed in a give
         &\approx\bclosed{\Thn + \Psi}\rec\cdot j_\ell(k\eta_0) , 
     \end{split}
 \end{equation}
-where we have used $\eta\rec\ll\eta_0$, and the fact that $\Theta_2\ll\Thn$ at recombination. The term $\Thn+\Psi$ represents an effective photon temperature. As the decoupled photons travel freely towards us today, they are gravitationally redshifted by the potential, $\Psi$. Hence, the SW term is an effective photon temperature with a tiny quadrupole correction. The anisotropies of the CMB power spectrum we observe today are therefore caused by temperature inhomogeneities present during recombination, as photons froze out during decoupling, and act as tracers of the physics present before they decoupled. \note{Last two sentences are awful.} From the approximation in \Eqref{eq:M4:theory:Theta_ell_today_SW_approximation}, we see that $\Thl\propto\jell(k\eta_0)$. Since $\jell(x)$ has a peak at $x\sim\ell$, we expect $\Thl(k)$ to have a peak at $k\sim\ell/\eta_0$. Thus, following \Eqref{eq:M4:theory:CMB_power_spectrum}, we may expect perturbation features on scales $k$ to be mapped onto angular scales of $\ell\sim k\eta_0$ in $\cl$. \note{Fix explanation etc.}
+where we have used $\eta\rec\ll\eta_0$, and the fact that $\Theta_2\ll\Thn$ at recombination. The term $\Thn+\Psi$ represents an effective photon temperature. As the decoupled photons travel freely towards us today, they are gravitationally redshifted by the potential, $\Psi$. Hence, the SW term is an effective photon temperature with a tiny quadrupole correction. The anisotropies of the CMB power spectrum we observe today are therefore caused by temperature inhomogeneities present during recombination, as photons froze out during decoupling, and act as tracers of the physics present before they decoupled. \note{Last two sentences are awful.} From the approximation in \Eqref{eq:M4:theory:Theta_ell_today_SW_approximation}, we see that $\Thl\propto\jell(k\eta_0)$. Since $\jell(x)$ has a peak at $x\sim\ell$, we expect $\Thl(k)$ to have a peak at $k\sim\ell/\eta_0$. On small angular scales, the spherical Bessel function can be approximated as \cite[Eq. (9.61)]{Dodelson}
+\begin{equation}
+    \jell(x) \xrightarrow{x/\ell\to0} \frac{1}{\ell}\pclosed{\frac{x}{\ell}}^{\ell-1/2},
+\end{equation} 
+so when $x<\ell$, i.e. $k\eta_0<\ell$, the spherical Bessel function is heavily suppressed. This means that the power spectrum at a certain $\ell$ gets very little contribution from larger scale modes where $k<\ell/\eta_0$. Physically, this is easily understood, as we expect to see little anisotropy on small angular scales from perturbations with large wavelengths. Conversely, on angular scales $\ell<1/(k\eta_0)$, there is also little contribution to the photon multipole from $\jell$. Thus, following \Eqref{eq:M4:theory:CMB_power_spectrum}, we may expect perturbation features on scales $k$ to be mapped onto angular scales of $\ell\sim k\eta_0$ in $\cl$.
+\note{Fix explanation etc.}
 
 The ISW represents the fact that gravitational potentials may change in time as photons move through it. For freely moving photons entering gravitational potentials, there is no net change in temperature if the potentials remain constant in time. Photons entering a gravitational potential gets an energy change that is cancelled out by the energy change it experiences when it leaves the gravitational potential again, if the potential remains constant in time. \note{Mention how this affects power spectrum at small and large scales.} The potentials are also weighted by a factor $e^{-\tau}$, so we only get a contribution from this term after recombination. Since the potentials are approximately constant during matter domination, we expect a contribution from ISW around recombination from intermediate scale modes, where the potential varies during recombination, as seen from \figref{fig:M3:results:Phi}. After this, we expect to get a contribution at late times, when the Universe starts accelerating. From \figref{fig:M3:results:Phi}, we see that the large scale modes varies most, and with $\tau(0)=0$, we therefore expect the largest contribution to $\cl$ to be at large scales, i.e. low $\ell$.  
 
@@ -77,3 +91,5 @@ If the ISW contribution is ignored, for low $l$, we have $(\Thn + \Psi)\rec\appr
     \end{split}
 \end{equation}
 When plotting the CMB power spectrum, we will plot the RHS of \Eqref{eq:M4:theory:C_ell_SW_plateau_integral} against $\ell$ in units of $\mathrm{\mu K^2}$. We have $\ns=0.965<1$, so we have $\ell(\ell+1)\cl\propto \ell^{\ns-1}$, which will induces a small tilt at low $\ell$. The ISW will also result in a further deviation from a constant value. 
+
+

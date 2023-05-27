@@ -24,35 +24,44 @@ The next prominent feature in \figref{fig:M4:results:peaks_and_troughs_cells} ar
 \begin{equation}
     \lambda_D = \mfp \sqrt{N} = 1 / \sqrt{n_e \sigma_T H},
 \end{equation}
-On scales smaller than $\ld$, scattering has the effect of smoothing the temperature fluctuations, since photons diffuse over such a region, causing the region to have a single mean temperature. In phase space, this corresponds to a damping on small scales $k_D\gtrsim 2\pi/\ld$. Although recombination is not an instantaneous process, it does occur relatively fast. There will be some random walks undertaken by photons as they decouple, but they will very rapidly start streaming in straight lines as $\ne$ eventually becomes very small. Larger angular scales, are not affected by diffusion of photons over small regions, as it statistically gives the same effect in several directions, and not affecting modes much larger than the diffusion scale itself. 
+On scales smaller than $\ld$, scattering has the effect of smoothing the temperature fluctuations, since photons diffuse over such a region, causing the region to have a single mean temperature. In phase space, this corresponds to a damping on small scales $k_D\gtrsim 2\pi/\ld$. Although recombination is not an instantaneous process, it does occur relatively fast. There will be some random walks undertaken by photons as they decouple, but they will very rapidly start streaming in straight lines as $\ne$ eventually becomes very small. For a mode with wavelength much larger than $\ld$, an observer would measure photons coming in from all directions from a distance $\lambda\sim\mfp$, over which the temperature hardly varies. Thus, larger angular scales are not affected by diffusion of photons. \note{Move last sentence to Milestone 3, and elaborate.} 
 
 Diffusion explains the damping at large $\ell$, but not the fact that the first peak is much bigger than the other two. The reason for this, is that the first peak correspond to a mode which compresses just before recombination. The mode enters the horizon during the radiation dominated era, and will shortly decay. As it compresses one time, the potential decays shortly after. Thus, the escaping photons are less redshifted, and we see a net increase in $\cl$ near this angular scale \note{Check all of the above}.
 
-We note that the third peak is higher than the second peak, as opposed to the other peaks, which are all lowered at higher $\ell$. 
+We note that the third peak is higher than the second peak, as opposed to the other peaks, which are all lowered at higher $\ell$. This follows a general trait, namely that the odd numbered peaks are enhanced relative to the even peaks. The reason for this is that the odd numbered peaks are caused by a compression of the fluid. This compression occurs when the baryon photon plasma falls into the gravitational wells set up by the CDM. However, as baryons fall into these potential wells, they will effectively make the potential well deeper. As a result, photons escaping from these potential wells during decoupling gets a further decrease in their effective temperature.     
 
 \subsubsection{Contribution from individual components} \label{sssec:M4:results:contribution_from_individual_components}
-In \figref{fig:M4:results:cells_components}, we plot the power spectrum obtained from the four individual terms in \Eqref{eq:M4:theory:source_function_LOS}. Note that the quadrupole term is non-zero. It can be seen on a logarithmic scale, but since it has a negligible contribution to the power spectrum, compared to the other terms, it has been omitted to better understand how the other terms contribute to the power spectrum.     
+In \figref{fig:M4:results:cells_components}, we plot the power spectrum obtained from the four individual terms in \Eqref{eq:M4:theory:source_function_LOS}. Note that the quadrupole term is non-zero. It can be seen on a logarithmic scale, but since it has a negligible contribution to the power spectrum, compared to the other terms, we have chosen to use the same scaling as in \figref{fig:M4:results:peaks_and_troughs_cells}, allowing for easier interpretation of the most important terms. We emphasize that the four individual terms in \figref{fig:M4:results:cells_components} don't sum up to $\cl$, since cross terms in $\Thl^2$ are missing.    
 
 The SW term is the dominant contribution to $\cl$, which justifies the choice of considering this term only for the discussion in \secref{sssec:M4:results:angular_power_spectrum}, as it contains all the features relevant for those discussions. 
 
-After the SW effect, the Doppler term is contributing the most to $\cl$. On the largest scales, modes have not entered the horizon before decoupling, resulting in decreasing contribution from this term at the largest scales, as $\Theta_1\simeq0$ here. For the photon baryon plasma, the perturbations, in Fourier space, behaved as waves propagating, with a phase shifted velocity.    
+After the SW effect, the Doppler term is contributing the most to $\cl$. On the largest scales, modes have not entered the horizon before decoupling, resulting in decreasing contribution from this term at the largest scales, as $\Theta_1\simeq0$ here. On smaller scales, we see that the dipole raises the overall spectrum, but it does so more for the troughs than the peaks. We previously found that the perturbations of the photon baryon plasma behaved as waves in Fourier space, with a velocity that was out of phase with the density. The dipole term therefore has the effect of reducing the prominence of the peaks in the CMB spectrum. We previously argued that the troughs are non-zero due to non-zero monopole contributions from several modes. This argument still holds, as seen from the SW line in \figref{fig:M4:results:cells_components} (green line), but there is also a considerable contribution coming from the dipole. 
+
+The final main contributor to the power spectrum is the ISW term. As expected, it gives a contribution at low $\ell$. Modes entering the horizon after the decoupling has taken place have potentials that are constant initially. However, as dark energy begins to dominate, the Universe begins accelerating, causing the potentials to decay, as seen from \figref{fig:M3:results:Phi}. These modes give a contribution to $\cl$ at low $\ell$, and are referred to as the late time ISW effect. There is also a noticeable contribution at intermediate scales, known as the early ISW. The transition from radiation domination to pure matter domination is not an abrupt process, and radiation energy density is not completely negligible after recombination, as seen from \figref{fig:M1:results:omega_i_of_x}. There is therefore a change in the potentials after recombination, which is noticeable in \figref{fig:M3:results:Phi}.  
 \begin{figure}[ht!]
     \includefig{cells_components\pspecresolution}
     \caption{The total angular power spectrum (dashed blue curve), compared to power spectra computed from individual terms in \Eqref{eq:M4:theory:source_function_LOS}. For each term in the figure, the remaining terms in \Eqref{eq:M4:theory:source_function_LOS} have been set to zero.}
     \label{fig:M4:results:cells_components}
 \end{figure}
 
+The ISW appears to have a relatively small contribution to $\cl$, compared to the dipole term. However, there is an important contribution coming from cross terms that we have ignored. In \figref{fig:M4:results:cells_components}, we see that the ISW contribution is in phase with the SW contribution. The dipole on the other hand is out of phase with the SW term. The relative contribution from ISW to $\cl$ is therefore stronger than that from the dipole term.    
+
 \subsubsection{Matter power spectrum} \label{sssec:M4:results:matter_power_spectrum}
+The matter power spectrum is plotted in \figref{fig:M4:results:matterPS_nk2000Neff}. For comparison, we have included the result obtained from not having $\neff=0$ in the background. This affects $\keq$, as well as the value of $\Phi$, since $\H$ is slightly altered by including neutrinos. We have not accounted for neutrinos when solving the perturbation ODEs, so this approach should only be taken as a highly approximate way of studying how neutrinos affect $\plk$. 
+
+The behaviour of $\plk$ follows that of \Eqref{eq:M4:theory:matter_power_spectrum_asymptotic_scaling}. There is a noticeable discrepancy between the predicted value of $\plk$ compared to that from data at high $k$. This regime is related to growth of perturbations on small scales, and is thus affected by the radiation at early times. Comparing with the prediction where neutrinos are included, we get a reduction of $\plk$ on small scales, differing from the data by roughly the same magnitude. This does, nonetheless, seem reasonable. When neutrinos are ignored completely, matter domination begins earlier, there is less energy density in matter domination occurs earlier, and 
 \begin{figure}[ht!]
-    \includefig{matterPS_nk1000}
+    \includefig{matterPS_nk2000Neff}
     \caption{Computed matter power spectrum (solid blue curve), compared with observational data from \note{cite}. The equality scale, $\keq$, is marked as the vertical black line.}
-    \label{fig:M4:results:matterPS_nk1000}
+    \label{fig:M4:results:matterPS_nk2000Neff}
 \end{figure}
 
 
 
 
+
 \subsubsection{Photon multipoles} \label{sssec:M4:results:photons_multipoles}
+The integrand term $\Thl^2/k$ is shown in \figref{fig:M4:results:integrand_thetas}, where we scale it with a factor $\ell(\ell+1)$ as we did for $\cl$. 
 \begin{figure}[ht!]
     \includefig{integrand_thetas\pspecresolution\ellintegrand}
     \caption{The term involved in the integrand of \Eqref{eq:M4:theory:CMB_power_spectrum}, for different values of $\ell$. Note that we scale each integrand by $\ell(\ell+1)$, just as we did for $\cl$. This is done to see each of the terms simultaneously.}
