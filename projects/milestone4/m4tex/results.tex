@@ -49,7 +49,7 @@ The ISW appears to have a relatively small contribution to $\cl$, compared to th
 \subsubsection{Matter power spectrum} \label{sssec:M4:results:matter_power_spectrum}
 The matter power spectrum is plotted in \figref{fig:M4:results:matterPS_nk2000Neff}. For comparison, we have included the result obtained from not having $\neff=0$ in the background. This affects $\keq$, as well as the value of $\Phi$, since $\H$ is slightly altered by including neutrinos. We have not accounted for neutrinos when solving the perturbation ODEs, so this approach should only be taken as a highly approximate way of studying how neutrinos affect $\plk$. 
 
-The behaviour of $\plk$ follows that of \Eqref{eq:M4:theory:matter_power_spectrum_asymptotic_scaling}. There is a noticeable discrepancy between the predicted value of $\plk$ compared to that from data at high $k$. This regime is related to growth of perturbations on small scales, and is thus affected by the radiation at early times. Comparing with the prediction where neutrinos are included, we get a reduction of $\plk$ on small scales, differing from the data by roughly the same magnitude. This does, nonetheless, seem reasonable. When neutrinos are ignored completely, matter domination begins earlier, there is less energy density in matter domination occurs earlier, and 
+The behaviour of $\plk$ follows that of \Eqref{eq:M4:theory:matter_power_spectrum_asymptotic_scaling}. There is a noticeable discrepancy between the predicted value of $\plk$ compared to that from data at high $k$. This regime is related to growth of perturbations on small scales, and is thus affected by the radiation at early times. Comparing with the prediction where neutrinos are included, we get a reduction of $\plk$ on small scales, differing from the data by roughly the same magnitude. This does, nonetheless, seem reasonable. When neutrinos are ignored completely, matter domination begins earlier. Modes inside the horizon grows as $\Delta_M\propto\log(a)$ during radiation domination, while they grow as $\Delta_M\propto a$ during matter domination. Thus, small scale modes have been able to grow more, resulting in the difference between the predicted value of $\plk$, in blue, and the observational data. A crucial factor we have not mentioned is polarization. This will change $\Psi$ as they affect the $\Thl$ evolution, but whether this is noticeable or not difficult to assess without having studied the effect of neutrinos or polarization on the perturbation equations.       
 \begin{figure}[ht!]
     \includefig{matterPS_nk2000Neff}
     \caption{Computed matter power spectrum (solid blue curve), compared with observational data from \note{cite}. The equality scale, $\keq$, is marked as the vertical black line.}
@@ -61,13 +61,16 @@ The behaviour of $\plk$ follows that of \Eqref{eq:M4:theory:matter_power_spectru
 
 
 \subsubsection{Photon multipoles} \label{sssec:M4:results:photons_multipoles}
-The integrand term $\Thl^2/k$ is shown in \figref{fig:M4:results:integrand_thetas}, where we scale it with a factor $\ell(\ell+1)$ as we did for $\cl$. 
+The transfer function, $\Thl\code(k)$, and the integrand term of $\cl$, $\Thl^2/k$, is plotted for different values of $\ell$, shown in \figref{fig:M4:results:integrand_thetas} and \figref{fig:M4:results:thetas}, respectively. We stress that the files have been stored with a sampling of $N=2000$ values of $k$, which is less than $10\,\%$ of the number of values used to both compute the transfer function and $\cl$.  
+
+For the integrand in \figref{fig:M4:results:integrand_thetas} we have plotted for $\ell=20,\,200$ and $300$, and used a scaling of $\ell(\ell+1)$, just as we did for $\cl$, to better compare the different values. Towards higher $k$, it's evident that a high resolution is needed to obtain an accurate result. We note that all integrands die out very slowly, and a high resolution is thus important to sample the integrand properly upon integrating. Each graph peaks at $k\eta_0$ slightly larger than $\ell$, as expected from our previous discussions. This suggests that a natural way to increase numerical efficiency would be to omit the lower $k$-values when computing the source function for a given $\ell$. Comparing with Fig. 4 in \citeauthor{callin}, we get a reasonably good agreement, regarding the overall shape and evolution of the integrands.             
 \begin{figure}[ht!]
     \includefig{integrand_thetas\pspecresolution\ellintegrand}
     \caption{The term involved in the integrand of \Eqref{eq:M4:theory:CMB_power_spectrum}, for different values of $\ell$. Note that we scale each integrand by $\ell(\ell+1)$, just as we did for $\cl$. This is done to see each of the terms simultaneously.}
     \label{fig:M4:results:integrand_thetas}
 \end{figure}
 
+In \figref{fig:M4:results:thetas}, the aforementioned sampling issue is highly noticeable, with $N=2000$ causing clear sampling issues. The sampling used in the actual computations seems to give reasonable results, based on \figref{fig:M4:results:integrand_thetas}, which does not show such prominent sampling issues. From the shape of the transfer functions alone, it appears that increasing the sampling by a factor of $10$ could yield appropriate results. 
 
 \begin{figure}[ht!]
     \includefig{thetas\pspecresolution\ellthetas}
