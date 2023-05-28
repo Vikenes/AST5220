@@ -17,7 +17,7 @@ In the tight coupling regime we use the initial conditions given in \Eqref{eq:M3
 
 Next, we need to determine when the tight coupling approximation is valid. We use the same conditions as \citeauthor{callin}, namely that the approximation holds as long as $\abs{\tau'}>10$ and $\abs{k/\H\tau'}<1/10$, and that it should not be used after the start of recombination. For the latter condition, we choose $x<-8.3$ as the time when recombination starts. If any of these three conditions fails, we switch to the full ODEs. We then use the final results from the tight coupling regime as initial conditions for the ODEs in \Eqref{eq:M3:theory:perturbation_ODEs}, and integrate up to $x=0$. 
 
-\subsubsection{Integration of ODEs} \label{sssec:M3:implementations:integration_details}
+\subsubsection{Integration of ODEs} \label{sssec:M3:implementations:integration_of_ODEs}
 
 When solving the perturbation ODEs we integrate across $x$ for each mode $k$. We choose $N_k=200$ logarithmically spaced values of $k\in[k_\mathrm{min},\,k_\mathrm{max}]$, where $k_\mathrm{min}=5\cdot10^{-5}/\mathrm{Mpc}$ and $k_\mathrm{max}=0.3/\mathrm{Mpc}$. For the photon multipoles, we set $\ell_\mathrm{max}=7$.
 

@@ -2,6 +2,13 @@
 One of the most crucial parts about integrating to obtain $\Theta_l(k)$ and $\cl$, is that the quantities we're integrating are oscillating rapidly. We must therefore ensure that we have a sufficiently high resolution, so that we accurately sample the integrands. 
 
 \subsubsection{LOS integration} \label{sssec:M4:implementations:LOS_integration}
+We begin by computing the source function. For the distribution of $k$, we use the same configuration as we did in \secref{sssec:M3:implementations:integration_of_ODEs}. We use a linear spacing of $x\in[-15,\,0]$, with $N_x=5000$ points, ensuring sufficient sampling at intermediate and late times when it becomes important. The result is splined then splined across $k$ and $x$.  
 
+The second term needed for the LOS integration is the spherical Bessel functions. To increase efficiency when integrating \Eqref{eq:M4:theory:Theta_ell_LOS_integration}, we create a spline of the Bessel functions. We consider the interval $\tilde{x}\in[0,\,k\eta_0]$, with a spacing of $\Delta\tilde{x}=2\pi/n$ where $n=32$, to ensure sufficient sampling in each period of the oscillations. 
 
-\subsubsection{Computing the power spectrum \pnote{working title}} \label{sssec:M4:implementations:integrating_across_k}
+When computing $\Thl(k)$ for a given $\ell$, the spacing in $k$ is important to accurately integrate \Eqref{eq:M4:theory:C_ell_integral_definition} later on. For $\Thl(k)$ we use a linear spacing in $k$, with $\Delta k=\frac{2\pi}{\eta_0 n}$ for $n=32$. We use the same interval as we did in the source function. For each $k$ and $\ell$, \Eqref{eq:M4:theory:Theta_ell_LOS_integration} is integrated across $x$ with a simple trapezoidal method. We use $2000$ values of $x\in[-15,\,0]$ for this. The resulting multipole values are stored in a 2D spline over $k$ and $\ell$.  
+
+From \Eqref{eq:M4:theory:source_function_LOS} we see that the integrand is approximately zero when $\g=0$ and $\tau$ is very large. This suggests that a natural way of increasing the efficiency of this calculation is to identify when the source function is non-zero, independent of $k$ and $\ell$, thus reducing the number of points needed to accurately compute $\Thl(k)$.
+
+\subsubsection{Computing the power spectrum} \label{sssec:M4:implementations:integrating_across_k}
+The integral in \Eqref{eq:M4:theory:C_ell_integral_definition} can be computed by integrating over $\dd k/k=\dd \log k$. We therefore choose a linear spacing of logarithmic $k$-values, using the same resolution as we did for the LOS integration. We integrate using the trapezoidal rule once again, and store the final result on a spline.   
