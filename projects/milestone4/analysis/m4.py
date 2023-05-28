@@ -331,7 +331,7 @@ class PowerSpectrum:
 
 
         plot.plot_Thetas(self.k_eta0, Thetas, ells, fname=figname,
-                         ylabel=ylabel, logy=False, logx=True, xlim=xlim,
+                         ylabel=ylabel, logy=False, logx=False, xlim=xlim,
                          save=SAVE, temp=TEMP, push=PUSH)
         
 
@@ -356,7 +356,7 @@ class PowerSpectrum:
         figname = "integrand_" + self.fname_Thetas.split(".txt")[0] + ell_string
         ylabel=r"$\ell(\ell+1)|\Theta_\ell(k)|^2 / k \quad[\mathrm{Mpc}]$"
         plot.plot_Thetas(self.k_eta0, integrands, ells, fname=figname,
-                         ylabel=ylabel, logy=False, logx=True, ypad=10, xlim=xlim,
+                         ylabel=ylabel, logy=False, logx=False, ypad=10, xlim=xlim,
                          save=SAVE, temp=TEMP, push=PUSH)
 
 
@@ -375,9 +375,9 @@ fname_wmap = "wmap_act.txt"
 
 pspec = PowerSpectrum(fname_Cell, fname_MPS, fname_Thetas)
 
-SAVE=True
-PUSH=True
-TEMP=True
+# SAVE=True
+# PUSH=True
+# TEMP=True
 
 ### CMB power spectrum 
 # pspec.plot_Cell(fname_planck, logx=True)
@@ -389,22 +389,17 @@ TEMP=True
 # pspec.plot_Psi_plus_Theta0_at_peaks_and_troughs()
 
 ### Matter power spectrum 
-pspec.plot_matter_power_spectrum(fname_galaxy_survey, fname_wmap)
+# pspec.plot_matter_power_spectrum(fname_galaxy_survey, fname_wmap)
 
 
 
 ### Thetas 
-# pspec.plot_Theta0_at_peaks()
-# pspec.plot_Theta0_at_troughs()
-
-
-# pspec.plot_Thetas(ells=[2, 4, 10, 50], xlim=[1e0, 5e2])
-# pspec.plot_Thetas(ells=[1000, 2000], xlim=[9e2, 2.5e3])
-
+pspec.plot_Thetas(ells=[50, 200], xlim=[1e0, 1e3])
 
 ### Integrand 
+pspec.plot_Integrand(ells=np.array([20, 200, 300]), xlim=[1,5e2])
+
+### NOT USING 
 # pspec.plot_Integrand(ells=np.array([2, 5, 10]), xlim=[1, 200])
-# pspec.plot_Integrand(ells=np.array([2, 10, 50, 100]), xlim=[1,5e2])
-
-
+# pspec.plot_Thetas(ells=[1000, 2000], xlim=[9e2, 2.5e3])
 

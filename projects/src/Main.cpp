@@ -202,13 +202,13 @@ int main(int argc, char **argv){
     return 0;
   }
 
-  m4_output=true;
+  m4_output=false;
   //=========================================================================
   // Module IV
   //=========================================================================
   if(m4_output){
     bool components = false;
-    bool matter_PS = true;
+    bool matter_PS = false;
     bool source;
 
     if(matter_PS){
