@@ -42,7 +42,7 @@ project_path = "/home/vetle/Documents/master_studies/subjects/V23/AST5220/projec
 
 here = os.path.abspath(".")
 data_path = project_path + "/data/"
-latex_path = project_path + "/report/tables/"
+latex_path = project_path + "/m1tex/tables/"
 # temp_path = here + "/../../output/plots/temp/"
 # fig_path = here +"/figures/"
 pdf_path = project_path + "/analysis/figures/"
@@ -224,18 +224,19 @@ def plot_omega_params(x, m, r, L,
 
 def compare_dH_and_ddH_over_H(x, dH_over_H, ddH_over_H, 
                               dH_label, ddH_label, 
-                              x_mr_eq, x_mL_eq, 
+                              x_mr_eq, x_mL_eq, x_acc=None,
                               title=None, xlim=[-16,5], ylim=[-1.1, 1.5],
                               save=True, push=False, temp=False):
     
     fig, ax = plt.subplots(figsize=(11,8))
-
     dH_,  = ax.plot(x, dH_over_H, color='blue', label=dH_label)
     ddH_, = ax.plot(x, ddH_over_H, color='k', label=ddH_label)
+    H_handles = [dH_, ddH_]
 
     l1 = ax.hlines(-1, xmin=xlim[0], xmax=x_mr_eq,  ls='dashed',color='r', label=r'$w=1/3$')
     l2 = ax.hlines(-1/2, xmin=x_mr_eq, xmax=x_mL_eq,ls='dashed',color='green', label=r'$w=0$')
     l3 = ax.hlines(1, xmin=x_mL_eq, xmax=xlim[-1],  ls='dashed',color='orange', label=r'$w=-1$')
+    hline_handles = [l1,l2,l3]
 
     ax.hlines(1, xmin=xlim[0], xmax=x_mr_eq,  ls='dashed',color='r')
     ax.hlines(1/4, xmin=x_mr_eq, xmax=x_mL_eq,ls='dashed',color='green')
@@ -245,10 +246,15 @@ def compare_dH_and_ddH_over_H(x, dH_over_H, ddH_over_H,
                     color='red', label=r'$\Omega_\mathrm{rel}=\Omega_m$')
     l5 = ax.vlines(x_mL_eq, *ylim, ls='dotted', alpha=0.5,
                     color='green', label=r'$\Omega_m=\Omega_\Lambda$')
+    vline_handles = [l4,l5]
+    if x_acc is not None:
+        l6 = ax.vlines(x_acc, *ylim, ls='dotted', alpha=0.5,
+                       color='purple', label=r'$\ddot{a}=0$')
+        vline_handles.append(l6)
     
-    leg1 = plt.legend(handles=[dH_, ddH_], loc='center left', fontsize=40, handlelength=1)
-    leg2 = plt.legend(handles=[l1,l2,l3], loc='lower right')
-    leg3 = plt.legend(handles=[l4, l5], loc=(0.435,0.85))#, bbox_to_anchor=(-0.1,1))
+    leg1 = plt.legend(handles=H_handles, loc='center left', fontsize=40, handlelength=1)
+    leg2 = plt.legend(handles=hline_handles, loc='lower right')
+    leg3 = plt.legend(handles=vline_handles, loc=(0.435,0.8))#, bbox_to_anchor=(-0.1,1))
     ax.add_artist(leg1)
     ax.add_artist(leg2)
     ax.add_artist(leg3)
@@ -301,7 +307,7 @@ def plot_t_and_eta(x, t, etac, fname,
         l5 = ax.vlines(acc, *ylim, ls='dashed', color='purple', alpha=0.5, label=r'$\ddot{a}=0$')
 
     leg1 = plt.legend(handles=[l1,l2], loc='upper left')
-    leg2 = plt.legend(handles=[l3,l4,l5], loc=(0.425, 0.1))
+    leg2 = plt.legend(handles=[l3,l4,l5], loc=(0.445, 0.1))
     ax.add_artist(leg1)
     ax.add_artist(leg2)
 
@@ -328,7 +334,7 @@ def plot_dL(data, planck=None, fit=[None,None],
     fig, ax = plt.subplots(figsize=(8,7))
 
     if dL_fit is not None:
-        ax.plot(z_fit, dL_fit/z_fit, color='blue', label='Best fit')
+        ax.plot(z_fit, dL_fit/z_fit, color='blue', label='MCMC fit')
 
         ax.plot(z_planck, dL_planck/z_planck, color='green', ls='dashed', alpha=0.7, label='Planck Cosmology')
     else:
@@ -338,8 +344,8 @@ def plot_dL(data, planck=None, fit=[None,None],
                 capthick=1.5, capsize=5, elinewidth=2, color='r', ms=3,
                 label='Data')
 
-    xlabel=r'$z$'
-    ylabel=r'$d_L(z)/z \:[\mathrm{Gpc}]$'
+    xlabel=r'z'
+    ylabel=r'$d_L(\mathrm{z})/\mathrm{z} \:\: [\mathrm{Gpc}]$'
 
     ax.set_xscale('log')
     ax.set_yscale('log')
@@ -378,20 +384,97 @@ def plot_OmegaM_OmegaLambda_plane(OmegaM, OmegaLambda, chi2_1sigma, chi2_2sigma,
     set_ax_info(ax, xlabel=r"$\Omega_m$", ylabel=r"$\Omega_\Lambda$")
     save_push(fig, fname, save, temp=temp)
 
-    print('best fit:')
-    print(f'{OmegaM[chi2_min]:.5f}')
-    print(f'{OmegaLambda[chi2_min]:.5f}')
-    print(f'{1 - OmegaM[chi2_min] - OmegaLambda[chi2_min]:.5f}')
 
+def plot_OmegaM_OmegaK_plane(OmegaM, OmegaK, chi2_1sigma, chi2_2sigma, chi2_min, 
+                                  fname, save=True, temp=False):
 
+    fig, ax = plt.subplots(figsize=(10,8))
 
-def plot_H0_posterior_pdf(H0, bins, H0_gaussian, fname, save=True, temp=False):
+    ax.plot(OmegaM[chi2_2sigma], OmegaK[chi2_2sigma],'ro',ms=1)
+    ax.plot(OmegaM[chi2_1sigma], OmegaK[chi2_1sigma],'bo',ms=1)
+    ax.plot([], 'ro', label=r'$2\sigma$')
+    ax.plot([], 'bo', label=r'$1\sigma$')
+    # omega_k_zero = np.linspace(0, 1, 20)
+    # ax.plot(omega_k_zero, 1 - omega_k_zero, 'k--', label=r'$\Omega_k=0$')
+    ax.plot(OmegaM[chi2_min], OmegaK[chi2_min], 'D', color='orange', ms=10, label='Best fit')
+
+    # ax.set_xlim(0,0.8)
+    # ax.set_ylim(0.1,1.2)
+    set_ax_info(ax, xlabel=r"$\Omega_m$", ylabel=r"$\Omega_K$")
+    save_push(fig, fname, save, temp=temp)
+
+def plot_H0_posterior_pdf(H0, bins, H0_gaussian, fname, bestfit=None, save=True, temp=False):
     fig, ax = plt.subplots(figsize=(12,8))
 
-    ax.plot(bins, H0_gaussian, color='blue', label=r"$H_0\sim \mathcal{N}(\mu,\sigma^2)$")
-    ax.hist(H0, bins=bins, density=True, color='green', edgecolor='k')
+    ax.plot(bins, H0_gaussian, color='black', label=r"$H_0\sim \mathcal{N}(\mu,\sigma^2)$")
+    ax.hist(H0, bins=bins, density=True, color='skyblue', edgecolor='k')
+    if bestfit is not None:
+        ylim = ax.get_ylim()
+        ax.vlines(bestfit, *ylim, ls='solid', color='red', label='Best fit')
+
     set_ax_info(ax, xlabel=r"$H_0\:[\mathrm{km/s/Mpc}]$")
     save_push(fig, fname, save, temp=temp)
+
+def plot_fit_posterior_pdf(y, bins, fname, mean=None, gaussian=None, save=False, temp=False,
+                           param_name=None, xlabel=None):
+    
+    fig, ax = plt.subplots(figsize=(12,8))
+    
+    if gaussian is not None:
+        ax.plot(bins, gaussian, color='blue', label= param_name + r"$ \sim \mathcal{N}(\mu,\sigma^2)$")
+    
+    ax.hist(y, bins=bins, density=True, color='green', edgecolor='k')
+    
+    if mean is not None:
+        ylim = ax.get_ylim()
+        ax.vlines(mean, *ylim, ls='dashed', color='k', label='Mean')
+
+    set_ax_info(ax, xlabel=xlabel)
+    save_push(fig, fname, save, temp=temp)
+
+def bestfit_supernova_table(best_fit, standard_deviations, save=False):
+    # Define the variable names, best fit values, and standard deviations
+    variables = [r'$H_0$', r'$\Omega_{m0}$', r'$\Omega_{k0}$', r'$\chi^2/N$']
+    standard_deviations[0:3] = np.round(standard_deviations[0:3], 4)
+    best_fit.append(best_fit.pop(0))
+    best_fit = np.round(best_fit, 3)
+    
+    # Create a dictionary from the variables, best fit values, and standard deviations
+    data = {'Parameter': variables, 'Best Fit': best_fit, 'Standard Deviation': standard_deviations}
+    # Create a dataframe from the dictionary
+    df = pd.DataFrame(data)
+    
+    # Format the "Best Fit" column to include the standard deviation
+    df['Best Fit'] = "$ " + df['Best Fit'].astype(str) + r' \pm ' + df['Standard Deviation'].astype(str) + "$"
+    df['Best Fit'][3] = "$" + df['Best Fit'][3].split(" ")[1] + "$"
+    df['Best Fit'][0] = df['Best Fit'][0][:-1] + r"\,\mathrm{km/s/Mpc}$" #df['Best Fit'][0].replace()
+    
+    # Drop the "Standard Deviation" column
+    df = df.drop(columns='Standard Deviation')
+
+    # Set table info 
+    table_caption   = "Best fit parameters from supernova data"
+    table_name      = "best_fit_supernova"
+    table_label     = "tab:M1:results:" + table_name 
+    table_fname     = table_name + ".tex"
+
+    if save:
+        buffer = latex_path + table_fname
+    else:
+        buffer = None 
+
+
+    # Convert the dataframe to a LaTeX table
+    latex_table = df.to_latex(index=False,
+                              escape=False,
+                              caption=table_caption,
+                              label=table_label,
+                              position="h",
+                              buf=buffer)
+    
+    # Print the LaTeX table
+    if not save:
+        print(latex_table)
 
 
 def time_table(mr_eq, ml_eq, acc_onset, t0, eta0_over_c, 

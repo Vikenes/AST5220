@@ -27,7 +27,8 @@ class ExpansionHistory:
     def __init__(self, 
                  fname_cosmology,
                  time_unit=u.Myr,
-                 length_unit=u.Mpc):
+                 length_unit=u.Mpc,
+                 SN_burn=1000):
         self.data   = self.load(fname_cosmology) 
         self.x      = self.data[0]
         
@@ -35,11 +36,13 @@ class ExpansionHistory:
         self.length_unit = length_unit
         
         self.load_important_times(fname_cosmology) 
+        self.load_H_parameters()
 
-        self.supernova_loaded = False
-        self.H_loaded = False 
-        self.eta_t_loaded = False 
-        self.omegas_loaded = False 
+        self.load_eta_and_t()
+        self.load_omegas() 
+
+        self.load_supernova_data()
+        self.load_supernovafit(SN_burn)
 
     def load(self, filename, skiprows=1):
         data = np.loadtxt(DATA_PATH + filename, 
@@ -48,8 +51,8 @@ class ExpansionHistory:
         return data 
     
     def load_supernova_data(self, filename="supernovadata.txt"):
-        self.supernova_loaded = True
         self.supernovadata = self.load(filename)
+        self.N_SN_data = len(self.supernovadata[0])
 
         
     def load_important_times(self, filename):
@@ -68,8 +71,6 @@ class ExpansionHistory:
         self.t_ml_eq = (t_ml_eq*u.s).to(u.Gyr)
         self.t_acc_onset = (t_acc_onset*u.s).to(u.Gyr)
 
-
-
         t0 = important_times[6] * u.s 
         eta0 = important_times[7] * u.m 
         self.t0 = t0.to(u.Gyr)
@@ -80,8 +81,6 @@ class ExpansionHistory:
 
     def load_H_parameters(self, convert_units=True):
         # Load Hp, Hp'(x) and H''(x)
-        self.H_loaded = True 
-
         H_params = self.data[1:4] / u.s 
 
         if convert_units: 
@@ -139,18 +138,14 @@ class ExpansionHistory:
 
     def plot_eta_H_over_c(self):
         ### Plot eta*Hp/c ### 
-        if not self.H_loaded:
-            self.load_H_parameters()
-        if not self.eta_t_loaded:
-            self.load_eta_and_t()
     
         ylabel = r'$\eta \mathcal{H} / c $'
-
         eta_Hp_over_c = (self.eta*self.Hp / c).to(1)
 
         plot.plot_single_param(self.x, eta_Hp_over_c, 
                                "compare_eta_H_over_c.pdf", 
                                self.x_mr_eq, self.x_ml_eq, 
+                               acc=self.x_acc_onset,
                                legend=True,
                                xlabel=r"x", ylabel=ylabel, 
                                xlim=[-16,2], ylim=[0.75, 4], 
@@ -160,9 +155,6 @@ class ExpansionHistory:
 
     def plot_dH_ddH_over_H(self):
         ### Compare H'/H and H''/H with analytical approx. ### 
-        if not self.H_loaded:
-            self.load_H_parameters()
-
 
         dHp_over_Hp = self.dHp_dx / self.Hp
         ddHp_over_Hp = self.ddHp_ddx / self.Hp
@@ -180,8 +172,6 @@ class ExpansionHistory:
     
     def plot_Hp(self):
         ### Plot Hp(x) ### 
-        if not self.H_loaded:
-            self.load_H_parameters()
 
         ylabel = r'$\mathcal{H}\: \left[ \frac{100\,\mathrm{km/s}}{\mathrm{Mpc}} \right] $'
         
@@ -195,8 +185,6 @@ class ExpansionHistory:
 
     def plot_eta_t(self):
         ### Plot eta and t ### 
-        if not self.eta_t_loaded:
-            self.load_eta_and_t()
 
         ylabel = rf"Time $[\mathrm{{{self.time_unit}}}]$"
         eta_over_c = (self.eta / c).to(self.time_unit)
@@ -210,8 +198,6 @@ class ExpansionHistory:
 
     def plot_omegas(self):
         ### Plot density parameters ### 
-        if not self.omegas_loaded:
-            self.load_omegas()
         title = r"$\Omega_i(x)$"
 
         plot.plot_omega_params(self.x, 
@@ -232,9 +218,6 @@ class ExpansionHistory:
         ### plot_fit=True: Plot dL from the simulation with parameters obtained from supernovafit.
         #       Planck results included for comparison
         
-        if not self.supernova_loaded:
-            self.load_supernova_data() 
-
         z, dL, dL_error = self.supernovadata
         planck_data     = self.load(fname_dL_planck)
         fit_data        = self.load(fname_dL_fitted)
@@ -256,37 +239,49 @@ class ExpansionHistory:
         # Load result from supernova fit 
         # Leave out the first N=burn results  
         supernova_mcmc_results = self.load("supernovafit.txt", skiprows=1+burn)
-        chi2, h, OmegaM, OmegaK = supernova_mcmc_results
-        return chi2, h, OmegaM, OmegaK
+        self.chi2, self.h_SN, self.OmegaM_SN, self.OmegaK_SN = supernova_mcmc_results
+
+        self.OmegaLambda_SN = 1 - self.OmegaM_SN - self.OmegaK_SN
+        self.H0_SN = self.h_SN * (100 * u.km / u.s / u.Mpc)
+        
+        self.bestfit_idx = np.argmin(self.chi2)
+        self.chi2_min = np.min(self.chi2) 
+        self.chi2_1sigma = self.chi2 < self.chi2_min + 3.53
+        self.chi2_2sigma = self.chi2 < self.chi2_min + 8.02 
+
+
+
+
+        self.best_fit = list(supernova_mcmc_results[:,self.bestfit_idx])
+        self.best_fit[0] /= self.N_SN_data
+        self.best_fit[1] *=  100 #* u.km / u.s / u.Mpc
+
 
 
     def plot_supernova_fit_omegas(self, burn=1000):
         # Plot OmegaM-OmegaK confidence region.
-        chi2, h, OmegaM, OmegaK = self.load_supernovafit(burn)
+        # chi2, h, OmegaM, OmegaK = self.load_supernovafit(burn)
     
-        OmegaLambda = 1 - OmegaM - OmegaK 
-        chi2min = np.min(chi2)
-        chi2_1sigma = chi2 < chi2min + 3.53
-        chi2_2sigma = chi2 < chi2min + 8.02
+        # OmegaLambda = 1 - OmegaM - OmegaK 
+        # chi2min = np.min(chi2)
+        # chi2_1sigma = chi2 < chi2min + 3.53
+        # chi2_2sigma = chi2 < chi2min + 8.02
 
-        plot.plot_OmegaM_OmegaLambda_plane(OmegaM, OmegaLambda, 
-                                        chi2_1sigma, chi2_2sigma, chi2_min=np.argmin(chi2),
+        plot.plot_OmegaM_OmegaLambda_plane(self.OmegaM_SN, self.OmegaLambda_SN, 
+                                        self.chi2_1sigma, self.chi2_2sigma, chi2_min=self.bestfit_idx,
                                         fname=f"mcmc_supernova_fit_Nburn{burn}.pdf", 
                                         save=SAVE, temp=TEMP)
 
-
     def plot_supernova_fit_H0_pdf(self, burn=1000):
         # Plot H0 pdf
-        h = self.load_supernovafit(burn)[1]
+        # h = self.load_supernovafit(burn)[1]
+        # bestfit_idx = np.argmin(self.load_supernovafit)
 
-        H0 = h * (100*u.km / u.s / u.Mpc)
+        # H0 = h * (100*u.km / u.s / u.Mpc)
 
-        H0_mean = np.mean(H0)
-        H0_std  = np.std(H0) 
-        H0_var  = np.var(H0) 
-
-        print(f"H0 mean: {H0_mean:.5f}")
-        print(f"H0 std : {H0_std:.5f}")
+        H0_mean = np.mean(self.H0_SN)
+        H0_std  =  np.std(self.H0_SN) 
+        H0_var  =  np.var(self.H0_SN) 
 
         
         H0_min = H0_mean - 4*H0_std 
@@ -296,15 +291,58 @@ class ExpansionHistory:
 
         H0_gaussian_distr = (2*np.pi*H0_std**2)**(-1/2) * np.exp(-(bins - H0_mean)**2 / (2 * H0_var))
 
-        plot.plot_H0_posterior_pdf(H0, bins, H0_gaussian_distr,
-                                    fname=f'H0_pdf_Nburn{burn}.pdf', save=SAVE, temp=TEMP)
+        plot.plot_H0_posterior_pdf(self.H0_SN, bins, H0_gaussian_distr,
+                                    fname=f'H0_pdf_Nburn{burn}.pdf', 
+                                    bestfit = self.best_fit[1],
+                                    save=SAVE, temp=TEMP)
+
+    def supernova_bestfit_table(self):
+        # Plot H0 pdf
+        # chi2, h, OmegaM, OmegaK = self.load_supernovafit(burn)
+        # H0 = h * (100*u.km / u.s / u.Mpc)
+
+        # best_fit_idx = np.argmin(chi2)
+        # chi2_best = chi2[best_fit_idx]
+
+        
+        # chi2best_over_N = chi2_best/self.N_SN_data
+        # best_fit = [H0[best_fit_idx].value, OmegaM[best_fit_idx], OmegaK[best_fit_idx], chi2best_over_N]
+
+        standard_deviations = [np.std(self.H0_SN.value), np.std(self.OmegaM_SN), np.std(self.OmegaK_SN), None]
+        plot.bestfit_supernova_table(self.best_fit, standard_deviations, save=SAVE)
+
+    def supernova_plot_chi2(self, burn=1000):
+        chi2_over_N = self.load_supernovafit(burn)[0] / self.N_SN_data
+        chi2_mean = np.mean(chi2_over_N)
+        chi2_std  = np.std(chi2_over_N) 
+        chi2_var  = np.var(chi2_over_N) 
+
+        
+        chi2_min = chi2_mean - 4*chi2_std 
+        chi2_max = chi2_mean + 4*chi2_std 
+        N_bins = 100 
+        bins   = np.linspace(chi2_min, chi2_max, N_bins)
+
+        plot.plot_fit_posterior_pdf(chi2_over_N, bins, mean=chi2_mean,
+                                    fname="chi2_pdf.pdf", 
+                                    param_name=r"$\chi^2 / N$", xlabel=r"$\chi^2 / N$",
+                                    save=SAVE, temp=TEMP)
+
 
 
     def best_fit_values(self, burn=1000):
         chi2, h, OmegaM, OmegaK = self.load_supernovafit(burn)
         H0 = h * (100*u.km / u.s / u.Mpc)
 
+        bestfit = np.argmin(np.abs(chi2/self.N_SN_data - 1))
+        print(H0[bestfit])
+        print(OmegaM[bestfit])
+        print(OmegaK[bestfit])
+
+        
+        exit()
         H0_std = np.std(H0)
+
         OmegaM_std = np.std(OmegaM)
         OmegaK_std = np.std(OmegaK)
 
@@ -327,16 +365,23 @@ class ExpansionHistory:
 
 Cosmology = ExpansionHistory("cosmology_new.txt")
 
-# SAVE = True 
-# TEMP = True 
+SAVE = True 
+TEMP = True 
 
-Cosmology.plot_eta_H_over_c()
+### COMPLETE ### 
 Cosmology.plot_dH_ddH_over_H()
+Cosmology.plot_eta_H_over_c()
 Cosmology.plot_Hp()
 Cosmology.plot_eta_t()
 Cosmology.plot_omegas()
 Cosmology.plot_dL(fname_dL_fitted="bestfit_dL.txt", fname_dL_planck="planck_dL.txt")
 Cosmology.plot_supernova_fit_omegas()
 Cosmology.plot_supernova_fit_H0_pdf()
-# Cosmology.make_table()
+
+### CHECK ### 
+
+# Cosmology.best_fit_values()
+
+# Cosmology.supernova_bestfit_table()
+# Cosmology.supernova_plot_chi2()
 
