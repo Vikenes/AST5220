@@ -125,7 +125,6 @@ void BackgroundCosmology::solve_eta(double x_low, double x_high){
 
 
 void BackgroundCosmology::solve_t(){
-  Utils::StartTiming("t");
   //=============================================================================
   // Solve ODE for t(x) and Spline result.
   //=============================================================================
@@ -148,7 +147,6 @@ void BackgroundCosmology::solve_t(){
   auto t_array = t_ode.get_data_by_component(0);
   t_of_x_spline.create(x_array, t_array, "t(x) spline");
 
-  Utils::EndTiming("t");
 }
 
 

@@ -20,20 +20,26 @@ class RecombinationHistory{
     // Helium fraction
     double Yp;
 
+    // Xe for when to switch between Saha and Peebles
+    double Xe_saha_limit;
+
     // The start and end points for recombination arrays (can be modified)
-    const double x_start  = Constants.x_start;
+    const double x_start  = -15.0;
     const double x_end    = Constants.x_end;
 
     // Numbers of points of Xe,ne array (modify as you see fit)
-    const int npts_rec_arrays = 1e5;
+    const int npts_rec_arrays = 1e4;
   
-    // Xe for when to switch between Saha and Peebles
     // const double Xe_saha_limit = 1e-6;
-    const double Xe_saha_limit = 0.99;
     
     
     double c_;
     double sigma_T_; 
+    double m_e_;
+    double k_b_;
+    double hbar_;
+    double eps0_;
+    double lambda_2s1s_;
 
 
 
@@ -87,7 +93,8 @@ class RecombinationHistory{
     RecombinationHistory() = delete;
     RecombinationHistory(
         BackgroundCosmology *cosmo, 
-        double Yp);
+        double Yp,
+        double Xe_saha_limit);
 
     // Do all the solving
     void solve();

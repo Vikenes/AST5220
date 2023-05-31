@@ -6,17 +6,27 @@
    
 RecombinationHistory::RecombinationHistory(
     BackgroundCosmology *cosmo, 
-    double Yp) :
+    double Yp,
+    double Xe_saha_limit) :
   cosmo(cosmo),
-  Yp(Yp)
-{}
+  Yp(Yp),
+  Xe_saha_limit(Xe_saha_limit)
+{
+  c_ = Constants.c;
+  sigma_T_ = Constants.sigma_T;
+  m_e_ = Constants.m_e;
+  k_b_ = Constants.k_b;
+  hbar_ = Constants.hbar;
+  eps0_ = Constants.epsilon_0;
+  lambda_2s1s_ = Constants.lambda_2s1s;
+}
 
 //====================================================
 // Do all the solving we need to do
 //====================================================
 
 void RecombinationHistory::solve(){
-    
+  
   // Compute and spline Xe, ne
   solve_number_density_electrons();
    
@@ -120,14 +130,10 @@ void RecombinationHistory::solve_number_density_electrons(){
 //====================================================
 std::pair<double,double> RecombinationHistory::electron_fraction_from_saha_equation(double x) const{
   // Physical constants
-  double k_b         = Constants.k_b;
-  double m_e         = Constants.m_e;
-  double hbar        = Constants.hbar;
-  double epsilon_0   = Constants.epsilon_0;
 
   // Fetch cosmological parameters
   const double Tb          = cosmo->get_TCMB(x);
-  const double kT          = k_b * Tb;
+  const double kT          = k_b_ * Tb;
   const double nb          = nb_of_x(x); 
 
 
@@ -139,8 +145,8 @@ std::pair<double,double> RecombinationHistory::electron_fraction_from_saha_equat
   // TODO: Compute Xe and ne from the Saha equation
   //=============================================================================
 
-  double pre_factor      = m_e * k_b*Tb / (2.0 * M_PI * hbar * hbar);
-  double y               = 1.0/nb * pow(pre_factor, 1.5) * exp(-epsilon_0 / (kT));
+  double pre_factor      = m_e_ * k_b_*Tb / (2.0 * M_PI * hbar_ * hbar_);
+  double y               = 1.0/nb * pow(pre_factor, 1.5) * exp(-eps0_ / (kT));
 
   // Compute Xe 
   // Set Xe=1 when y is very large to avoid numerical errors. 
@@ -165,14 +171,6 @@ int RecombinationHistory::rhs_peebles_ode(double x, const double *Xe, double *dX
   // Current value of X_e
   double X_e         = Xe[0];
 
-  // Physical constants in SI units
-  const double k_b         = Constants.k_b;
-  const double c           = Constants.c;
-  const double m_e         = Constants.m_e;
-  const double hbar        = Constants.hbar;
-  const double sigma_T     = Constants.sigma_T;
-  const double lambda_2s1s = Constants.lambda_2s1s;
-  const double epsilon_0   = Constants.epsilon_0;
 
   // Cosmological parameters
   const double Tb           = cosmo->get_TCMB(x);
@@ -180,16 +178,16 @@ int RecombinationHistory::rhs_peebles_ode(double x, const double *Xe, double *dX
   const double nb           = nb_of_x(x); // Assume all baryons are protons 
 
   // Relevant physical quantities for the Peebles equation
-  double kT                 = k_b * Tb;
-  double eps0_over_kT       = epsilon_0 / kT;
-  double eps_over_hc_cubed  = epsilon_0*epsilon_0*epsilon_0 / (hbar*hbar*hbar * c*c*c);
+  double kT                 = k_b_ * Tb;
+  double eps0_over_kT       = eps0_ / kT;
+  double eps_over_hc_cubed  = eps0_*eps0_*eps0_ / (hbar_*hbar_*hbar_ * c_*c_*c_);
 
   //=============================================================================
   // Compute parameters of the Peebles equation 
   //=============================================================================
   double phi2      = 0.448 * log(eps0_over_kT);
-  double alpha2    = 8. / sqrt(3.*M_PI) * c * sigma_T * sqrt(eps0_over_kT) * phi2;
-  double beta      = alpha2 * pow((m_e*kT / (2.*M_PI*hbar*hbar)),1.5) * exp(-eps0_over_kT);
+  double alpha2    = 8. / sqrt(3.*M_PI) * c_ * sigma_T_ * sqrt(eps0_over_kT) * phi2;
+  double beta      = alpha2 * pow((m_e_*kT / (2.*M_PI*hbar_*hbar_)),1.5) * exp(-eps0_over_kT);
   double nH        = (1. - Yp) * nb; // Yp=0. 
   double n1s       = (1. - X_e) * nH;
 
@@ -199,8 +197,8 @@ int RecombinationHistory::rhs_peebles_ode(double x, const double *Xe, double *dX
     beta2 = beta * exp(0.75 * eps0_over_kT);
 
   double Lambda_alpha = H * 27. * eps_over_hc_cubed / (64. * M_PI*M_PI * n1s);
-  double Cr           = (lambda_2s1s + Lambda_alpha) 
-                         / (lambda_2s1s + Lambda_alpha + beta2); 
+  double Cr           = (lambda_2s1s_ + Lambda_alpha) 
+                         / (lambda_2s1s_ + Lambda_alpha + beta2); 
 
   dXedx[0] = Cr/H * (beta*(1. - X_e) - nH*alpha2 * X_e*X_e);
 
@@ -225,9 +223,7 @@ void RecombinationHistory::solve_for_optical_depth_tau(){
     //=============================================================================
     // TODO: Write the expression for dtaudx
     //=============================================================================
-    double c       = Constants.c; 
-    double sigma_T = Constants.sigma_T;
-    dtaudx[0] = - c * sigma_T * ne_of_x(x) * exp(x) / cosmo->Hp_of_x(x); 
+    dtaudx[0] = - c_ * sigma_T_ * ne_of_x(x) * exp(x) / cosmo->Hp_of_x(x); 
     return GSL_SUCCESS;
   };
 
@@ -378,12 +374,11 @@ double RecombinationHistory::cs_of_x(double x) const{
   //====================================================
   // Compute sound speed of photon baryon plasma
   //====================================================
-  double c            = Constants.c;
   double OmegaR       = cosmo->get_OmegaR(x);
   double OmegaB       = cosmo->get_OmegaB(x);
   double nominator    = 4.0*OmegaR;
   double denominator  = 3.0*OmegaB + nominator;
-  double c_s          = c / sqrt(3.0) * sqrt(nominator / denominator);
+  double c_s          = c_ / sqrt(3.0) * sqrt(nominator / denominator);
 
   return c_s;
 }
@@ -435,14 +430,11 @@ void RecombinationHistory::info() const{
 void RecombinationHistory::output(const std::string filename) const{
   
   std::string fname = filename;
-  if(Xe_saha_limit < 0.99){
-    int idx = filename.find(".");
-    fname = fname.insert(idx, "_saha");
-  }
 
   std::ofstream fp(fname.c_str());
 
-  std::cout << "Writing result to " << fname << std::endl; 
+  std::cout << "Writing result to " << fname << "\n"; 
+  std::cout << std::endl; 
 
   const int npts       = nx_write;
   const double x_min   = x_start;
@@ -470,17 +462,9 @@ void RecombinationHistory::output(const std::string filename) const{
 void RecombinationHistory::output_important_times(const std::string filename) const{
   std::string fname = filename;
 
-  if(Xe_saha_limit < 0.99){
-    int idx = filename.find(".");
-    fname = fname.insert(idx, "_saha");
-  }
-
-  std::cout << fname << std::endl;
-  
   std::ofstream fp(fname.c_str());
 
-  std::cout << "Computing decoupling and recombination time. " << std::endl
-  << "Writing to: " << fname << std::endl;
+  std::cout << "Writing decoupling and recombination time to: " << fname << "\n" << std::endl;
 
   // Locate tau=1. 
   double tau_at_dec = 1.0; 
@@ -508,11 +492,11 @@ void RecombinationHistory::output_important_times(const std::string filename) co
   auto z = [&](double x){ return exp(-x) - 1.0; };
   auto t = [&](double x){ return cosmo->get_t_of_x(x); }; 
 
-  fp << "LS Recombination \n";
-  fp << "x: " << x_dec_g_peak << " " << x_recomb << " \n";
-  fp << "z: " << z(x_dec_g_peak) << " " << z(x_recomb) << " \n"; 
-  fp << "t: " << t(x_dec_g_peak) << " " << t(x_recomb) << " \n"; 
-  fp << "r: " << s_of_x(x_dec_g_peak) << " " << s_of_x(x_recomb) << " \n"; 
+  fp << "param dec_tau deg_g rec  \n";
+  fp << "x: " << x_dec_tau        << " " << x_dec_g_peak        << " " << x_recomb << " \n";
+  fp << "z: " << z(x_dec_tau)     << " " << z(x_dec_g_peak)     << " " << z(x_recomb) << " \n"; 
+  fp << "t: " << t(x_dec_tau)     << " " << t(x_dec_g_peak)     << " " << t(x_recomb) << " \n"; 
+  fp << "r: " << s_of_x(x_dec_tau)<< " " << s_of_x(x_dec_g_peak)<< " " << s_of_x(x_recomb) << " \n"; 
 
 
 

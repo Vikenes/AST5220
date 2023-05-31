@@ -21,23 +21,29 @@ int main(int argc, char **argv){
   double TCMB        = 2.7255;
 
   // Recombination parameters
-  double Yp          = 0.0;
-
+  double Yp             = 0.0;
+  double Xe_saha_limit  = 0.99;
 
   // Power-spectrum parameters
   double A_s         = 2.1e-9;
   double n_s         = 0.965;
   double kpivot_mpc  = 0.05;
 
+  // What to solve 
   bool m1_output = false;
   bool supernova = false;
-  bool m2_output = false;
+
+  bool m2_output = true;
+  
   bool m3_output = false;
   bool m3_theta0 = false;
+  
   bool m4_output = false;
 
-  std::string M4_DATA_PATH = "milestone4/data/";
+  std::string M1_DATA_PATH = "milestone1/data/";
+  std::string M2_DATA_PATH = "milestone2/data/";
   std::string M3_DATA_PATH = "milestone3/data/";
+  std::string M4_DATA_PATH = "milestone4/data/";
 
 
 
@@ -46,8 +52,6 @@ int main(int argc, char **argv){
   // Module I
   //=========================================================================
 
-  // m1_output=true;
-  // supernova=true;
   if(m1_output){
     // Set up and solve the background
     std::string M1_OUTPATH = "milestone1/data/";
@@ -93,7 +97,7 @@ int main(int argc, char **argv){
       // cosmo.output(M1_OUTPATH + "NEWcosmology_times.txt");    // High resolution for important times  
     }
 
-
+    return 0;
 
   }
 
@@ -106,19 +110,23 @@ int main(int argc, char **argv){
     cosmo.solve();
 
     // Solve the recombination history
-    RecombinationHistory rec(&cosmo, Yp);
+    RecombinationHistory rec(&cosmo, Yp, Xe_saha_limit);
     rec.solve();
-    rec.info();
+    // rec.info();
+
+    RecombinationHistory rec_saha(&cosmo, Yp, 1e-6);
+    rec_saha.solve();
   
   
     // Output recombination quantities
-    rec.output("milestone2/data/recombination.txt");
-    rec.output("milestone2/data/recombination_saha.txt");
-    rec.output("milestone2/data/recombination_split.txt");
+    rec.output(M2_DATA_PATH + "recombination.txt");
+    rec_saha.output(M2_DATA_PATH + "recombination_saha.txt");
   
     //===== Find decoupling times ======
-    rec.output_important_times("milestone2/data/rec_times.txt");
-    rec.output_important_times("milestone2/data/rec_times_saha.txt");
+    rec.output_important_times(M2_DATA_PATH + "rec_times.txt");
+    rec_saha.output_important_times(M2_DATA_PATH + "rec_times_saha.txt");
+
+    return 0;
   }
 
   //=========================================================================
@@ -131,7 +139,7 @@ int main(int argc, char **argv){
     cosmo.solve();
 
     // Solve the recombination history
-    RecombinationHistory rec(&cosmo, Yp);
+    RecombinationHistory rec(&cosmo, Yp, Xe_saha_limit);
     rec.solve();
   
     // Solve the perturbations
@@ -185,7 +193,7 @@ int main(int argc, char **argv){
     cosmo.solve();
 
     // Solve the recombination history
-    RecombinationHistory rec(&cosmo, Yp);
+    RecombinationHistory rec(&cosmo, Yp, Xe_saha_limit);
     rec.solve();
   
     // Solve the perturbations
@@ -199,10 +207,10 @@ int main(int argc, char **argv){
 
     pert.outputPsi(k_peaks_arr, M4_DATA_PATH + "Psi_of_x_at_peaks.txt");
     pert.outputPsi(k_troughs_arr, M4_DATA_PATH + "Psi_of_x_at_troughs.txt");
+
     return 0;
   }
 
-  m4_output=false;
   //=========================================================================
   // Module IV
   //=========================================================================
@@ -222,7 +230,7 @@ int main(int argc, char **argv){
     cosmo.solve();
 
     // Solve the recombination history
-    RecombinationHistory rec(&cosmo, Yp);
+    RecombinationHistory rec(&cosmo, Yp, Xe_saha_limit);
     rec.solve();
 
     // Solve the perturbations
