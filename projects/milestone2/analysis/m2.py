@@ -42,6 +42,13 @@ class Recombination:
         self.length_unit    = length_unit
         self.time_unit      = time_unit
 
+        self.load_taus()
+        self.load_g()
+        self.load_x_decoupling()
+        self.load_Xe()
+        self.load_ne()
+        self.load_sound_horizon()
+
 
 
     
@@ -49,9 +56,10 @@ class Recombination:
         return np.loadtxt(data_path + filename, unpack=True, skiprows=skiprows)
     
     def load_x_decoupling(self):
-        x = np.loadtxt(data_path + self.rec_dec_file, skiprows=1, usecols=(1,2))[0]
-        self.xLSS     = x[0]
-        self.xrec     = x[1]
+        x = np.loadtxt(data_path + self.rec_dec_file, skiprows=1, usecols=(1,2,3))[0]
+        self.xdec_tau     = x[0]
+        self.xdec_g       = x[1]
+        self.xrec         = x[2]
 
     
     def load_Xe(self):
@@ -81,76 +89,6 @@ class Recombination:
         # Convert from x to redshift 
         return np.exp(-x) - 1 
     
-    ##########################################
-    # Make use of the times data in the class 
-    ##########################################
-    def assert_valid_recombination_value(self, print_x=False, stop=False):
-        """
-        Check that recombination occurs at z in [1050, 1150]
-        both via tau(x_rec)=1 and g_tilde(x_rec)=max(g_tilde)
-        """
-        if hasattr(self, 'tau'):
-            pass
-        else:
-            self.load_taus()
-
-        if hasattr(self, 'g_tilde'):
-            pass
-        else:
-            self.load_g()
-
-        tau_equal_1_idx = np.argmin(np.abs(self.tau - 1))
-        g_peak_idx      = np.argmax(self.g_tilde)
-        x_rec_tau = self.x[tau_equal_1_idx]
-        x_rec_g= self.x[g_peak_idx]
-        z_rec_tau = self.x_to_redshift(x_rec_tau)
-        z_rec_g   = self.x_to_redshift(x_rec_g)
-    
-
-        if z_rec_tau < 1050 or z_rec_tau > 1150:
-            print(" ")
-            print("### ERROR ###")
-            print("Invlaid solution. tau=1 at z outside [1050, 1150]")
-            print_x = True 
-            stop = True  
-
-        elif z_rec_g < 1050 or z_rec_g > 1150:
-            print("### ERROR ###")
-            print("Invlaid solution. g peaks at z outside [1050, 1150]")
-            print_x = True 
-            stop = True 
-
-        if print_x:
-            print(f"z(tau=1) = {z_rec_tau:.5f}, x={x_rec_tau:.5f}")
-            print(f"z(g_max) = {z_rec_g:.5f}, x={x_rec_g:.5f}")
-
-        if stop:
-            exit()
-
-    def assert_normalized_g_tilde(self, tol=1e-4, print_g=False, stop=False):
-        """
-        Check that g_tilde is sufficiently normalized to 1
-        by checking whether abs(g-1) > tol   
-        """
-
-        if hasattr(self, 'g_tilde'):
-            pass
-        else:
-            self.load_g()
-
-        g_integrated = simpson(self.g_tilde, self.x)
-        delta_g_norm = abs(g_integrated - 1)
-        if delta_g_norm > tol:
-            print("### WARNING ###")
-            print("g_tilde(x) not properly normalized.")
-            print_g = True 
-            stop = True
-        
-        if print_g:
-            print(f"  int g(x) deviation = {delta_g_norm:.5e}")
-
-        if stop:
-            exit() 
 
     def Xe_today(self):
         self.load_Xe()
@@ -163,24 +101,18 @@ class Recombination:
                    ylim=[1e-4, 2], xlim=[-7.8,-5.3],
                    figname="compare_Xe_peebles_saha.pdf"):
         
-        if hasattr(self, 'Xe'):
-            pass
-        else:
-            self.load_Xe()
 
-        if RECOMBINATION:
-            if not hasattr(self, "xrec"):
-                self.load_x_decoupling()
+        # if RECOMBINATION:
             
-            xrec_peebles = self.xrec
+            # xrec_peebles = self.xrec
 
 
         plot.compare_Xe_peebles_and_saha(self.x, x_saha,
                                          self.Xe, Xe_saha,
-                                         xrec_peebles=xrec_peebles, xrec_saha=xrec_saha,
+                                         xrec_peebles=self.xrec, xrec_saha=xrec_saha,
                                          fname=figname,
                                          xlim=xlim, ylim=ylim,
-                                         rec_times=RECOMBINATION,
+                                         rec_times=True,
                                          save=SAVE, temp=TEMP)
 
 
@@ -195,11 +127,6 @@ class Recombination:
         Plot g(x), g'(x) and g''(x)
         scale g'(x) and g''(x) to fit in the same plot as g(x)
         """
-
-        if hasattr(self, 'g_tilde'):
-            pass
-        else:
-            self.load_g()
 
         dg_dx_scaled = self.dg_tilde_dx / dg_dx_scaling
         ddg_ddx_scaled = self.ddg_tilde_ddx / ddg_ddx_scaling
@@ -218,17 +145,13 @@ class Recombination:
         plot.plot_quantity_with_derivatives(x, y, dy, ddy, 
                                             y_legend, dy_legend, ddy_legend,
                                             fname=figname,
-                                            xlim=xlim, log=False,
+                                            x_dec=self.xdec_tau, dec_leg=r"$\tau=1$",
+                                            xlim=xlim, ylim=[-3.6, 5.4], log=False,
                                             save=SAVE, temp=TEMP)
 
 
     def plot_tau_with_derivatives(self, xlim=[-10,0], ylim=[1e-8, 1e6],
                                   figname="tau_plot.pdf"):
-
-        if hasattr(self, 'tau'):
-            pass
-        else:
-            self.load_taus()
 
         x   = self.x 
         y   = self.tau 
@@ -242,6 +165,7 @@ class Recombination:
         plot.plot_quantity_with_derivatives(x, y, dy, ddy, 
                                             y_legend, dy_legend, ddy_legend,
                                             fname="tau_plot.pdf",
+                                            x_dec=self.xdec_tau, dec_leg=r"$\tau=1$",
                                             xlim=xlim, ylim=ylim,
                                             save=SAVE, temp=TEMP)
 
@@ -283,8 +207,6 @@ rec_saha_only.load_x_decoupling()
 
 x_rec_saha = rec_saha_only.xrec
 
-rec.assert_valid_recombination_value()
-rec.assert_normalized_g_tilde()
 
 
 
@@ -296,7 +218,7 @@ rec.assert_normalized_g_tilde()
 
 # rec.plot_tau_with_derivatives()
 # rec.plot_visibility_functions()
-# rec.compare_Xe(x_saha=x_saha, Xe_saha=Xe_saha, xrec_saha=x_rec_saha)
+rec.compare_Xe(x_saha=x_saha, Xe_saha=Xe_saha, xrec_saha=x_rec_saha)
 # rec.make_table(True)
 # rec.make_table()
 

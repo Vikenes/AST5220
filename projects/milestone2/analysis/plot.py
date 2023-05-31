@@ -133,13 +133,16 @@ def load(file, folder=data_path, skiprows=0):
 
 def plot_quantity_with_derivatives(x, y, dy, ddy,
                                    y_legend, dy_legend, ddy_legend, 
-                                   fname, xlabel=r"$x$", ylabel=None, 
+                                   fname, 
+                                   xlabel=r"$x$", ylabel=None, 
+                                   x_dec=None, dec_leg=None, 
                                    xlim=None, ylim=None, 
                                    legendloc='best', yticks=None, 
                                    figsize=(8,6), log=True, 
                                    save=True, temp=False):
 
     fig, ax = plt.subplots(figsize=figsize)
+
     ax.plot(x, y  ,ls='solid' , color='blue'  , label=y_legend)
     ax.plot(x, dy ,ls='dashed', color='orange', label=dy_legend)
     ax.plot(x, ddy,ls='dotted', color='green' , label=ddy_legend)
@@ -147,6 +150,12 @@ def plot_quantity_with_derivatives(x, y, dy, ddy,
     
     ax.set_ylim(ylim)
     ax.set_xlim(xlim)
+
+    if x_dec is not None:
+        if ylim is None:
+            ylim=ax.get_ylim()
+        ax.vlines(x_dec, *ylim, ls='solid', colors='k', alpha=0.5, label=dec_leg)
+    
 
     if log:
         ax.set_yscale('log')
