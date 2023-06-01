@@ -33,7 +33,7 @@ int main(int argc, char **argv){
   bool m1_output = false;
   bool supernova = false;
 
-  bool m2_output = true;
+  bool m2_output = false;
   
   bool m3_output = false;
   bool m3_theta0 = false;

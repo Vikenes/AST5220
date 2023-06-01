@@ -1,0 +1,93 @@
+\documentclass{aa}
+
+\usepackage{preamble}
+\usepackage{newcommands}
+
+\begin{document} 
+   \title{My paper on the cosmic microwave background and formation of structures in our Universe}
+
+   \author{V. A. Vikenes\inst{1}}
+ 
+   \institute{Institute of Theoretical Astrophysics,  
+                University of Oslo,  0315 Oslo,  Norway\\
+              \email{v.a.vikenes@astro.uio.no}
+             }
+
+   \date{\today}
+
+  \abstract{The code for this project can be found on my GitHub repository: \url{https://github.com/Vikenes/AST5220/}}
+
+   \keywords{   cosmic microwave background  --
+                large-scale structure of Universe
+               }
+
+   \maketitle
+
+\section{Introduction}
+In this report our goal is to compute the angular power spectrum of the cosmic microwave background (CMB) radiation. In \secref{sec:M1} we compute the background cosmology, determining the evolution of the Universe in general. \secref{sec:M2} focuses on the behaviour of particles in the Universe, mainly focusing on production of neutral Hydrogen. In \secref{sec:M3} we consider cosmological perturbation theory, and study how tiny perturbation of the content of the Universe evolves on different scales. Finally, in \secref{sec:M4}, we use the perturbation quantities to compute the CMB power spectrum.  
+
+Throughout this paper, we will use cosmological parameters from the latest Planck data {Planck2020}, unless otherwise mentioned,
+\section{Fiducial parameters} \label{app:M1:fiducial_parameters}
+The parameter values we use in this report are 
+\begin{equation} \label{eq:Appendix:Fiducial_cosmology_parameters}
+      \begin{split}
+            h &= 0.67, \\ 
+            \tcmb &= 2.7255\unit{K}, \\
+            \neff &= 3.046, \\
+            \obn &= 0.05, \\
+            \ocdmn &= 0.267,\\
+            \okn &=0,\\
+            \onun &= \neff \cdot \frac{7}{8} \pclosed{\frac{4}{11}}^{4/3} \ogn, \\
+            \oln &= 1 - (\okn + \obn + \ocdmn + \ogn + \onun), \\
+            n_s &= 0.965,\\
+            A_s &= 2.1\cdot 10^{-9},\\
+            Y_p &= 0.245, \\
+            z_\mathrm{reion} &= 8, \\
+            \Delta z_\mathrm{reion} &= 0.5, \\
+            z_\mathrm{Hereion} &= 3.5, \\
+            \Delta z_\mathrm{Hereion} &= 0.5, \\
+      \end{split}
+\end{equation}   
+
+
+%==============================================
+%     MILESTONE 1
+%==============================================
+\input{../milestone1/m1tex/milestone1.tex}
+
+
+%==============================================
+%     MILESTONE 2
+%==============================================
+\input{../milestone2/m2tex/milestone2.tex}
+
+
+%==============================================
+%     MILESTONE 3
+%==============================================
+\input{../milestone3/m3tex/milestone3.tex}
+
+
+%==============================================
+%     MILESTONE 4
+%==============================================
+\input{../milestone4/m4tex/milestone4.tex}
+
+\section{Conclusions}
+
+Write a short summary and conclusion in the end. 
+
+\begin{acknowledgements}
+      I would like to thank Soria Moria trafikkskole for their patience regarding my lack of driving lessons, allowing me to focus on this report. I would also like to thank my mom for helping me move today (1st of June) as I eventually failed the practical driving test, following the forementioned lack of practice.     
+\end{acknowledgements}
+
+
+\clearpage
+% \bibliographystyle{aa}
+\bibliography{ref}
+% \bibliographystyle{abbrvnat}
+\bibliographystyle{aasjournal}
+% \bibliographystyle{unsrtnat}
+
+
+\end{document}
