@@ -27,17 +27,17 @@ At late times, when the baryon temperature gets low, the exponent term in \Eqref
 \subsubsection{Optical depth and visibility function} \label{sssec:M2:implementations:optical_depth}
 With $\ne$ we can then solve \Eqref{eq:M2:theory:tau_ODE} for $\tau(x)$ with the aforementioned initial condition of $\tau(x=0)=0$. We therefore integrate backwards, starting from $x=0$. The visibility function is now easily obtained, as $\tau'(x)$ is given analytically by \Eqref{eq:M2:theory:tau_ODE}. From this, we get immediately $\gx$. 
 
-We also need the second derivative of $\tau$, as well as the first two derivatives of $\g$. For $\tau''(x)$, we compute it from numerically differentiating the $\tau'(x)$ data. \footnote{Couldn't we just compute it analytically? I get a tiny "bump" in $\tau''$ near $X_e^\mathrm{tol}$, and I don't know if this will cause problems later on, and therefore didn't want to spend too much time on it if wasn't needed.} We use this to compute 
+We also need the second derivative of $\tau$, as well as the first two derivatives of $\g$. For $\tau''(x)$, we compute it from numerically differentiating the $\tau'(x)$ data. We use this to compute 
 \begin{equation} \label{eq:M2:implementations:dg_dx}
     \g'(x) = \pclosed{\tau'(x)^2 - \tau''(x)} e^{-\tau(x)}, 
 \end{equation}
-and obtain $\g''(x)$ by numerically differentiating $\g'(x)$. This is done to avoid potential errors that may occur when numerically computing the second derivative of $\g(x)$, if $\g(x)$ is somewhat ill-behaved at certain times. \footnote{I don't know if this is useful, or helps, at all. I don't know if we care about the derivatives at $x$-values where this might be an issue.} 
+and obtain $\g''(x)$ by numerically differentiating $\g'(x)$. This is done to avoid potential errors that may occur when numerically computing the second derivative of $\g(x)$, if $\g(x)$ is somewhat ill-behaved at certain times. 
 
 \subsubsection{Determining the time of recombination and decoupling} \label{sssec:M2:implementations:determining_the_time_of_recombination_and_decoupling}
 To estimate the times when recombination takes place, we define this as 
 \begin{equation}
-    \Xe(x=x_\mathrm{recombination}) = 0.1,  
+    \Xe(x=x\rec) = 0.1,  
 \end{equation}
 where the value $\Xe=0.1$ is chosen arbitrarily. 
 
-For decoupling, we find $x_\mathrm{decoupling}$ as the point where $\g'(x_\mathrm{decoupling})=0$. However, we limit the time values to $x\in[x_0\pm0.1]$, where $x_0$ is defined by $\tau(x_0)=1$. This is done to avoid $x$ values where $\g(x)=0$. 
+For decoupling, we find $x\dec$ as the point where $\tau(x\dec)=1$.  

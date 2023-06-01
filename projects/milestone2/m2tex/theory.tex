@@ -16,17 +16,17 @@ is the Thompson cross-section and $a$ is the scale factor. $\alpha$ is the fine-
 \begin{equation} \label{eq:M2:theory:tau_ODE}
     \dv{\tau}{x} = - \frac{\ne \sigma_T}{H},
 \end{equation}
-which we can solve numerically once we know $n_e$. The initial condition is $\tau(x=0)=0$, as the universe is transparent today.
+which we can solve numerically once we know $n_e$. The initial condition is $\tau(x=0)=0$, as we then integrate over a medium of zero extent. The quantity $\tau'$ can loosely be viewed as a cosmological scattering rate, as it gives a measure of the number of scatterings a photon undergoes over the course of a Hubble time $H^{-1}$. In \secref{sec:M4} we discuss how this quantity is crucial to understanding small scale features of the CMB.   
 
 From the optical depth, we obtain the so-called \textit{visibility function} \cite[Eq. (8)]{callin} 
 \begin{equation} \label{eq:M2:theory:g_tilde_of_x_definition}
     \gx = -\tau' e^{-\tau},
 \end{equation}
-which is normalized as 
+which has the property 
 \begin{equation} \label{eq:M2:theory:g_tilde_normalization}
     \int_{-\infty}^0\dd x\,\gx = 1.
 \end{equation}
-The normalization means that $\gx$ is a probability distribution, and we may interpret it as the probability of an observed CMB photon today having experienced its last scattering at a time $x$. The visibility function is sharply peaked around the time when the photons decouple from the baryons, and is often referred to as the surface of last scattering. We may therefore use the peak of $\gx$ to estimate the time when decoupling took place in the early universe. 
+This implies that $\gx$ can be interpreted a probability distribution, namely the probability of an observed CMB photon today having experienced its last scattering at a time $x$. The visibility function is sharply peaked around the time when the photons decouple from the baryons, and is often referred to as the surface of last scattering. We may therefore use the peak of $\gx$ to estimate the time when decoupling took place in the early universe. The time when recombination and decoupling takes place marks the time of when the Universe became transparent. In the very early Universe, the optical depth was high, meaning that no photons were tightly coupled to baryons, and thus not able to travel unimpeded. The time of decoupling thus marks the earliest period of the Universe that we are able to observe today. The CMB photons we observe today is therefore light emerging from the plasma at a time when $\tau\sim1$. How the optical depth evolves is thus crucial to understand and compute the evolution of the early Universe, which is the topic of the next two sections.   
 
 \subsubsection{Electron density} \label{sssec:M2_electron_density}
 The final thing we need to compute $\tau$ and $\g$ is the number density of free electrons. To compute the evolution of free electrons, we have to consider the Boltzmann equation \citep[Eq. (3.19)]{Dodelson}
@@ -35,7 +35,7 @@ The final thing we need to compute $\tau$ and $\g$ is the number density of free
 \end{equation}
 where $f$ is the distribution function and $C[f]$ is a collision term. 
 
-We will not consider the full Boltzmann equation, but an approximated version relevant for the recombination. Following the notation and definitions from \cite[Eq. (4.5)-(4.9)]{Dodelson}, the equation we consider is given as  
+We will consider the zeroth order of the Boltzmann equation, which is the relevant equation for the scope of our analysis of recombination. Following the notation and definitions from \cite[Eq. (4.5)-(4.9)]{Dodelson}, the equation we consider is given as  
 \begin{equation} \label{eq:M2:theory:Boltzmann_equation_four_particles_scale_factor}
     a^{-3}\dv{(n_1 a^3)}{t} = \equilibriumn[1] \equilibriumn[2] \expval{\sigma v} \BBclosed{\frac{n_3 n_4}{\equilibriumn[3] \equilibriumn[4]} - \frac{n_1 n_2}{\equilibriumn[1] \equilibriumn[2]}},
 \end{equation}
@@ -53,7 +53,7 @@ where $n_b$ is the total baryon density of the universe. Since the universe must
 \begin{equation} \label{eq:M2:theory:helium_baryon_number_density}
     n_b \approx \frac{\rho_b}{m_H} = \frac{\obn \rhocn}{m_H a^3},
 \end{equation}
-where $\rhocn\equiv \frac{ H_0^2}{8\pi G}$ is the critical density of the universe today and $m_H$ is the Hydrogen mass. 
+where $\rhocn\equiv \frac{3 H_0^2}{8\pi G}$ is the critical density of the universe today and $m_H$ is the Hydrogen mass. 
 
 Before recombination occurs, the interaction rates greatly exceed the expansion rate of the universe, and for \Eqref{eq:M2:theory:Boltzmann_equation_four_particles_scale_factor} to be valid we must have that 
 \begin{equation} \label{eq:M2:theory:Boltzmann_equation_recombination_approximation}
@@ -85,7 +85,7 @@ where $C_r(\Tb),\: \beta(\Tb)$ and $\alpha^{(2)}(\Tb)$ are quantities related to
         \phi_2(\Tb) &= 0.448\ln(\epsn/\Tb). \label{eq:M2:theory:peebles:phi_2} 
     \end{align}
 \end{subequations}
-The main reason behind these additional equations is that Hydrogen production is inefficient at $\Tb\simeq\epsn$. Direct recombination to the Hydrogen ground state is likely to produce a photon with energy greater than $\epsn$, which will ionize another nearby Hydrogen atom, resulting in no net Hydrogen production. Recombination is achieved when an electron and proton combine to an excited Hydrogen atom, followed by the atom's decay into the ground state, which is a slow process.
+The main reason behind these additional equations is that Hydrogen production is inefficient at $\Tb\simeq\epsn$. Direct recombination to the Hydrogen ground state is likely to produce a photon with energy greater than $\epsn$, which will ionize another nearby Hydrogen atom, resulting in no net Hydrogen production. Recombination is achieved when an electron and proton combine to an excited Hydrogen atom, followed by the atom's decay into the ground state, which is a slow process. 
 
 In \secref{sssec:M2:implementations:solving_peebles} we discuss how combine the Saha and Peebles equation to compute $\Xe$.
 
@@ -98,7 +98,7 @@ The total co-moving distance a sound wave in this plasma could have travelled si
 \begin{equation} \label{eq:M2:theory:sound_horizon_integral}
     s(x)=\int_{-\infty}^x \frac{\dd x' c_s}{\H}.
 \end{equation}
-From this we can compute the sound horizon at decoupling, $r_s = s(x_\mathrm{rec})$, which is an important quantity of the CMB. Thus, we have an additional ODE to solve, 
+From this we can compute the sound horizon at decoupling, $r_s = s(x\rec)$, which is an important quantity of the CMB. Thus, we have an additional ODE to solve, 
 \begin{equation} \label{eq:M2:theory:sound_horizon_ODE}
     \dv{s(x)}{x} = \frac{c_s}{\H},
 \end{equation}
