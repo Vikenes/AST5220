@@ -331,13 +331,19 @@ class ExpansionHistory:
 
 
     def best_fit_values(self, burn=1000):
-        chi2, h, OmegaM, OmegaK = self.load_supernovafit(burn)
-        H0 = h * (100*u.km / u.s / u.Mpc)
+        # chi2, h, OmegaM, OmegaK = self.load_supernovafit(burn)
+        # H0 = h * (100*u.km / u.s / u.Mpc)
 
-        bestfit = np.argmin(np.abs(chi2/self.N_SN_data - 1))
-        print(H0[bestfit])
-        print(OmegaM[bestfit])
-        print(OmegaK[bestfit])
+        # bestfit = np.argmin(np.abs(chi2/self.N_SN_data - 1))
+        print(np.min(self.H0_SN));exit()
+        H0_min = self.H0_SN[self.chi2_1sigma].min()
+        H0_max = self.H0_SN[self.chi2_1sigma].max() 
+        print(self.H0_SN[self.bestfit_idx] - H0_min)
+        print(self.H0_SN[self.bestfit_idx] - H0_max)
+        print(np.std(self.H0_SN))
+
+        # print(OmegaM[bestfit])
+        # print(OmegaK[bestfit])
 
         
         exit()
@@ -366,22 +372,22 @@ class ExpansionHistory:
 Cosmology = ExpansionHistory("cosmology_new.txt")
 
 SAVE = True 
-TEMP = True 
+# TEMP = True 
 
 ### COMPLETE ### 
-Cosmology.plot_dH_ddH_over_H()
-Cosmology.plot_eta_H_over_c()
-Cosmology.plot_Hp()
-Cosmology.plot_eta_t()
-Cosmology.plot_omegas()
-Cosmology.plot_dL(fname_dL_fitted="bestfit_dL.txt", fname_dL_planck="planck_dL.txt")
-Cosmology.plot_supernova_fit_omegas()
-Cosmology.plot_supernova_fit_H0_pdf()
+# Cosmology.plot_dH_ddH_over_H()
+# Cosmology.plot_eta_H_over_c()
+# Cosmology.plot_Hp()
+# Cosmology.plot_eta_t()
+# Cosmology.plot_omegas()
+# Cosmology.plot_dL(fname_dL_fitted="bestfit_dL.txt", fname_dL_planck="planck_dL.txt")
+# Cosmology.plot_supernova_fit_omegas()
+# Cosmology.plot_supernova_fit_H0_pdf()
 
+Cosmology.supernova_bestfit_table()
 ### CHECK ### 
 
-# Cosmology.best_fit_values()
 
-# Cosmology.supernova_bestfit_table()
+# Cosmology.best_fit_values()
 # Cosmology.supernova_plot_chi2()
 

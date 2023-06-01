@@ -434,7 +434,7 @@ def plot_fit_posterior_pdf(y, bins, fname, mean=None, gaussian=None, save=False,
 
 def bestfit_supernova_table(best_fit, standard_deviations, save=False):
     # Define the variable names, best fit values, and standard deviations
-    variables = [r'$H_0$', r'$\Omega_{m0}$', r'$\Omega_{k0}$', r'$\chi^2/N$']
+    variables = [r'$\hat{H}_0$', r'$\hat{\Omega}_{m0}$', r'$\hat{\Omega}_{k0}$', r'$\chi_\mathrm{min}^2/N$']
     standard_deviations[0:3] = np.round(standard_deviations[0:3], 4)
     best_fit.append(best_fit.pop(0))
     best_fit = np.round(best_fit, 3)
@@ -453,7 +453,7 @@ def bestfit_supernova_table(best_fit, standard_deviations, save=False):
     df = df.drop(columns='Standard Deviation')
 
     # Set table info 
-    table_caption   = "Best fit parameters from supernova data"
+    table_caption   = "The parameter values resulting in the lowest value of $\chi^2$, obtained from fitting to supernova data."
     table_name      = "best_fit_supernova"
     table_label     = "tab:M1:results:" + table_name 
     table_fname     = table_name + ".tex"
@@ -469,7 +469,7 @@ def bestfit_supernova_table(best_fit, standard_deviations, save=False):
                               escape=False,
                               caption=table_caption,
                               label=table_label,
-                              position="h",
+                              position="ht",
                               buf=buffer)
     
     # Print the LaTeX table
