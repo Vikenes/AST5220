@@ -70,7 +70,7 @@ The initial condition we have is $\eta(-\infty)=0$. Noting from \Eqref{eq:M1:the
     \eta(x_\mathrm{start}) \approx \int_{-\infty}^{x_\mathrm{start}} \frac{c\,\dd x'}{H_0\sqrt{\oradn}} e^{x'} = \frac{c}{\H(x_\mathrm{start})}. \label{eq:M1:theory:eta_of_xstart_analytical_approximation}
 \end{align} 
 %
-Note that $\eta(x)\Hx/c\to 1$ at low $x$, which provides a natural way of validating our implementation.    
+Note that $\eta(x)\Hx/c\to 1$ at low $x$, which provides a natural way of validating our implementation. $\eta(x)$ is related to the particle horizon, which is the comoving distance light could have travelled since the Big Bang, which equals $\eta c$. It is therefore often referred to as the comoving horizon, as it determines the scale over which there have been causal contact in the Universe. This will have great impact on how structures grow in the early Universe, as we shall see in \secref{sec:M3} and \secref{sec:M4}. Its value today, $\eta_0\equiv\eta(t_0)$, represents the furthest distance from which we can receive information from the past, and it therefore defines the observable Universe.     
 
 For the cosmic time, $t$, starting from $H=\dot{a}/a$ and applying the chain rule yields the desired differential equation for $t(x)$, which we will solve numerically, 
 \begin{equation}
