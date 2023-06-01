@@ -176,7 +176,7 @@ class Recombination:
         else:
             fname = self.rec_dec_file
 
-        x, z, t, r = np.loadtxt(data_path + fname, skiprows=1, usecols=(1,2)) 
+        x, z, t, r = np.loadtxt(data_path + fname, skiprows=1, usecols=(1,3)) 
 
         
         t       = (t * u.s).to(self.time_unit).value 
@@ -210,7 +210,7 @@ x_rec_saha = rec_saha_only.xrec
 
 
 
-# SAVE        = True
+SAVE        = True
 # TEMP        = True
 # RECOMBINATION  = True 
 
@@ -218,9 +218,9 @@ x_rec_saha = rec_saha_only.xrec
 
 # rec.plot_tau_with_derivatives()
 # rec.plot_visibility_functions()
-rec.compare_Xe(x_saha=x_saha, Xe_saha=Xe_saha, xrec_saha=x_rec_saha)
-# rec.make_table(True)
-# rec.make_table()
+# rec.compare_Xe(x_saha=x_saha, Xe_saha=Xe_saha, xrec_saha=x_rec_saha)
+rec.make_table(True)
+rec.make_table()
 
 exit()
 

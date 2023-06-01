@@ -43,7 +43,7 @@ plt.rcParams['font.family'] = 'Times New Roman'
 project_path = "/home/vetle/Documents/master_studies/subjects/V23/AST5220/projects/milestone2"
 
 data_path = project_path + "/data/"
-latex_path = project_path + "/report/tables/"
+latex_path = project_path + "/m2tex/tables/"
 pdf_path = project_path + "/analysis/figures/"
 png_path = pdf_path + "temp/" 
 
@@ -249,7 +249,7 @@ def time_table(x, z, t, r, saha=False, save=False, temp=False):
         data = np.array([row_labels, x, z, t, r]).T 
 
 
-    table_caption   = "Times when decoupling and recombination occurs, computed from the " 
+    table_caption   = "Times when decoupling, $\tau=1$ and recombination, $X_e=0.1$, occurs, computed from the " 
     table_caption   += method + " equation."
 
     table_name      = "rec_and_dec_time_table_" + method
